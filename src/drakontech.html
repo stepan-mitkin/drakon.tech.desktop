@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'unsafe-inline' 'self'; img-src 'self' data:">
@@ -20,8 +20,14 @@
 <link rel="stylesheet" href="static/libs/dark3.css" />
 <link rel="stylesheet" href="static/libs/night2.css" />
 
-<title>Drakon.Tech</title>
-
+<title>DrakonTech</title>
+<style>
+*, *:before, *:after {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+</style>
 
 <style>
 /* http://meyerweb.com/eric/tools/css/reset/ 
@@ -581,38 +587,16 @@ input:focus {
 
 
 
+<script src="static/js/strings.js"></script>
 <script src="static/CallTrace.js"></script>
 <script src="static/HtmlUtils.js"></script>
-
-<script>
-
-var pagePanic = function(text) {
-	window.onbeforeunload = null
-	HtmlUtils.hide("loading")
-	HtmlUtils.hide("wide")
-	HtmlUtils.hide("working")
-	HtmlUtils.hide("popup")
-	if (gUserId) {
-		HtmlUtils.show("panicDashboard", "block")
-	} else {
-		HtmlUtils.show("panicHome", "block")
-	}
-	HtmlUtils.show("panic", "inline-block")
-	document.getElementById("panic").style.zIndex = 1000
-	HtmlUtils.setText("panic_message", text)		
-}
-
-window.onerror = pagePanic
-
-</script>
-
-<script src="static/static/libs/mousetrap.js"></script>
-<script src="static/static/libs/fontfaceobserver.js"></script>
-<script src="static/static/libs/codemirror.js"></script>
-<script src="static/static/libs/javascript.js"></script>
-<script src="static/static/libs/css.js"></script>
-<script src="static/static/libs/xml.js"></script>
-<script src="static/static/libs/htmlmixed.js"></script>
+<script src="static/libs/mousetrap.js"></script>
+<script src="static/libs/fontfaceobserver.js"></script>
+<script src="static/libs/codemirror.js"></script>
+<script src="static/libs/javascript.js"></script>
+<script src="static/libs/css.js"></script>
+<script src="static/libs/xml.js"></script>
+<script src="static/libs/htmlmixed.js"></script>
 
 <script src="static/appedit.js"></script>
 
@@ -639,46 +623,9 @@ window.onerror = pagePanic
 <script src="static/Ide3.js"></script>
 <script src="static/Ide3Logic.js"></script>
 
-<script src="static/static/libs/canvas2svg.js"></script>
-
-<script>
-
-var overlayOn = false
-var overlayItems = []
-
-
-var onCaptureLoadCallback = null
-
-var ide = null
-var logic = null
-
-
-ide = new Ide3(window, document, translate, gUserId, pagePanic)
-logic = new Ide3Logic(gUserId, ide, translate)
-ide.logic = logic
-
-
-window.onerror = ide.onError
-
-onCaptureLoadCallback = function() {
-	ide.onCaptureLoadCallback(grecaptcha)
-}
-
-window.onpopstate = function (e) {
-	if (e.state) {
-		ide.onStateChange(e)	
-	}
-}
-
-window.onresize = ide.orderResize	
-
-window.onmouseout = function(evt) { evt.preventDefault() }
-
-ide.init()
-
-
-
-</script>
+<script src="static/libs/canvas2svg.js"></script>
+<script src="static/js/local.js"></script>
+<script src="static/js/main.js"></script>
 
 </body>
 </html>
