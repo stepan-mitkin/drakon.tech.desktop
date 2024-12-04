@@ -3038,14 +3038,14 @@ setFont(tfont)
 	gMoveAllImage.onload = function() {
 		gMoveAllImageReady = true
 	}
-	gMoveAllImage.src = "/static/images/4-way-pan.png"
+	gMoveAllImage.src = "static/images/4-way-pan.png"
 
 	gVideoImage = new Image()
 	gLinkImage = new Image()
 	gPictureImage = new Image()
-	gVideoImage.src = "/static/images/video-s.png"
-	gLinkImage.src = "/static/images/link-s.png"
-	gPictureImage.src = "/static/images/picture-s.png"
+	gVideoImage.src = "static/images/video-s.png"
+	gLinkImage.src = "static/images/link-s.png"
+	gPictureImage.src = "static/images/picture-s.png"
 
 
 

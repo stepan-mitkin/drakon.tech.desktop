@@ -203,8 +203,20 @@
             ]),
         
             createStyle(".recent-item", [
-                "margin", "5px 0",
+                "padding", "10px",
+                "user-select", "none",
+                "cursor", "pointer",
+                "line-height", "1.3"
             ]),
+            createStyle(".recent-name", [
+                "font-weight", "bold"
+            ]),
+            createStyle(".recent-value", [
+                "color", "gray"
+            ]),
+            createStyle(".recent-item:hover", [
+                "background", "#f0f0f0"
+            ]),            
         
             createStyle(".button-div", [
                 "margin", "10px 0",
@@ -240,8 +252,8 @@
     function addRecentButton(recent, parent) {
         const recentItem = div("recent-item");
         var last = getLastStage(recent)
-        recentItem.add(div("recent-name", {text:last}))
-        recentItem.add(div("recent-value", {text:recent}))
+        add(recentItem, div("recent-name", {text:last}))
+        add(recentItem, div("recent-value", {text:recent}))
         var callback = function() {
             tryOpenFolder(recent)
         }
@@ -249,8 +261,33 @@
         add(parent, recentItem);
     }
 
-    function openFolder() {
-        console.log("openFolder")
+    async function openFolder() {
+        var folder = await backend.chooseFolder()
+        if (!folder) {return}
+        await tryOpenFolder(folder)
+    }
+
+    async function addToRecent(folder) {
+        var recent = await backend.getRecent()
+        var index = recent.indexOf(folder)
+        if (index !== -1) {
+            recent.splice(index, 1)
+        }
+        recent.unshift(folder)
+        while (recent.length > 20) {
+            recent.pop()
+        }
+        await backend.setRecent(recent)
+    }
+
+    async function tryOpenFolder(folder) {
+        try {
+            var spaceId = await backend.openFolder(folder)
+            await addToRecent(folder)
+            startIde(spaceId)
+        } catch (ex) {
+            console.error(ex)
+        }
     }
 
     function clearRecent(recentDiv) {
@@ -258,7 +295,34 @@
         clear(recentDiv)
     }
 
+    function addOption(select, value, text) {
+        var option = document.createElement("option")
+        addText(option, text)
+        option.value = value
+        add(select, option)
+    }
+
+    function createLanguageCombo(container, recent) {
+        var select = document.createElement("select")
+        addOption(select, "en", "English")
+        addOption(select, "ru", "Русский")
+        select.value = getLanguage()
+        select.addEventListener("change", () => { 
+            var language = select.value
+            setLanguage(language)
+            backend.updateSettings("language", language)
+            renderStartPage(container, recent)            
+        })
+        return div({
+                display: "inline-block"
+            },
+            div({text:"Language", display: "inline-block", "margin-right": "10px"}),
+            select
+        )        
+    }
+
     function renderStartPage(container, recent) {
+        clear(container)
         var motherSite = "https://drakonhub.com/"
         var logoUrl = "static/images/drakosha-logo-text-126.png"
         var logoHeight = 63
@@ -278,6 +342,11 @@
         add(headerLink, logo);
         add(header, headerLink);
         add(container, header);
+        var languageCombo = createLanguageCombo(container, recent)
+        languageCombo.style.position = "absolute"
+        languageCombo.style.left = "5px"
+        languageCombo.style.top = "5px"
+        add(container, languageCombo)
 
         add(
             container,
@@ -302,7 +371,7 @@
         // Add "Open folder..." button
         const openFolderButtonDiv = div("button-div");
         const openFolderButton = div("ui2-default-button");
-        openFolderButton.innerText = translate("Open folder...");
+        openFolderButton.innerText = translate("Open folder") + "...";
         openFolderButton.onclick = openFolder; // Set click handler
         add(openFolderButtonDiv, openFolderButton);
         add(body, openFolderButtonDiv);
@@ -336,6 +405,8 @@
 
     async function main() {
         initStyles()
+        var settings = await backend.getSettings()
+        setLanguage(settings.language)
         var recent = await backend.getRecent()
         removeExisting("loading")
         var wide = get("wide")
@@ -349,6 +420,24 @@
         renderStartPage(wide, recent)
     }
 
+    function startIde(spaceId) {
+        var wide = get("wide")
+        clear(wide)        
+        var userId = "Dar Veter"
+        var pagePanic = function(err) {console.error(err)}
+        var ide = new Ide3(window, document, translate, userId, pagePanic)
+        var logic = new Ide3Logic(spaceId, userId, ide, translate)
+        ide.logic = logic
+        
+        
+        window.onerror = ide.onError
+       
+        window.onresize = ide.orderResize	
+        
+        window.onmouseout = function(evt) { evt.preventDefault() }
+        
+        ide.init()    
+    }    
 
     main()
 

@@ -508,7 +508,10 @@ var gStringsEn = {
 	"ERR_MODULE_WITH_THIS_NAME_ALREADY_ADDED": "A module with this name was already added",
 	"ERR_SCRIPT_MISSING": "The %SCRIPT% keyword is missing in HTML",
 	"MES_DRAKONTECH_CLOSED": "Drakon.Tech will shut down forever on December 7, 2024",
-	"ERR_PLEASE_PROVIDE_HTML": "HTML is missing"	
+	"ERR_PLEASE_PROVIDE_HTML": "HTML is missing",
+	"Open folder": "Open folder",
+	"Recent": "Recent",
+	"Clear recent": "Clear recent"
 }
 
 var gStringsRu = {
@@ -1023,7 +1026,10 @@ var gStringsRu = {
 	"ERR_MODULE_WITH_THIS_NAME_ALREADY_ADDED": "Модуль с этим именем уже добавлен",
 	"ERR_SCRIPT_MISSING": "Ключевое слово %SCRIPT% отсутствует в HTML-коде",
 	"MES_DRAKONTECH_CLOSED": "Drakon.Tech будет навсегда отключен 7 декабря 2024 г.",
-	"ERR_PLEASE_PROVIDE_HTML": "HTML-код отсутствует"
+	"ERR_PLEASE_PROVIDE_HTML": "HTML-код отсутствует",
+	"Open folder": "Открыть папку",
+	"Recent": "Недавнее",
+	"Clear recent": "Очистить недавнее"
 }
 
 function translate(text) {

@@ -2905,7 +2905,7 @@ function setHeight(div, height) {
     bottomBorder = stripPx(style.borderBottomWidth)
     height2 = height - topPadding - bottomPadding -
       topBorder - bottomBorder
-    style.height = height2 + "px"
+    style.height = height + "px"
 }
 
 function setListRowFormat(row) {

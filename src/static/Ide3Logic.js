@@ -1,14 +1,14 @@
-function Ide3Logic(gUserId, browser, translate) {
+function Ide3Logic(gSpaceId, gUserId, browser, translate) {
 
 var FEATURE_SAVE_PROJECT = true
-var Root = "https://drakon.tech/"
+var Root = "https://drakonhub.com/"
 var IDE = "ide"
 
 var MinSplitter = 30
 var ProjectsPath = "/" + IDE + "/spaces"
 
 var globs = null
-var AppName = "Drakon.Tech"
+var AppName = "DrakonTech"
 
 var PollInterval = 1
 var MaxSaveItems = 30
@@ -503,9 +503,6 @@ function DescriptionChanger_ShowDialog_onData(self, data) {
     browser.hideWorking()
     var old = data.description || ""
     var title = translate("MES_EDIT_DESCRIPTION")
-    if (self.folderId == "1") {
-        title += (": " + self.spaceId)
-    }
     var onSave = function(desc) {
         self.onData(desc)
     }
@@ -1169,14 +1166,6 @@ function FolderGetter_GettingFolder_onData(self, data) {
         [self.id, self.src]
     )
     addToCache(self.id, data, null)
-    if (self.ids.folderId == "1") {
-        
-    } else {
-        renameEverywhere(
-            self.id,
-            data.name
-        )
-    }
     complete(self, data)
     self.state = null;
 }
@@ -1190,10 +1179,10 @@ function FolderGetter_Start_onData(self, data) {
     self.id = data.id
     self.src = data.src
     self.ids = parseId(self.id)
-    var url = "/api/visit/" + 
-     self.ids.spaceId + "/" + 
-     self.ids.folderId
-    browser.sendGet(url, self)
+    backend.getFolder(
+    	self.ids.spaceId,
+    	self.ids.folderId
+    ).then(result => self.onData(result))
     self.state = "GettingFolder";
 }
 
@@ -3203,7 +3192,7 @@ function addSpaceToCache(space) {
         space.space_id,
         "1"
     )
-    space.name = space.space_id
+    space.name = space.name
     space.id = "1"
     space.type = "folder"
     addToCache(id, space, null)
@@ -4778,11 +4767,7 @@ function getLeftSplitterWidth() {
 }
 
 function getNormalName(folder) {
-    if (isSpace(folder)) {
-        return folder.space_id
-    } else {
-        return folder.name
-    }
+    return folder.name
 }
 
 function getParentFolder(folder) {
@@ -5095,14 +5080,14 @@ function idToServerFolder(id) {
 }
 
 function init() {
-    var parts, target
+    var target
     if (browser.getWidth() >= 700) {
         globs.wide = true
     } else {
         globs.wide = false
     }
-    globs.isDev = isDevUrl()
-    globs.isTryMe = isTryMeUrl()
+    globs.isDev = false
+    globs.isTryMe = false
     globs.clipboard = new browser.Clipboard()
     browser.initControls(
         globs.wide,
@@ -5112,25 +5097,12 @@ function init() {
     resetSearch()
     browser.widgets.foreach(putAsidePath)
     browser.widgets.foreach(putAsideSearches)
-    parts = parsePath()
     target = {
         onData : browser.onInitCompleted,
         onError : panic
     }
     loadSplitterValues()
-    if (parts.length >= 2) {
-        initNormal(parts, target)
-    } else {
-        if (parts.length == 0) {
-            if (gUserId) {
-                sv_dashboard(target)
-            } else {
-                browser.goToUrl("/signup")
-            }
-        } else {
-            initTryMe(target)
-        }
-    }
+    sv_folder(gSpaceId, "1", undefined)
 }
 
 function initNormal(parts, target) {
@@ -5824,9 +5796,6 @@ function makeTextListItem(list, textId, action, id, image) {
 }
 
 function makeTitle(spaceId, folderId, name) {
-    if (folderId == "1") {
-        name = spaceId
-    }
     var title = name
     return title
 }
@@ -6911,11 +6880,22 @@ function renameInPath(name, id) {
 }
 
 function requestAccount(target) {
-    browser.sendGet("/api/account", target)
+    var folder
+    backend.getFolder(gSpaceId, "1").then(
+    	folder => {
+    		target.onData({
+    			name: "user",
+    			spaces_access: [folder]
+    		})
+    	}
+    )
 }
 
 function requestHistory(target) {
-    browser.sendGet("/api/recent", target)
+    var data
+    backend.getHistory().then(
+    	data => target.onData(data)
+    )
 }
 
 function requestTheme(target) {
@@ -8019,17 +7999,6 @@ function showSpacesInFolder() {
 function showSpacesInTree() {
     var item, items, tree
     items = []
-    if (globs.user.userId) {
-        item = {
-            id : "dashboard",
-            text : translate("MES_DASHBOARD"),
-            icon : "dashboard.png",
-            rank : 5,
-            isFolder : false,
-            kids : []
-        }
-        items.push(item)
-    }
     var _ind429 = 0;
     var _col429 = globs.user.spaces;
     var _keys429 = Object.keys(_col429); 
@@ -8043,7 +8012,7 @@ function showSpacesInTree() {
         var spaceId = _keys429[_ind429]; var space = _col429[spaceId];
         item = {
             id : makeId(spaceId, "1"),
-            text : spaceId,
+            text : space.name,
             icon : "workspace-s2.png",
             rank : 10,
             isFolder : true,
@@ -8051,17 +8020,6 @@ function showSpacesInTree() {
         }
         items.push(item)
         _ind429++;
-    }
-    if (globs.user.userId) {
-        item = {
-            id : "trash",
-            text : translate("MES_TRASH"),
-            icon : "trash-s2.png",
-            rank : 20,
-            isFolder : false,
-            kids : []
-        }
-        items.push(item)
     }
     tree = getWidget("tree")
     tree.setChildren(

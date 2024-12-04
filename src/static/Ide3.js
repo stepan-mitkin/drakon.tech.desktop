@@ -2,7 +2,7 @@
 
 function Ide3(window, document, translate, gUserId, pagePanic) {
 
-var Root = "https://drakon.tech/"
+var Root = "https://drakonhub/"
 var self = this
 
 var globs = null
@@ -18,11 +18,11 @@ var TopPanelHeight = 52
 var DockHeaderColor = "#E2EDF5"
 var DarkBackground = "#455A64"
 var BorderRadius = "4px"
-var ImagePath = "/static/images/"
+var ImagePath = "static/images/"
 
 var SearchHeight = 30
 
-var logonCtrl = new Logon(window, document, translate)
+var logonCtrl = undefined
 
 var SpecialBack = "linear-gradient(coral, #CD5B45)"
 var NormalBack = "linear-gradient(#758A94, #455A64)"
@@ -1384,7 +1384,6 @@ function createState() {
     var state = {
     	tt: new ToolTip(window, document),
     	pop: new Popup(window, document),
-    	logon: new Logon(window, document, translate),
     	widgets: new DraWidgets(window, document, translate, 1, ImagePath),
     	loadedFonts: {},
     	clip: {},
@@ -6541,8 +6540,6 @@ function wrapShortcut(action, actionName) {
 
 globs = createState()
 self.widgets = globs.widgets
-
-logonCtrl.onError = resizeCentral
 
 
 exportMethod(this, init, "init")
