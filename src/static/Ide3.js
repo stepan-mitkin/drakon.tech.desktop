@@ -83,22 +83,6 @@ function addClickable(popup, text, action, style) {
     )
 }
 
-function addDrakonHubClosed(parent) {
-    if (Config.dead) {
-        var banner = make(parent, "div")
-        banner.style.padding = "10px"
-        banner.style.fontSize = "30px"
-        banner.style.cursor = "pointer"
-        banner.style.background = "black"
-        banner.style.color = "red"
-        banner.style.border = "solid 2px red"
-        var text = translate("MES_DRAKONTECH_CLOSED")
-        HtmlUtils.setDivText(banner, text)
-        banner.onclick = function() {
-        	goToUrl("/static/dead.html")
-        }
-    }
-}
 
 function addEmpty(text) {
     var popup = globs.search.popup
@@ -1169,27 +1153,6 @@ function createCentralCore(node, centralMachine) {
     resizeCentral()
 }
 
-function createCloseBanner() {
-    if (Config.dead) {
-        var banner = make(document.body, "div")
-        banner.style.display = "inline-block"
-        banner.style.position = "fixed"
-        banner.style.left = "10px"
-        banner.style.bottom = "10px"
-        banner.style.padding = "10px"
-        banner.style.fontSize = "30px"
-        banner.style.zIndex = 1000
-        banner.style.cursor = "pointer"
-        banner.style.background = "black"
-        banner.style.color = "red"
-        banner.style.border = "solid 2px red"
-        var text = translate("MES_DRAKONTECH_CLOSED")
-        HtmlUtils.setDivText(banner, text)
-        banner.onclick = function() {
-        	goToUrl("/static/dead.html")
-        }
-    }
-}
 
 function createEditor() {
     var editor = new EditorCtrl(window, document, "middle_diagram", gUserId)
@@ -1759,7 +1722,7 @@ function getDateString() {
 }
 
 function getDrakosha() {
-    return "/static/drakosha132.png"
+    return "static/drakosha132.png"
 }
 
 function getEditor() {
@@ -1769,7 +1732,7 @@ function getEditor() {
 function getExample() {
     var search = Utils.parseSearch(window.location.search)
     var example = search.example || "example01"
-    return "/static/" + example + ".json"
+    return "static/" + example + ".json"
 }
 
 function getHeight() {
@@ -1872,7 +1835,7 @@ function getRightSplitterWidth() {
 }
 
 function getTextMenu() {
-    return "/static/logo-text-s-hub.png"
+    return "static/logo-text-s-hub.png"
 }
 
 function getTotalFound() {
@@ -1990,7 +1953,10 @@ function hidePopup() {
 }
 
 function hideWorking() {
-    display("working", "none")
+    var working = document.getElementById("working")
+    if (working) {
+        working.remove()
+    }    
 }
 
 function init() {
@@ -2001,8 +1967,7 @@ function init() {
     if (globs.isTryMe) {
         //window.onbeforeunload = confirmExit
         window.onbeforeunload = null
-    }
-    createCloseBanner()
+    }    
 }
 
 function initControls(wide, isTryMe) {
@@ -2469,7 +2434,7 @@ function makeFolderListDesc() {
 function makeFontFaceRule(italic, bold, family, file) {
     var text = "@font-face {\n"
     text += "    font-family: '" + family + "';\n"
-    text += "    src: url('/static/fonts/" + file + "');\n"
+    text += "    src: url('static/fonts/" + file + "');\n"
     if (italic) {
         text += "    font-style: italic;\n"
     }
@@ -6229,7 +6194,38 @@ function showUrlScreen(module, urls, machine) {
 }
 
 function showWorking() {
-    display("working", "block")
+    hideWorking()
+    const workingDiv = document.createElement('div');
+    workingDiv.id = 'working';
+    workingDiv.style.position = 'fixed';
+    workingDiv.style.top = '0px';
+    workingDiv.style.left = '0px';
+    workingDiv.style.width = '100vw';
+    workingDiv.style.height = '100vh';
+    workingDiv.style.background = 'rgba(255, 255, 255, 0.0)';
+    workingDiv.style.zIndex = 1000;
+    workingDiv.style.display = 'inline-block';
+    
+
+    // Create the inner div
+    const innerDiv = document.createElement('div');
+    innerDiv.textContent = translate("MES_WORKING");
+    innerDiv.style.display = 'inline-block';
+    innerDiv.style.position = 'absolute';
+    innerDiv.style.top = '50%';
+    innerDiv.style.left = '50%';
+    innerDiv.style.transform = 'translate(-50%, -50%)';
+    innerDiv.style.background = 'white';
+    innerDiv.style.color = 'black';
+    innerDiv.style.padding = '20px';
+    innerDiv.style.textAlign = 'center';
+    innerDiv.style.userSelect = 'none';
+
+    // Append the inner div to the outer div
+    workingDiv.appendChild(innerDiv);
+
+    // Append the outer div to the body
+    document.body.appendChild(workingDiv);
 }
 
 function sortByName(array) {

@@ -8,7 +8,7 @@ var gWidgets = new TabGen4(gName)
 gWidgets.setNextId(id)
 
 
-this.imagePath = imagePath || "/static/images/"
+this.imagePath = imagePath || "static/images/"
 
 
 var TreeIconWidth = 30
@@ -2981,7 +2981,7 @@ function setWidth(div, width) {
     width2 = width - leftPadding -
       rightPadding - leftBorder - 
       rightBorder
-    style.width = width2 + "px"
+    style.width = width + "px"
 }
 
 function showWidget(id) {

@@ -422,6 +422,7 @@
 
     function startIde(spaceId) {
         var wide = get("wide")
+        wide.style.opacity = 0
         clear(wide)        
         var userId = "Dar Veter"
         var pagePanic = function(err) {console.error(err)}
@@ -437,6 +438,10 @@
         window.onmouseout = function(evt) { evt.preventDefault() }
         
         ide.init()    
+        setTimeout(() => {
+            wide.style.transition = "opacity 200ms ease-in-out"
+            wide.style.opacity = 1
+        }, 100)
     }    
 
     main()

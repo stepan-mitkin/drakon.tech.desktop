@@ -6976,11 +6976,7 @@ function runManyOperation(parentId, folders, operation, machine) {
         target : target,
         operation : operation
     }
-    browser.sendPost(
-        "/api/many",
-        payload,
-        machine
-    )
+    backend.changeMany(payload).then(machine.onData)
 }
 
 function save(saver, item) {
@@ -7243,34 +7239,24 @@ function sendBuild(self) {
     )
 }
 
+
+
 function sendCreateDiagram(spaceId, parentFolderId, props, target) {
-    var data, url
-    data = {
+    var data = {
         parent : parentFolderId
     }
     Object.assign(data, props)
-    url = "/api/folder/" + spaceId
-    browser.sendPost(
-        url,
-        data,
-        target
-    )
+    backend.createFolder(spaceId, data).then(target.onData)
 }
 
 function sendCreateFolder(spaceId, parentFolderId, type, name, target, language) {
-    var data, url
-    data = {
+    var data = {
         parent : parentFolderId,
         type : type,
         name : name,
         language : language
     }
-    url = "/api/folder/" + spaceId
-    browser.sendPost(
-        url,
-        data,
-        target
-    )
+    backend.createFolder(spaceId, data).then(target.onData)
 }
 
 function sendDelete(folders, target) {
@@ -7281,11 +7267,7 @@ function sendDelete(folders, target) {
         items : items,
         operation : "delete"
     }
-    browser.sendPost(
-        "/api/many",
-        payload,
-        target
-    )
+    backend.changeMany(payload).then(target.onData)
 }
 
 function sendGetFolder(spaceId, folderId, target) {
@@ -7326,18 +7308,10 @@ function sendInput(self) {
 }
 
 function sendRename(self, spaceId, folderId, name) {
-    var payload, url
-    url = "/api/folder/" + 
-     spaceId + "/" + 
-     folderId
-    payload = {
+    var payload = {
         name : name
     }
-    browser.sendPut(
-        url,
-        payload,
-        self
-    )
+    backend.updateFolder(spaceId, folderId, payload).then(self.onData)
 }
 
 function sendSaveDiagramProps(spaceId, folderId, payload, self) {

@@ -225,7 +225,7 @@ function make(parent, tag) {
 
 function makeImagePath(image) {
     // item 58
-    return "/static/images/" + image
+    return "static/images/" + image
 }
 
 function repos(x, y) {

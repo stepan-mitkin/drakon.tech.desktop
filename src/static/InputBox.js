@@ -147,7 +147,7 @@ function make(parent, tag) {
 }
 
 function makeImagePath(image) {
-    return "/static/images/" + image
+    return "static/images/" + image
 }
 
 function makeWindowTitle(main, headerText) {

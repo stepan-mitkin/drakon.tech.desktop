@@ -93,13 +93,12 @@
         localStorage.setItem(allFoldersKey, JSON.stringify(allFolders))
     }
 
-    function createFolder(spaceId, folderId) {
-        var id = buildId(spaceId, folderId)        
-        var body = {type:"folder"}        
+    function createFolderWithId(spaceId, folderId, body) {
+        var id = buildId(spaceId, folderId)                
         var all = getAllFolders(spaceId)
         all[id] = true
         setAllFolders(spaceId, all)
-        localStorage.setItem(id, JSON.stringify(body))
+        setFolderBody(id, body)        
     }
 
     function replace(str, from, to) {
@@ -120,7 +119,8 @@
         if (!spaceId) {
             spaceId = generateId(projects, "proj")
             projects[folder] = spaceId
-            createFolder(spaceId, "1")
+            var body = {type:"folder"}        
+            createFolderWithId(spaceId, "1", body)
             setProjects(projects)
         }
         gFolder = folder
@@ -144,24 +144,42 @@
     }
 
     async function getHistory() {
+        console.log("getHistory")
         await pause(10)
         return {
             recent: []
         }
     }
 
-    async function getFolder(spaceId, folderId) {
+    async function createFolder(spaceId, body) {
+        console.log("createFolder", spaceId, body)
+        await pause(10)
+        body.parent = buildId(spaceId, body.parent)        
+        var folderId = createFolderCore(spaceId, body)
+        return {folder_id: folderId}
+    }
+
+    function createFolderCore(spaceId, body) {
+        var all = getAllFolders(spaceId)        
+        var folderId = generateId(all, "f")
+        createFolderWithId(spaceId, folderId, body)
+        return folderId
+    }    
+
+    async function updateFolder(spaceId, folderId, body) {
+        console.log("updateFolder", spaceId, folderId, body)
         await pause(10)
         var id = buildId(spaceId, folderId)
-        var all = getAllFolders(spaceId)
         var folder = getFolderBody(id)
-        folder.children = []
-        folder.fullId = id
-        folder.id = folderId
-        folder.space_id = spaceId
-        fixFolderName(folder)
-        objFor(all, findChildren, folder)
-        folder.path = buildFolderPath(id)
+        Object.assign(folder, body)
+        setFolderBody(id, folder)
+    }
+
+    async function getFolder(spaceId, folderId) {
+        console.log("getFolder", spaceId, folderId)
+        await pause(10)
+        var folder = getFolderWithChildren(spaceId, folderId)
+        folder.path = buildFolderPath(folder.fullId)
         if (folder.parent) {
             var pp = parseId(folder.parent)
             folder.parent = pp.folderId
@@ -169,6 +187,82 @@
         folder.access = "write"
         return folder
     }
+
+    function getFolderWithChildren(spaceId, folderId) {
+        var id = buildId(spaceId, folderId)
+        var all = getAllFolders(spaceId)
+        var folder = getFolderBody(id)
+        folder.children = []
+        folder.fullId = id
+        objFor(all, findChildren, folder)
+        folder.id = folderId
+        folder.space_id = spaceId
+        fixFolderName(folder)        
+        return folder
+    }
+
+    function deleteOneFolder(item) {
+        var id = buildId(item.space_id, item.id)
+        var all = getAllFolders(item.space_id)
+        delete all[id]
+        setAllFolders(item.space_id, all)
+        localStorage.removeItem(id)
+    }
+
+    async function changeMany(body) {
+        console.log("changeMany", body)
+        await pause(10)        
+        if (body.operation === "delete") {
+            body.items.forEach(deleteOneFolder)
+        } else if (body.operation === "copy") {
+            forEach(body.items, copyOneFolder, body.target)
+        }
+
+        return "ok"
+    }
+
+    function copyOneFolder(item, target) {
+        var id = buildId(item.space_id, item.id)
+        var folder = getFolderBody(id)
+        var targetId = buildId(target.space_id, target.folder_id)
+        var targetFolder = getFolderWithChildren(target.space_id, target.folder_id)
+        var name = folder.name
+        while (!isUnique(targetFolder.children, name)) {
+            name += "-x2"
+        }        
+        copyFolderRecursive(id, name, targetId)
+    }
+
+    function isUnique(folders, name) {
+        name = name.toLowerCase()
+        for (var folder of folders) {
+            var fname = folder.name.toLowerCase()
+            if (name === fname) {
+                return false
+            }
+        }
+        return true
+    }
+
+    function copyFolderRecursive(id, name, targetId) {
+        var parsed = parseId(id)
+        var tparsed = parseId(targetId)
+        var folder = getFolderBody(id)
+        if (name) {
+            folder.name = name
+        }
+        folder.parent = targetId
+        var newFolderId = createFolderCore(tparsed.spaceId, folder)
+        var newId = buildId(tparsed.spaceId, newFolderId)
+        var existing = getFolderWithChildren(parsed.spaceId, parsed.folderId)
+        for (var child of existing.children) {
+            var childId = buildId(child.space_id, child.id)
+            copyFolderRecursive(childId, undefined, newId)
+        }
+    }
+
+
+
 
     function parseId(id) {
         var parts = id.split(" ")
@@ -192,11 +286,16 @@
             path.push(step)
             id = folder.parent
         }
+        path.reverse()
         return path
     }
 
     function getFolderBody(id) {
         return JSON.parse(localStorage.getItem(id))        
+    }
+
+    function setFolderBody(id, body) {
+        localStorage.setItem(id, JSON.stringify(body))        
     }
 
     function findChildren(id, _, output) {
@@ -223,7 +322,10 @@
         chooseFolder: chooseFolder,
         openFolder: openFolder,
         getFolder: getFolder,
-        getHistory: getHistory
+        getHistory: getHistory,
+        createFolder: createFolder,
+        updateFolder: updateFolder,
+        changeMany: changeMany
     }
     
 })();
