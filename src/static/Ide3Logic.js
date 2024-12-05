@@ -1721,6 +1721,9 @@ function Paster_RunningCopy_onError(self, data) {
 }
 
 function Paster_RunningOperation_onData(self, data) {
+    if (data.error) {
+        browser.showNotification(data.error)
+    }
     startMachine(
         new RecentGetter(),
         null,

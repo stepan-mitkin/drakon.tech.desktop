@@ -25,8 +25,22 @@
     }
 
     async function setRecent(recent) {
-        var recentStr = JSON.stringify(recent)
-        localStorage.setItem("recent", recentStr)
+        if (recent.length === 0) {
+            var projects = getProjects()
+            for (var path in projects) {
+                var spaceId = projects[path]
+                var all = getAllFolders(spaceId)
+                for (var id in all) {
+                    localStorage.removeItem(id)
+                }
+                localStorage.removeItem(spaceId + "-folders")
+            }
+            localStorage.removeItem("projects")
+            localStorage.removeItem("recent")
+        } else {
+            var recentStr = JSON.stringify(recent)
+            localStorage.setItem("recent", recentStr)
+        }
     }
 
     function getSettingsCore() {
@@ -159,12 +173,17 @@
         return {folder_id: folderId}
     }
 
-    function createFolderCore(spaceId, body) {
-        var all = getAllFolders(spaceId)        
-        var folderId = generateId(all, "f")
+    function createFolderCore(spaceId, body) {         
+        var folderId = generateFolderId(spaceId)
         createFolderWithId(spaceId, folderId, body)
         return folderId
     }    
+
+    function generateFolderId(spaceId) {
+        var all = getAllFolders(spaceId)        
+        var folderId = generateId(all, "f")
+        return folderId
+    }
 
     async function updateFolder(spaceId, folderId, body) {
         console.log("updateFolder", spaceId, folderId, body)
@@ -202,6 +221,8 @@
     }
 
     function deleteOneFolder(item) {
+        var folder = getFolderWithChildren(item.space_id, item.id)
+        forEach(folder.children, deleteOneFolder)
         var id = buildId(item.space_id, item.id)
         var all = getAllFolders(item.space_id)
         delete all[id]
@@ -212,25 +233,56 @@
     async function changeMany(body) {
         console.log("changeMany", body)
         await pause(10)        
-        if (body.operation === "delete") {
-            body.items.forEach(deleteOneFolder)
-        } else if (body.operation === "copy") {
-            forEach(body.items, copyOneFolder, body.target)
+        try {
+            if (body.operation === "delete") {
+                body.items.forEach(deleteOneFolder)
+            } else if (body.operation === "copy") {
+                forEach(body.items, copyOneFolder, body.target)
+            } else if (body.operation === "move") {
+                forEach(body.items, moveOneFolder, body.target)
+            }
+        } catch (ex) {
+            return {ok:false, error:ex.message}
         }
 
-        return "ok"
+        return {ok:true}
+    }
+
+    function checkForCycles(id, targetId) {
+        var targetPath = buildFolderPath(targetId)
+        var parsed = parseId(id)
+        for (var step of targetPath) {
+            if (step.space_id === parsed.spaceId && step.id === parsed.folderId) {
+                throw new Error("ERR_CYCLE")
+            }
+        }
     }
 
     function copyOneFolder(item, target) {
         var id = buildId(item.space_id, item.id)
         var folder = getFolderBody(id)
         var targetId = buildId(target.space_id, target.folder_id)
+        checkForCycles(id, targetId)
         var targetFolder = getFolderWithChildren(target.space_id, target.folder_id)
         var name = folder.name
         while (!isUnique(targetFolder.children, name)) {
             name += "-x2"
         }        
         copyFolderRecursive(id, name, targetId)
+    }
+
+    function moveOneFolder(item, target) {
+        var id = buildId(item.space_id, item.id)
+        var folder = getFolderBody(id)        
+        var targetId = buildId(target.space_id, target.folder_id)
+        checkForCycles(id, targetId)        
+        var targetFolder = getFolderWithChildren(target.space_id, target.folder_id)
+        var name = folder.name
+        while (!isUnique(targetFolder.children, name)) {
+            name += "-x2"
+        }        
+        folder.parent = targetId
+        setFolderBody(id, folder)        
     }
 
     function isUnique(folders, name) {
@@ -252,13 +304,14 @@
             folder.name = name
         }
         folder.parent = targetId
-        var newFolderId = createFolderCore(tparsed.spaceId, folder)
+        var newFolderId = generateFolderId(tparsed.spaceId)
         var newId = buildId(tparsed.spaceId, newFolderId)
         var existing = getFolderWithChildren(parsed.spaceId, parsed.folderId)
         for (var child of existing.children) {
             var childId = buildId(child.space_id, child.id)
             copyFolderRecursive(childId, undefined, newId)
         }
+        createFolderWithId(tparsed.spaceId, newFolderId, folder)        
     }
 
 
