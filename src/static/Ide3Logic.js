@@ -5046,11 +5046,7 @@ function hasDrakon(folders) {
 }
 
 function hasModuleAbove(folder) {
-    if (((folder.parent) && (folder.module)) && (!(folder.module == folder.folderId))) {
-        return true
-    } else {
-        return false
-    }
+    return true
 }
 
 function hasMoreFontsToLoad(self) {
@@ -6902,7 +6898,7 @@ function requestHistory(target) {
 }
 
 function requestTheme(target) {
-    browser.sendGet("/api/theme", target)
+    backend.getSettings().then(target.onData)    
 }
 
 function resetSearch() {
@@ -7013,14 +7009,7 @@ function saveApp(data) {
 }
 
 function saveChange(spaceId, folderId, change, target) {
-    var url
-    url = "/api/edit/" +
-      spaceId + "/" + folderId
-    browser.sendPost(
-        url,
-        change,
-        target
-    )
+    backend.edit(spaceId, folderId, change).then(target.onData)
 }
 
 function saveChanges(changes) {
@@ -7098,21 +7087,8 @@ function saveUserPropsInMem(settings) {
 }
 
 function saveUserSettings(settings) {
-    var noop, target
     saveUserPropsInMem(settings)
-    if (gUserId) {
-        noop = function() {}
-        target = makeTarget(
-            noop,
-            noop
-        )
-        var url = "/api/theme"
-        browser.sendPost(
-            url,
-            settings,
-            target
-        )
-    }
+    backend.updateSettings(settings)
 }
 
 function scanItems(collection, needle, items, name, id, path) {
@@ -7203,15 +7179,15 @@ function scheduleNextStateAfter(machine, data, delay) {
 }
 
 function schedulePoll() {
-    var interval, timer
-    cancelPolling()
-    interval = PollInterval + Math.random() * 0.5
-    timer = browser.setTimeout(
-        timeToPoll,
-        interval * 1000,
-        "schedulePoll"
-    )
-    globs.pollTimer = timer
+    // var interval, timer
+    // cancelPolling()
+    // interval = PollInterval + Math.random() * 0.5
+    // timer = browser.setTimeout(
+    //     timeToPoll,
+    //     interval * 1000,
+    //     "schedulePoll"
+    // )
+    // globs.pollTimer = timer
 }
 
 function selectTreeItem(id) {
@@ -7384,6 +7360,26 @@ function setActiveScreen(screen, access) {
     updateGui()
 }
 
+function normalizeDiagram(diagram) {
+    var items = []
+    if (diagram.items) {
+        for (var id in diagram.items) {
+            var item = diagram.items[id]
+            fixContent(item)
+            item.id = id
+            items.push(item)
+        }
+    }
+    diagram.items = items
+}
+
+function fixContent(item) {
+    if ("content" in item) {
+        item.text = item.content
+        delete item.content
+    }
+}
+
 function setDiagram(self) {
     var onReadonly
     if (gUserId) {
@@ -7395,6 +7391,7 @@ function setDiagram(self) {
         isReadonly(),
         onReadonly
     )
+    normalizeDiagram(self.diagram)
     getEditor().setDiagram(
     	self.diagram,
     	true
@@ -8172,19 +8169,19 @@ function startMachine(machine, data, target) {
 }
 
 function startPoll(saver) {
-    var ids, target, url
-    ids = parseId(
-        globs.current.id
-    )
-    saver.lastIo = getTime()
-    url = "/api/tag/" +
-     ids.spaceId + "/" + ids.folderId +
-     "/" + saver.lastIo
-    target = makeTarget(
-        onTag,
-        onTagError
-    )
-    browser.sendGet(url, target)
+    // var ids, target, url
+    // ids = parseId(
+    //     globs.current.id
+    // )
+    // saver.lastIo = getTime()
+    // url = "/api/tag/" +
+    //  ids.spaceId + "/" + ids.folderId +
+    //  "/" + saver.lastIo
+    // target = makeTarget(
+    //     onTag,
+    //     onTagError
+    // )
+    // browser.sendGet(url, target)
 }
 
 function startSearchFolders(needle, target) {

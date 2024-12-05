@@ -4435,12 +4435,12 @@ function sendFeedbackCore(data, success, error) {
     data.folderId = current.folderId
     data.doc_type = current.type
     var url = "/api/feedback/"
-    HtmlUtils.sendPost(
-    	url,
-    	data,
-    	success,
-    	error
-    )
+    // HtmlUtils.sendPost(
+    // 	url,
+    // 	data,
+    // 	success,
+    // 	error
+    // )
 }
 
 function sendGet(url, target) {

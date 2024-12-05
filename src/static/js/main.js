@@ -310,7 +310,7 @@
         select.addEventListener("change", () => { 
             var language = select.value
             setLanguage(language)
-            backend.updateSettings("language", language)
+            backend.updateSettings({"language": language})
             renderStartPage(container, recent)            
         })
         return div({

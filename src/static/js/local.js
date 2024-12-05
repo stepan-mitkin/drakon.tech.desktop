@@ -2,6 +2,7 @@
     var gFolder = ""
     var gSpaceId = ""
     var gFolderName = ""
+    var gFolders = {}
 
     function objFor(obj, callback, target) {
         for (var key in obj) {
@@ -55,9 +56,9 @@
         return settings
     }
 
-    async function updateSettings(key, value) {
+    async function updateSettings(update) {
         var settings = getSettingsCore()
-        settings[key] = value
+        Object.assign(settings, update)
         var settingsStr = JSON.stringify(settings)
         localStorage.setItem("settings", settingsStr)
     }
@@ -204,6 +205,8 @@
             folder.parent = pp.folderId
         }
         folder.access = "write"
+        var id = buildId(spaceId, folderId)
+        gFolders[id] = getFolderBody(id)
         return folder
     }
 
@@ -246,6 +249,64 @@
         }
 
         return {ok:true}
+    }
+
+    async function edit(spaceId, folderId, change) {
+        console.log("edit", spaceId, folderId, change)
+        await pause(10)
+        var id = buildId(spaceId, folderId)
+        var folder = gFolders[id]
+        setProperty(folder, change, "name")
+        setProperty(folder, change, "params")
+        setProperty(folder, change, "keywords")
+        if (change.removed) {
+            forEach(change.removed, removeItem, folder)
+        }
+        if (change.updated) {
+            forEach(change.updated, updateItem, folder)
+        }
+        if (change.added) {
+            forEach(change.added, addItem, folder)
+        }        
+        setFolderBody(id, folder)        
+    }
+
+    function setProperty(target, source, name) {
+        if (name in source) {
+            target[name] = source[name]
+        }
+    }
+
+    function removeItem(id, folder) {
+        delete folder.items[id]
+    }
+
+    function addItem(change, folder) {
+        var copy = {}
+        Object.assign(copy, change)
+        delete copy["id"]
+        if (!folder.items) {
+            folder.items = {}
+        }
+        fixContentField(copy)
+        folder.items[change.id] = copy
+    }  
+    
+    function updateItem(change, folder) {
+        var existing = folder.items[change.id]
+        var copy = {}
+        Object.assign(copy, existing)
+        Object.assign(copy, change)
+        delete copy["id"]
+        fixContentField(copy)
+        folder.items[change.id] = copy
+    }      
+
+    function fixContentField(copy) {
+        if ("text" in copy) {
+            copy.content = copy.text
+            delete copy["text"]
+        }
     }
 
     function checkForCycles(id, targetId) {
@@ -378,7 +439,8 @@
         getHistory: getHistory,
         createFolder: createFolder,
         updateFolder: updateFolder,
-        changeMany: changeMany
+        changeMany: changeMany,
+        edit: edit
     }
     
 })();
