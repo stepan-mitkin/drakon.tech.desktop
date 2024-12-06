@@ -1939,8 +1939,8 @@ function hideDiv(div) {
 }
 
 function hideHelp() {
-    show("help_wide", "none")
-    show("help_narrow", "none")
+    // show("help_wide", "none")
+    // show("help_narrow", "none")
     globs.helpOn = false
 }
 

@@ -3,6 +3,7 @@
     var gSpaceId = ""
     var gFolderName = ""
     var gFolders = {}
+    var gSearch = undefined
 
     function objFor(obj, callback, target) {
         for (var key in obj) {
@@ -427,6 +428,170 @@
         }
     }
 
+    async function searchFolders(body) {
+        console.log("searchFolders", body)
+        await pause(10)  
+        var spaceId = body.spaces[0]
+        var all = getAllFolders(spaceId)
+        var needle = prepareNeedle(body.needle)
+        var results = []
+        if (needle) {
+            for (var id in all) {
+                var folder = getFolderBody(id)
+                if (!folder.name) {continue}
+                var name = folder.name.toLowerCase()
+                var rank
+                if (name === needle) {
+                    rank = 1
+                } else if (name.indexOf(needle) !== -1) {
+                    rank = 10
+                } else {
+                    continue
+                }
+                results.push({
+                    id: id,
+                    name: folder.name,
+                    rank: rank,
+                    body: folder
+                })
+            }
+            results.sort(sortByRankThenName)
+        }
+        return {
+            folders: results.map(transformSearchResultFolder)
+        }
+    }
+
+    function prepareNeedle(text) {
+        text = text || ""
+        text = text.trim()
+        return text.toLowerCase()
+    }
+
+    function sortByRankThenName(left, right) {
+        if (left.rank < right.rank) {return -1}
+        if (left.rank > right.rank) {return 1}
+        if (left.name < right.name) {return -1}
+        if (left.name > right.name) {return 1}  
+        return 0
+    }
+
+    function transformSearchResultFolder(item) {
+        var parsed = parseId(item.id)
+        return {
+            folder_id: parsed.folderId,
+            space_id: parsed.spaceId,
+            name: item.body.name,
+            type: item.body.type,
+            path: buildPathForSearch(item.id)
+        }
+    }
+
+    function buildPathForSearch(id) {
+        return buildFolderPath(id).map(step => step.name)
+    }
+
+    function createItemSearch(all, needle) {
+        var found = []
+        var completed = false
+        async function start() {
+            if (!needle) {
+                completed = true
+                return
+            }
+            if (completed) {throw new Error("Search has completed")}
+            for (var id in all) {
+                searchDiagram(id)
+                await pause(1)
+            }
+            completed = true
+        }
+
+        function searchDiagram(id) {
+            var folder = getFolderBody(id)
+            if (folder.type === "folder") { return }
+            searchItem(id, "params", folder, folder.params)
+            var items = folder.items || {}
+            for (var itemId in items) {
+                var item = items[itemId]
+                searchItem(id, itemId, folder, item.content)
+            }
+        }
+
+        function searchItem(id, itemId, folder, content) {
+            content = content || ""
+            var parts = content
+                .split("\n")
+                .map(part => part.trim())
+                .filter(part => !!part)
+            for (var part of parts) {
+                var low = part.toLowerCase()
+                if (low.indexOf(needle) !== -1) {
+                    found.push(createFoundItem(id, itemId, folder, part))
+                }
+            }  
+        }
+
+        function createFoundItem(id, itemId, folder, text) {
+            var parsed = parseId(id)
+            return {
+                space_id: parsed.spaceId,
+                folder_id: parsed.folderId,
+                name: folder.name,
+                path: buildPathForSearch(id),
+                type: folder.type,
+                item_id: itemId,
+                text: text
+            }
+        }
+
+        function getResults() {
+            var result = {
+                completed: completed,
+                items: found
+            }
+            found = []
+            return result
+        }
+
+        return {
+            start: start,
+            getResults: getResults
+        }
+    }
+
+    async function searchItems(body) {
+        console.log("searchItems", body)
+        await pause(10)  
+        if (gSearch) {
+            gSearch.stop()
+            gSearch = undefined
+        }
+        var spaceId = body.spaces[0]
+        var all = getAllFolders(spaceId)
+        var needle = prepareNeedle(body.needle)        
+        gSearch = createItemSearch(all, needle)
+        gSearch.start()
+        return {}
+    }    
+
+    async function pollSearch() {
+        console.log("pollSearch")
+        await pause(10)  
+        var result = {
+            completed: true,
+            items: []
+        }
+        if (!gSearch) {
+            return result
+        }
+        result = gSearch.getResults()
+        if (result.completed) {
+            gSearch = undefined
+        }
+        return result
+    }
+
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -440,7 +605,10 @@
         createFolder: createFolder,
         updateFolder: updateFolder,
         changeMany: changeMany,
-        edit: edit
+        edit: edit,
+        searchFolders: searchFolders,
+        searchItems: searchItems,
+        pollSearch: pollSearch
     }
     
 })();

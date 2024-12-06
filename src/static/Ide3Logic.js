@@ -7235,10 +7235,7 @@ function sendGetFolderProps(spaceId, folderId, target) {
 }
 
 function sendGetSearch(target) {
-    browser.sendGet(
-        "/api/search",
-        target
-    )
+    backend.pollSearch().then(target.onData)
 }
 
 function sendInput(self) {
@@ -8092,21 +8089,6 @@ function startBuildAll(buildInfo) {
     )
 }
 
-function startFindReferences(needle, target) {
-    var data, id
-    id = parseId(globs.current.id)
-    data = {
-        spaces : [id.spaceId],
-        type : "references",
-        needle : needle
-    }
-    browser.sendPost(
-        "/api/search",
-        data,
-        target
-    )
-}
-
 function startMachine(machine, data, target) {
     if (target) {
         
@@ -8148,11 +8130,7 @@ function startSearchFolders(needle, target) {
         type : "folders",
         needle : needle
     }
-    browser.sendPost(
-        "/api/search",
-        data,
-        target
-    )
+    backend.searchFolders(data).then(target.onData)
 }
 
 function startSearchItems(needle, target) {
@@ -8163,11 +8141,7 @@ function startSearchItems(needle, target) {
         type : "items",
         needle : needle
     }
-    browser.sendPost(
-        "/api/search",
-        data,
-        target
-    )
+    backend.searchItems(data).then(target.onData)
 }
 
 function startSearchMachine(machine) {
