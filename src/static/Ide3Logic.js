@@ -524,16 +524,14 @@ function DescriptionChanger_ShowDialog_onError(self, data) {
 
 function DescriptionChanger_UserInput_onData(self, data) {
     browser.showWorking()
-    var url = "/api/folder/" +
-     self.spaceId + "/" + self.folderId
     var payload = {
         description : data
-    }
-    browser.sendPut(
-        url,
-        payload,
-        self
-    )
+    }    
+    backend.updateFolder(
+        self.spaceId,
+        self.folderId,
+        payload
+    ).then(self.onData)
     self.state = "Saving";
 }
 
@@ -7220,13 +7218,10 @@ function sendDelete(folders, target) {
 }
 
 function sendGetFolder(spaceId, folderId, target) {
-    var url
-    url = "/api/folder/" + spaceId +
-    	"/" + folderId
-    browser.sendGet(
-        url,
-        target
-    )
+    backend.getFolder(
+    	spaceId,
+    	folderId
+    ).then(target.onData)    
 }
 
 function sendGetFolderProps(spaceId, folderId, target) {
@@ -7263,16 +7258,12 @@ function sendRename(self, spaceId, folderId, name) {
     backend.updateFolder(spaceId, folderId, payload).then(self.onData)
 }
 
-function sendSaveDiagramProps(spaceId, folderId, payload, self) {
-    var url
-    url = "/api/folder/" + 
-     spaceId + "/" + 
-     folderId
-    browser.sendPut(
-        url,
-        payload,
-        self
-    )
+function sendSaveDiagramProps(spaceId, folderId, payload, self) {  
+    backend.updateFolder(
+        spaceId,
+        folderId,
+        payload
+    ).then(self.onData)
 }
 
 function sendSaveFolderProps(spaceId, folderId, data, target) {
