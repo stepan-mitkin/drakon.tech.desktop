@@ -2053,7 +2053,7 @@ function initControls(wide, isTryMe) {
     	rootDiv,
     	rootNode
     )
-    createFeedbackButton()
+    //createFeedbackButton()
     createEditor()
     getWidget("top").setActive("top_diagram")
     getWidget("middle").setActive("middle_folder")
@@ -3885,8 +3885,8 @@ function panicOnFont(data, font) {
 }
 
 function placeFeedback(right) {
-    var button = get("feedback")
-    button.style.right = right + "px"
+    // var button = get("feedback")
+    // button.style.right = right + "px"
 }
 
 function positionSearchResults() {
