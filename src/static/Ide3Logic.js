@@ -1,5 +1,6 @@
 function Ide3Logic(gSpaceId, gUserId, browser, translate) {
 
+var gSkipPushState = false
 var FEATURE_SAVE_PROJECT = true
 var Root = "https://drakonhub.com/"
 var IDE = "ide"
@@ -1096,6 +1097,9 @@ function FolderCutterDeleter_Reloading_onError(self, data) {
 }
 
 function FolderCutterDeleter_RunningOperation_onData(self, data) {
+    if (!self.cut) {
+        data.deleted.forEach(Nav.onDeleteFolder)
+    }
     startMachine(
         new RecentGetter(),
         null,
@@ -1113,7 +1117,8 @@ function FolderCutterDeleter_Start_onData(self, data) {
     var type
     self.folders = data.folders
     self.parentId = data.parentId
-    if (data.cut) {
+    self.cut = data.cut
+    if (self.cut) {
         type = getFolderCategory(
             data.folders[0]
         )
@@ -3327,6 +3332,8 @@ function bindHandlers() {
     bind("middle_recent", "click", onRecentClick)
     bind("path", "click", onRecentClick)
     bind("up", "click", goUp)
+    bind("back", "click", goBack)
+    bind("forward", "click", goForward)
     bind("splitter", "resize", onSplitterResize)
     bind("hideCentral", "click", hideCentral)
     bind("actions", "click", onActionsClick)
@@ -4994,6 +5001,14 @@ function goToTrash(onCompleted) {
     )
 }
 
+function goBack() {    
+    Nav.back()
+}
+
+function goForward() {
+    Nav.forward()
+}
+
 function goUp() {
     var parent
     parent = globs.current.parent
@@ -6283,6 +6298,7 @@ function onStateChange(data, onCompleted) {
     var _sw23300000_ = 0;
     _sw23300000_ = data.type;
     if (_sw23300000_ === "folder") {
+        gSkipPushState = true
         goToFolder(data.id, onCompleted)
     } else {
         if (_sw23300000_ === "projects") {
@@ -7662,14 +7678,18 @@ function showFolderCommon(id, data) {
     globs.current.type = data.type
     name = getNormalName(data)
     browser.setMobileHeader(name)
-    browser.setTitle(name + " - " + getAppName())
+    browser.setTitle(name + " | " + getAppName())
     setPath(data.path)
     path = convertPathToIds(data.path)
     addToPrevious(path)
-    pushNavFolder(
-        id,
-        data.name
-    )
+    if (gSkipPushState) {
+        gSkipPushState = false
+    } else {
+        pushNavFolder(
+            id,
+            data.name
+        )
+    }
     updateUpButton(data)
 }
 

@@ -224,10 +224,11 @@
         return folder
     }
 
-    function deleteOneFolder(item) {
+    function deleteOneFolder(item, deleted) {
         var folder = getFolderWithChildren(item.space_id, item.id)
-        forEach(folder.children, deleteOneFolder)
+        forEach(folder.children, deleteOneFolder, deleted)
         var id = buildId(item.space_id, item.id)
+        deleted.push(id)
         var all = getAllFolders(item.space_id)
         delete all[id]
         setAllFolders(item.space_id, all)
@@ -237,9 +238,10 @@
     async function changeMany(body) {
         console.log("changeMany", body)
         await pause(10)        
+        var deleted = []
         try {
             if (body.operation === "delete") {
-                body.items.forEach(deleteOneFolder)
+                forEach(body.items, deleteOneFolder, deleted)
             } else if (body.operation === "copy") {
                 forEach(body.items, copyOneFolder, body.target)
             } else if (body.operation === "move") {
@@ -249,7 +251,7 @@
             return {ok:false, error:ex.message}
         }
 
-        return {ok:true}
+        return {ok:true, deleted: deleted}
     }
 
     async function edit(spaceId, folderId, change) {
@@ -624,6 +626,10 @@
         return result
     }
 
+    function setTitle(title) {
+        document.title = title
+    }
+
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -641,7 +647,8 @@
         searchFolders: searchFolders,
         searchItems: searchItems,
         pollSearch: pollSearch,
-        searchDefinitions: searchDefinitions
+        searchDefinitions: searchDefinitions,
+        setTitle: setTitle
     }
     
 })();

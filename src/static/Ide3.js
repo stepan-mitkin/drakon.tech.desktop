@@ -1963,7 +1963,7 @@ function init() {
     globs.widgets.onEvent = onEvent
     self.logic.init()
     registerShortcuts()
-    Nav.stateCallback = self.logic.onStateChange
+    Nav.onStateChange = self.logic.onStateChange
     if (globs.isTryMe) {
         //window.onbeforeunload = confirmExit
         window.onbeforeunload = null
@@ -2887,7 +2887,7 @@ function makeTopWidgetsDesc() {
     	style:{borderRadius:radius},
     	tooltip: "MES_SAVE_AS_IMAGE"
     }
-    var folder = {
+    var up = {
     	signalId: "up",
     	hPadding:buttonMargin, vPadding:buttonMargin,
     	type: "image_button",
@@ -2897,6 +2897,26 @@ function makeTopWidgetsDesc() {
     	style:{borderRadius:radius},
     	tooltip: "MES_UP"
     }
+    var back = {
+    	signalId: "back",
+    	hPadding:buttonMargin, vPadding:buttonMargin,
+    	type: "image_button",
+    	image:"left-angle.png",
+    	width:40,
+    	height:40,
+    	style:{borderRadius:radius},
+    	tooltip: "MES_BACK"
+    }
+    var forward = {
+    	signalId: "forward",
+    	hPadding:1, vPadding:buttonMargin,
+    	type: "image_button",
+    	image:"right-angle.png",
+    	width:40,
+    	height:40,
+    	style:{borderRadius:radius},
+    	tooltip: "MES_FORWARD"
+    }      
     var qsearch = {
     	signalId: "quickSearch",
     	hPadding:buttonMargin, vPadding:buttonMargin,
@@ -2970,8 +2990,8 @@ function makeTopWidgetsDesc() {
     	id: "top_diagram",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, create1, create2, undoButton, 
-    redoButton, exp, build, folder],
+    	lefts: [mainMenu, back, forward, up, create1, create2, undoButton, 
+    redoButton, exp, build],
     	rights: rightsDiagram,
     	style:{background:DarkBackground},
     	center: {
@@ -2987,8 +3007,8 @@ function makeTopWidgetsDesc() {
     	id: "top_folder",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, create0, sSpacer,
-    build, folder],
+    	lefts: [mainMenu, back, forward, up, create0, sSpacer,
+    build],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -2999,7 +3019,7 @@ function makeTopWidgetsDesc() {
     	id: "top_app",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, create0, sSpacer, folder],
+    	lefts: [mainMenu, create0, sSpacer, up],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -3027,7 +3047,7 @@ function makeTopWidgetsDesc() {
     	id: "top_diagram_ro",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, exp2, buildStub, folder],
+    	lefts: [mainMenu, back, forward, up, exp2, buildStub],
     	rights: rightsDiagram,
     	style:{background:DarkBackground},
     	center: {
@@ -3038,7 +3058,7 @@ function makeTopWidgetsDesc() {
     	id: "top_folder_ro",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, oneButtSpace, buildStub, folder],
+    	lefts: [mainMenu, back, forward, up, oneButtSpace, buildStub],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -3049,7 +3069,7 @@ function makeTopWidgetsDesc() {
     	id: "top_app_ro",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, sSpacer, folder],
+    	lefts: [mainMenu, sSpacer, up],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -3086,7 +3106,7 @@ function makeTopWidgetsDesc() {
     	id: "top_diagram_nu",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, saveButton, exp3, buildStub, folder],
+    	lefts: [mainMenu, saveButton, exp3, buildStub, up],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -3097,7 +3117,7 @@ function makeTopWidgetsDesc() {
     	id: "top_folder_nu",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, nuSpace, buildStub, folder],
+    	lefts: [mainMenu, nuSpace, buildStub, up],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -3119,7 +3139,7 @@ function makeTopWidgetsDesc() {
     	id: "top_app_nu",
     	type: "hdock",
     	height: TopPanelHeight,
-    	lefts: [mainMenu, nuSpace, folder],
+    	lefts: [mainMenu, nuSpace, up],
     	rights: [search],
     	style:{background:DarkBackground},
     	center: {
@@ -3248,7 +3268,7 @@ function makeTopWidgetsDescMob() {
     	height:40,
     	style:{borderRadius:radius},
     	tooltip: "MES_UP"
-    }
+    }      
     var createProject = {
     	hPadding:8, vPadding:8,
     	type: "text_button",
@@ -3796,16 +3816,6 @@ function onSignupSuccess(data) {
     goToUrl("/welcome")
 }
 
-function onStateChange(state) {
-    if (globs.initCompleted) {
-        killCentral()
-        hidePopup()
-        hidePopup()
-        hideHelp()
-        Nav.onStateChange(state)
-    }
-}
-
 function onUserDown(evt) {
     var _sw28630000_ = 0;
     _sw28630000_ = evt.keyCode;
@@ -3929,10 +3939,7 @@ function pushTempIfMobile() {
 }
 
 function pushTempState() {
-    var state = {
-    	type: "tmp"
-    }
-    //Nav.pushState(null, "", "")
+
 }
 
 function quickSearch(evt) {
@@ -4645,7 +4652,7 @@ function setTimeout(delayed, delay, src) {
 }
 
 function setTitle(title) {
-    document.title = title
+    backend.setTitle(title)
 }
 
 function shouldReport(message) {
@@ -6514,7 +6521,6 @@ self.widgets = globs.widgets
 exportMethod(this, init, "init")
 exportMethod(this, onResize, "onResize")
 exportMethod(this, orderResize, "orderResize")
-exportMethod(this, onStateChange, "onStateChange")
 exportMethod(this, onError, "onError")
 exportMethod(this, hideHelp, "hideHelp")
 

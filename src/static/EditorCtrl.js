@@ -4112,8 +4112,7 @@ function setUserSettings(settings) {
         globals.view.zoomTo(settings.zoom)
     }
     if (settings.theme) {
-        globals.theme = getThemeKey(settings.theme)
-        console.log(globals.theme)
+        globals.theme = getThemeKey(settings.theme)        
         Theme.setThemeValues(settings.theme)
     } else {
         globals.theme = "parrot"

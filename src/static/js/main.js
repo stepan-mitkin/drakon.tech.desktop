@@ -489,6 +489,7 @@
 
     function startIde(spaceId) {
         var wide = get("wide")
+        wide.style.transition = ""
         wide.style.opacity = 0
         clear(wide)        
         var userId = "Dar Veter"
