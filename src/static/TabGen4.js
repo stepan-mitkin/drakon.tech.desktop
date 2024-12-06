@@ -702,6 +702,24 @@ function getRow(tableName, id, procedure) {
     }
 }
 
+function findByProperty(tableName, prop, value) {
+    var table = gState[tableName]
+    if (table === undefined) {
+        // item 375
+        raise("table \"" +
+          tableName + "\" does not exist")
+    } else {
+        var result = []
+        for (var key in table) {
+            var row = table[key]
+            if (row[prop] === value) {
+                result.push(row)
+            }
+        }
+        return result
+    }
+}
+
 function getRowOrNull(tableName, id) {
     var row, table
     // item 1696
@@ -1805,6 +1823,7 @@ this.update = update
 this.remove = remove
 this.set = set
 this.push = push
+this.findByProperty = findByProperty
 
 init()
 

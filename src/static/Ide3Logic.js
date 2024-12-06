@@ -4884,6 +4884,10 @@ function getWidget(id) {
     return browser.widgets.getWidget(id)
 }
 
+function findWidgetsBySignalId(signalId) {
+    return browser.widgets.findWidgetsBySignalId(signalId)
+}
+
 function globalSearch(evt, type, widget, id, cellId) {
     var input, msg
     if (globs.searchThrottle) {
@@ -7666,6 +7670,16 @@ function showFolderCommon(id, data) {
         id,
         data.name
     )
+    updateUpButton(data)
+}
+
+function updateUpButton(data) {
+    var ups = findWidgetsBySignalId("up")
+    if (data.parent) {
+        ups.forEach(up => up.ownDiv.style.visibility = "visible")
+    } else {
+        ups.forEach(up => up.ownDiv.style.visibility = "hidden")
+    }
 }
 
 function showFolderInGrid(data) {

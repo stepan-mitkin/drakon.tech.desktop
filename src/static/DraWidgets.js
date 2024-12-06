@@ -2109,6 +2109,7 @@ function createWidget(parentDiv, node) {
             div.id = widget.id
             nodeCopy.id = widget.id
             generator(div, nodeCopy, widget)
+            widget.ownDiv = div
             return widget.id
         }
     } else {
@@ -2377,6 +2378,10 @@ function getTreeItems(widget) {
 
 function getWidget(id) {
     return gWidgets.get("widgets", id)
+}
+
+function findWidgetsBySignalId(signalId) {
+    return gWidgets.findByProperty("widgets", "signalId", signalId)
 }
 
 function hideDiv(div) {
@@ -3324,5 +3329,6 @@ this.getWidget = getWidget
 this.resizeWidget = resizeWidget
 this.deleteWidget = deleteWidget
 this.foreach = foreach
+this.findWidgetsBySignalId = findWidgetsBySignalId
 
 }

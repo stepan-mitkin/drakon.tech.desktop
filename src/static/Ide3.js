@@ -2952,35 +2952,14 @@ function makeTopWidgetsDesc() {
     	style: {background: DarkBackground},
     	background: "white"
     }
-    var help = 
-    {
-    	hPadding:buttonMargin, vPadding:buttonMargin,
-    	type: "image_button",
-    	signalId: "showHelp",
-    	image:"help.png",
-    	width:40,
-    	height:40,
-    	style:{borderRadius:radius},
-    	tooltip: translate("MES_HELP")
-    }
-    var user = {
-    	hPadding:buttonMargin, vPadding:buttonMargin,
-    	signalId: "accountButton",
-    	type: "image_button",
-    	image:"user.png",
-    	width:40,
-    	height:40,
-    	style:{borderRadius:radius},
-    	tooltip: translate("MES_ACCOUNT")
-    }
-    var rights = [user, search]
-    var rightsDiagram = [user, search, qsearch]
+    var rights = [search]
+    var rightsDiagram = [search, qsearch]
     var spacesTop = {
     	id: "top_spaces",
     	type: "hdock",
     	height: TopPanelHeight,
     	lefts: [mainMenu, createProject],
-    	rights: [user, search],
+    	rights: [search],
     	style:{background:DarkBackground},
     	center: {
     		type: "path",
@@ -3010,7 +2989,7 @@ function makeTopWidgetsDesc() {
     	height: TopPanelHeight,
     	lefts: [mainMenu, create0, sSpacer,
     build, folder],
-    	rights: [user, search],
+    	rights: [search],
     	style:{background:DarkBackground},
     	center: {
     		type: "path"
@@ -3021,7 +3000,7 @@ function makeTopWidgetsDesc() {
     	type: "hdock",
     	height: TopPanelHeight,
     	lefts: [mainMenu, create0, sSpacer, folder],
-    	rights: [user, search],
+    	rights: [search],
     	style:{background:DarkBackground},
     	center: {
     		type: "path"
@@ -3032,7 +3011,7 @@ function makeTopWidgetsDesc() {
     	type: "hdock",
     	height: TopPanelHeight,
     	lefts: [mainMenu],
-    	rights: [user, search],
+    	rights: [search],
     	style:{background:DarkBackground},
     	center: {
     		type: "path"
@@ -3060,7 +3039,7 @@ function makeTopWidgetsDesc() {
     	type: "hdock",
     	height: TopPanelHeight,
     	lefts: [mainMenu, oneButtSpace, buildStub, folder],
-    	rights: [user, search],
+    	rights: [search],
     	style:{background:DarkBackground},
     	center: {
     		type: "path"
@@ -3071,7 +3050,7 @@ function makeTopWidgetsDesc() {
     	type: "hdock",
     	height: TopPanelHeight,
     	lefts: [mainMenu, sSpacer, folder],
-    	rights: [user, search],
+    	rights: [search],
     	style:{background:DarkBackground},
     	center: {
     		type: "path"
