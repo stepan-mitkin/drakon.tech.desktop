@@ -5761,7 +5761,6 @@ function showMainMenu(menus) {
     main.style.background = "white"
     main.style.color = "black"
     main.className = "popup appearing"
-    addDrakonHubClosed(main)
     var header = make(main, "div")
     header.style.paddingLeft = "5px"
     header.style.paddingRight = "5px"

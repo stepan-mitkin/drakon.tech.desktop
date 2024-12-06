@@ -189,7 +189,7 @@ function moveCursorToEnd(textarea) {
 
 function onCrmKeyDown(a, evt, c) {
     if (evt.key === "Enter") {
-        if (evt.ctrlKey) {
+        if (evt.ctrlKey || evt.metaKey) {
             evt.preventDefault()
             onSave()
         }
