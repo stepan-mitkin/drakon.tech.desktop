@@ -3588,9 +3588,9 @@ function onDefResult(cx, cy, queryId, current, data) {
     var extended = globs.extended
     if ((extended) && (queryId == extended.queryId)) {
         var menuItems = []
-        if (data.items) {
+        if (data.folders) {
             var _ind3662 = 0;
-            var _col3662 = data.items;
+            var _col3662 = data.folders;
             var _len3662 = _col3662.length;
             while (true) {
                 if (_ind3662 < _len3662) {
@@ -5434,7 +5434,6 @@ function showContextMenu(x, y, menu, onBackground, item) {
         extended.urls = getItemUrls(item.text)
         extended.queryId = queryId
         extended.item = item
-        var url = "/api/def_query"
         var current = self.logic.getCurrent()
         var spaceId = current.spaceId
         var onSuccess = function(data) {
@@ -5455,11 +5454,7 @@ function showContextMenu(x, y, menu, onBackground, item) {
         	onData: onSuccess,
         	onError: function(){}
         }
-        sendPost(
-        	url,
-        	body,
-        	target
-        )
+        backend.searchDefinitions(body).then(target.onData)
     }
 }
 

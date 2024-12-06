@@ -432,22 +432,43 @@
         console.log("searchFolders", body)
         await pause(10)  
         var spaceId = body.spaces[0]
+        return searchFolderCore(spaceId, [body.needle], 10)
+    }
+
+    async function searchDefinitions(body) {
+        console.log("searchDefinitions", body)
+        await pause(10)  
+        var spaceId = body.space_id
+        return searchFolderCore(spaceId, body.tokens, 1)
+    }    
+
+    function getMatchRank(name, needles) {
+        var rank = 10000
+        for (var needle of needles) {
+            var nrank
+            if (name === needle) {
+                nrank = 1
+            } else if (name.indexOf(needle) !== -1) {
+                nrank = 10
+            } else {
+                continue
+            }
+            rank = Math.min(rank, nrank)
+        }
+        return rank
+    }
+
+    function searchFolderCore(spaceId, needles, maxRank) {
         var all = getAllFolders(spaceId)
-        var needle = prepareNeedle(body.needle)
+        var needlesChecked = prepareNeedles(needles)        
+
         var results = []
-        if (needle) {
-            for (var id in all) {
-                var folder = getFolderBody(id)
-                if (!folder.name) {continue}
-                var name = folder.name.toLowerCase()
-                var rank
-                if (name === needle) {
-                    rank = 1
-                } else if (name.indexOf(needle) !== -1) {
-                    rank = 10
-                } else {
-                    continue
-                }
+        for (var id in all) {
+            var folder = getFolderBody(id)
+            if (!folder.name) {continue}
+            var name = folder.name.toLowerCase()
+            var rank = getMatchRank(name, needlesChecked)
+            if (rank <= maxRank) {
                 results.push({
                     id: id,
                     name: folder.name,
@@ -455,11 +476,11 @@
                     body: folder
                 })
             }
-            results.sort(sortByRankThenName)
         }
+        results.sort(sortByRankThenName)
         return {
             folders: results.map(transformSearchResultFolder)
-        }
+        }        
     }
 
     function prepareNeedle(text) {
@@ -491,14 +512,10 @@
         return buildFolderPath(id).map(step => step.name)
     }
 
-    function createItemSearch(all, needle) {
+    function createItemSearch(all, needles) {
         var found = []
         var completed = false
         async function start() {
-            if (!needle) {
-                completed = true
-                return
-            }
             if (completed) {throw new Error("Search has completed")}
             for (var id in all) {
                 searchDiagram(id)
@@ -526,8 +543,10 @@
                 .filter(part => !!part)
             for (var part of parts) {
                 var low = part.toLowerCase()
-                if (low.indexOf(needle) !== -1) {
-                    found.push(createFoundItem(id, itemId, folder, part))
+                for (var needle of needles) {
+                    if (low.indexOf(needle) !== -1) {
+                        found.push(createFoundItem(id, itemId, folder, part))
+                    }
                 }
             }  
         }
@@ -563,17 +582,30 @@
     async function searchItems(body) {
         console.log("searchItems", body)
         await pause(10)  
+        var spaceId = body.spaces[0]
+        startItemsSearch(spaceId, [body.needle])
+        return {}
+    }    
+
+    function prepareNeedles(needles) {
+        return needles
+            .map(prepareNeedle)
+            .filter(nee => !!nee)          
+    }
+
+    function startItemsSearch(spaceId, needles) {
+        var needlesChecked = prepareNeedles(needles)        
         if (gSearch) {
             gSearch.stop()
             gSearch = undefined
         }
-        var spaceId = body.spaces[0]
+        if (needlesChecked.length === 0) {
+            return
+        }
         var all = getAllFolders(spaceId)
-        var needle = prepareNeedle(body.needle)        
-        gSearch = createItemSearch(all, needle)
-        gSearch.start()
-        return {}
-    }    
+        gSearch = createItemSearch(all, needlesChecked)
+        gSearch.start()        
+    }
 
     async function pollSearch() {
         console.log("pollSearch")
@@ -608,7 +640,8 @@
         edit: edit,
         searchFolders: searchFolders,
         searchItems: searchItems,
-        pollSearch: pollSearch
+        pollSearch: pollSearch,
+        searchDefinitions: searchDefinitions
     }
     
 })();
