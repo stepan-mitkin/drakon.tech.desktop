@@ -6207,22 +6207,22 @@ function showWorking() {
     workingDiv.style.display = 'inline-block';
     
 
-    // Create the inner div
-    const innerDiv = document.createElement('div');
-    innerDiv.textContent = translate("MES_WORKING");
-    innerDiv.style.display = 'inline-block';
-    innerDiv.style.position = 'absolute';
-    innerDiv.style.top = '50%';
-    innerDiv.style.left = '50%';
-    innerDiv.style.transform = 'translate(-50%, -50%)';
-    innerDiv.style.background = 'white';
-    innerDiv.style.color = 'black';
-    innerDiv.style.padding = '20px';
-    innerDiv.style.textAlign = 'center';
-    innerDiv.style.userSelect = 'none';
+    // // Create the inner div
+    // const innerDiv = document.createElement('div');
+    // innerDiv.textContent = translate("MES_WORKING");
+    // innerDiv.style.display = 'inline-block';
+    // innerDiv.style.position = 'absolute';
+    // innerDiv.style.top = '50%';
+    // innerDiv.style.left = '50%';
+    // innerDiv.style.transform = 'translate(-50%, -50%)';
+    // innerDiv.style.background = 'white';
+    // innerDiv.style.color = 'black';
+    // innerDiv.style.padding = '20px';
+    // innerDiv.style.textAlign = 'center';
+    // innerDiv.style.userSelect = 'none';
 
-    // Append the inner div to the outer div
-    workingDiv.appendChild(innerDiv);
+    // // Append the inner div to the outer div
+    // workingDiv.appendChild(innerDiv);
 
     // Append the outer div to the body
     document.body.appendChild(workingDiv);

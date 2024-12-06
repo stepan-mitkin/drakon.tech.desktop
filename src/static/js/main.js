@@ -225,6 +225,73 @@
         ])     
     }
 
+    function FilenameChecker_isGoodChar(self, ch) {
+        if (ch in self.bad) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function FilenameChecker() {
+        var self = {};
+        self.isGoodChar = function (ch) {
+            return FilenameChecker_isGoodChar(self, ch);
+        };
+        return self;
+    }    
+
+    function checkFileName(str) {
+        var text = str || ""
+        text = text.trim()
+        if (!text) {
+            return "ERR_NAME_CANNOT_BE_EMPTY"
+        }
+        if (text.length > 80) {
+            return "ERR_NAME_IS_TOO_LONG"
+        }
+        var checker = createFilenameChecker()
+        for (let i = 0; i < text.length; i++) {
+            var ch = text[i]
+            if (!checker.isGoodChar(ch)) {
+                return "ERR_PATH_CONTAINS_ILLEGAL_CHARACTERS"
+            }
+        }        
+        return ""
+    }
+
+    function createFilenameChecker() {
+        var bad, self;
+        bad = {};
+        bad['#'] = true;
+        bad['%'] = true;
+        bad['&'] = true;
+        bad['{'] = true;
+        bad['}'] = true;
+        bad['/'] = true;
+        bad['\\'] = true;
+        bad[':'] = true;
+        bad['"'] = true;
+        bad['\''] = true;
+        bad['?'] = true;
+        bad['<'] = true;
+        bad['>'] = true;
+        bad['|'] = true;
+        bad['`'] = true;
+        bad['$'] = true;
+        bad['='] = true;
+        bad['!'] = true;
+        bad['@'] = true;
+        bad['+'] = true;
+        bad['*'] = true;
+        bad['\t'] = true;
+        bad['\r'] = true;
+        bad['\n'] = true;
+        self = FilenameChecker();
+        self.bad = bad;
+        return self;
+    }    
+
     function createLink(url) {
         var link = div({
             "cursor": "pointer",       
@@ -443,6 +510,8 @@
             wide.style.opacity = 1
         }, 100)
     }    
+
+    window.checkFileName = checkFileName
 
     main()
 

@@ -4491,11 +4491,7 @@ function getActionList(checked) {
         }
     }
     if (checked.length == 1) {
-        makeTextListItem(
-        	items,
-        	"MES_DESCRIPTION",
-        	descriptionCheckedFolder
-        )
+
         folder = getFromCache(checked[0])
         if (folder.type == "module") {
             makeSeparator(
@@ -4518,6 +4514,11 @@ function getActionList(checked) {
             )
         } else {
             if (folder.type == "drakon") {
+                makeTextListItem(
+                    items,
+                    "MES_DESCRIPTION",
+                    descriptionCheckedFolder
+                )                
                 makeSeparator(
                     items
                 )
@@ -6432,31 +6433,7 @@ function onTreeContextFolder(evt, tree, id) {
                     )
                 }
                 if (isSpace) {
-                    if (isAdmin) {
-                        makeSeparator(
-                            list
-                        )
-                        makeTextListItem(
-                            list,
-                            "MES_ACCESS",
-                            function() {showAccessScreen(folder.spaceId, null)}
-                        )
-                    }
-                    if (FEATURE_SAVE_PROJECT) {
-                        makeSeparator(
-                            list
-                        )
-                        makeTextListItem(
-                            list,
-                            "MES_LOAD_FROM_FILE",
-                            function() {showLoadFromFile(folder.spaceId)}
-                        )
-                        makeTextListItem(
-                            list,
-                            "MES_SAVE_TO_FILE",
-                            function() {showSaveToFile(folder.spaceId)}
-                        )
-                    }
+
                 } else {
                     makeSeparator(
                         list
@@ -6478,14 +6455,7 @@ function onTreeContextFolder(evt, tree, id) {
                     )
                 }
             }
-            makeSeparator(
-                list
-            )
-            makeTextListItem(
-                list,
-                "MES_DESCRIPTION",
-                function() {changeDescription(id)}
-            )
+
             if (folder.type == "module") {
                 makeSeparator(
                     list
@@ -8425,12 +8395,11 @@ function updateHistoryList() {
 }
 
 function validateFolderName(name) {
-    name = name || ""
-    name = name.trim()
-    if (name) {
-        return null
+    var error = checkFileName(name)
+    if (error) {
+        return translate(error)
     } else {
-        return translate("ERR_EMPTY_NAME")
+        return null
     }
 }
 
@@ -8442,6 +8411,8 @@ function validateModuleName(name, language) {
         return null
     }
 }
+
+
 
 function validateSpaceName(name) {
     name = name || ""
