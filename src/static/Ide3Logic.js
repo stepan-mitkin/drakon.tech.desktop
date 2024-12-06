@@ -7941,20 +7941,10 @@ function showSpacesInFolder() {
 }
 
 function showSpacesInTree() {
-    var item, items, tree
-    items = []
-    var _ind429 = 0;
-    var _col429 = globs.user.spaces;
-    var _keys429 = Object.keys(_col429); 
-    var _len429 = _keys429.length;
-    while (true) {
-        if (_ind429 < _len429) {
-            
-        } else {
-            break;
-        }
-        var spaceId = _keys429[_ind429]; var space = _col429[spaceId];
-        item = {
+    var items = []
+    for (var spaceId in globs.user.spaces) {
+        var space = globs.user.spaces[spaceId];
+        var item = {
             id : makeId(spaceId, "1"),
             text : space.name,
             icon : "workspace-s2.png",
@@ -7963,13 +7953,18 @@ function showSpacesInTree() {
             kids : []
         }
         items.push(item)
-        _ind429++;
     }
-    tree = getWidget("tree")
+    var tree = getWidget("tree")
     tree.setChildren(
-        null,
+        undefined,
         items
     )
+    for (var spaceId in globs.user.spaces) {
+        var space = globs.user.spaces[spaceId];
+        var id = makeId(spaceId, "1")
+        setTreeChildren(space)
+        tree.expand(id)
+    }    
 }
 
 function showTrash(items) {
