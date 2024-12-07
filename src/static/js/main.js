@@ -487,22 +487,68 @@
         renderStartPage(wide, recent)
     }
 
+    function onError(evt) {
+        panic(evt.error);
+    }
+    function onRejection(evt) {
+        evt.preventDefault();
+        panic(evt.reason);
+    }
+
+    function createDefaultButton(text, action) {
+        var button = div('ui2-default-button', {text:text})
+        button.addEventListener("click", action)
+        return button
+    }
+
+    function removeById(id) {
+        var working = document.getElementById(id)
+        if (working) {
+            working.remove()
+        }    
+    }
+
+    function panic(ex) {
+        console.error(ex);
+        var wide = get("wide")
+        clear(wide)
+        removeById("working")
+        removeById("central")
+        removeById("popup")
+        var main = div({
+            position: "fixed",
+            display: "inline-block",
+            background: "white",
+            color: "black",
+            left: "0px",
+            top: "0px",
+            width: "100vw",
+            height: "100vh"
+        })
+        add(wide, main)
+        var message = div('header1', { text: translate('An error has occurred') });
+        var ok = createDefaultButton(translate('Ok'), backend.restartApp);
+        var buttonDiv = div({
+            'padding-top': '20px',
+            'text-align': 'center'
+        }, ok);
+        var central = div('middle', message, buttonDiv);
+        add(main, central);
+    }    
+
     function startIde(spaceId) {
+        window.addEventListener('error', onError);
+        window.addEventListener('unhandledrejection', onRejection);        
         var wide = get("wide")
         wide.style.transition = ""
         wide.style.opacity = 0
         clear(wide)        
         var userId = "Dar Veter"
-        var pagePanic = function(err) {console.error(err)}
-        var ide = new Ide3(window, document, translate, userId, pagePanic)
+        var ide = new Ide3(window, document, translate, userId, panic)
         var logic = new Ide3Logic(spaceId, userId, ide, translate)
-        ide.logic = logic
+        ide.logic = logic        
         
-        
-        window.onerror = ide.onError
-       
-        window.onresize = ide.orderResize	
-        
+        window.onresize = ide.orderResize	        
         window.onmouseout = function(evt) { evt.preventDefault() }
         
         ide.init()    

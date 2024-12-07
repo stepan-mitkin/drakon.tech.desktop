@@ -259,8 +259,8 @@
         setFolderBody(id, folder)
     }
 
-    async function getFolder(spaceId, folderId) {
-        console.log("getFolder", spaceId, folderId)
+    async function getFolder(spaceId, folderId) {                
+        console.log("getFolder", spaceId, folderId)        
         await pause(10)
         var folder = getFolderWithChildren(spaceId, folderId)
         folder.path = buildFolderPath(folder.fullId)
@@ -705,6 +705,11 @@
         document.title = title
     }
 
+    function restartApp() {
+        console.log("restartApp")
+        location.reload()
+    }
+
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -723,7 +728,8 @@
         searchItems: searchItems,
         pollSearch: pollSearch,
         searchDefinitions: searchDefinitions,
-        setTitle: setTitle
+        setTitle: setTitle,
+        restartApp: restartApp
     }
     
 })();

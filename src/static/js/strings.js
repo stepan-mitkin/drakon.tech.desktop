@@ -515,7 +515,9 @@ var gStringsEn = {
 	"ERR_PLEASE_PROVIDE_HTML": "HTML is missing",
 	"Open folder": "Open folder",
 	"Recent": "Recent",
-	"Clear recent": "Clear recent"
+	"Clear recent": "Clear recent",
+	"An error has occurred": "An error has occurred",
+	"Ok": "Ok"
 }
 
 var gStringsRu = {
@@ -1036,7 +1038,9 @@ var gStringsRu = {
 	"ERR_PLEASE_PROVIDE_HTML": "HTML-код отсутствует",
 	"Open folder": "Открыть папку",
 	"Recent": "Недавнее",
-	"Clear recent": "Очистить недавнее"
+	"Clear recent": "Очистить недавнее",
+	"An error has occurred": "Произошла ошибка",
+	"Ok": "Ок"
 }
 
 function translate(text) {

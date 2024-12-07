@@ -532,7 +532,7 @@ function DescriptionChanger_UserInput_onData(self, data) {
         self.spaceId,
         self.folderId,
         payload
-    ).then(self.onData)
+    ).then(self.onData).catch(self.onError)
     self.state = "Saving";
 }
 
@@ -1185,7 +1185,7 @@ function FolderGetter_Start_onData(self, data) {
     backend.getFolder(
     	self.ids.spaceId,
     	self.ids.folderId
-    ).then(result => self.onData(result))
+    ).then(self.onData).catch(self.onError)
     self.state = "GettingFolder";
 }
 
@@ -6875,18 +6875,18 @@ function requestAccount(target) {
     			spaces_access: [folder]
     		})
     	}
-    )
+    ).catch(target.onError)
 }
 
 function requestHistory(target) {
     var data
     backend.getHistory().then(
-    	data => target.onData(data)
-    )
+    	target.onData
+    ).catch(target.onError)
 }
 
 function requestTheme(target) {
-    backend.getSettings().then(target.onData)    
+    backend.getSettings().then(target.onData).catch(target.onError)
 }
 
 function resetSearch() {
@@ -6963,7 +6963,7 @@ function runManyOperation(parentId, folders, operation, machine) {
         target : target,
         operation : operation
     }
-    backend.changeMany(payload).then(machine.onData)
+    backend.changeMany(payload).then(machine.onData).catch(machine.onError)
 }
 
 function save(saver, item) {
@@ -6997,7 +6997,7 @@ function saveApp(data) {
 }
 
 function saveChange(spaceId, folderId, change, target) {
-    backend.edit(spaceId, folderId, change).then(target.onData)
+    backend.edit(spaceId, folderId, change).then(target.onData).catch(target.onError)
 }
 
 function saveChanges(changes) {
@@ -7213,7 +7213,7 @@ function sendCreateDiagram(spaceId, parentFolderId, props, target) {
         parent : parentFolderId
     }
     Object.assign(data, props)
-    backend.createFolder(spaceId, data).then(target.onData)
+    backend.createFolder(spaceId, data).then(target.onData).catch(target.onError)
 }
 
 function sendCreateFolder(spaceId, parentFolderId, type, name, target, language) {
@@ -7223,7 +7223,7 @@ function sendCreateFolder(spaceId, parentFolderId, type, name, target, language)
         name : name,
         language : language
     }
-    backend.createFolder(spaceId, data).then(target.onData)
+    backend.createFolder(spaceId, data).then(target.onData).catch(target.onError)
 }
 
 function sendDelete(folders, target) {
@@ -7234,14 +7234,14 @@ function sendDelete(folders, target) {
         items : items,
         operation : "delete"
     }
-    backend.changeMany(payload).then(target.onData)
+    backend.changeMany(payload).then(target.onData).catch(target.onError)
 }
 
 function sendGetFolder(spaceId, folderId, target) {
     backend.getFolder(
     	spaceId,
     	folderId
-    ).then(target.onData)    
+    ).then(target.onData).catch(target.onError)
 }
 
 function sendGetFolderProps(spaceId, folderId, target) {
@@ -7255,7 +7255,7 @@ function sendGetFolderProps(spaceId, folderId, target) {
 }
 
 function sendGetSearch(target) {
-    backend.pollSearch().then(target.onData)
+    backend.pollSearch().then(target.onData).catch(target.onError)
 }
 
 function sendInput(self) {
@@ -7272,7 +7272,7 @@ function sendRename(self, spaceId, folderId, name) {
     var payload = {
         name : name
     }
-    backend.updateFolder(spaceId, folderId, payload).then(self.onData)
+    backend.updateFolder(spaceId, folderId, payload).then(self.onData).catch(self.onError)
 }
 
 function sendSaveDiagramProps(spaceId, folderId, payload, self) {  
@@ -7280,7 +7280,7 @@ function sendSaveDiagramProps(spaceId, folderId, payload, self) {
         spaceId,
         folderId,
         payload
-    ).then(self.onData)
+    ).then(self.onData).catch(self.onError)
 }
 
 function sendSaveFolderProps(spaceId, folderId, data, target) {
@@ -8164,7 +8164,7 @@ function startSearchFolders(needle, target) {
         type : "folders",
         needle : needle
     }
-    backend.searchFolders(data).then(target.onData)
+    backend.searchFolders(data).then(target.onData).catch(target.onError)
 }
 
 function startSearchItems(needle, target) {
@@ -8175,7 +8175,7 @@ function startSearchItems(needle, target) {
         type : "items",
         needle : needle
     }
-    backend.searchItems(data).then(target.onData)
+    backend.searchItems(data).then(target.onData).catch(target.onError)
 }
 
 function startSearchMachine(machine) {
