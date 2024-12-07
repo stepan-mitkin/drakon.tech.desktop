@@ -36,7 +36,8 @@
                     localStorage.removeItem(id)
                 }
                 localStorage.removeItem(spaceId + "-folders")
-            }
+                localStorage.removeItem(spaceId + "-history")                
+            }            
             localStorage.removeItem("projects")
             localStorage.removeItem("recent")
         } else {
@@ -161,9 +162,71 @@
 
     async function getHistory() {
         console.log("getHistory")
-        await pause(10)
+        await pause(10)        
+        var history = getHistoryItems()
         return {
-            recent: []
+            recent: history.map(getHistoryItem)
+        }
+    }
+
+    function getUtc() {
+        return Math.floor(Date.now() / 1000)
+    }
+
+    function getHistoryItems() {
+        var historyStr = localStorage.getItem(gSpaceId + "-history") || "[]"
+        return JSON.parse(historyStr)        
+    }
+
+    function saveHistoryItems(history) {
+        var historyStr = JSON.stringify(history)
+        localStorage.setItem(gSpaceId + "-history", historyStr)
+    }
+
+    function addToHistory(id) {        
+        var histItem = {
+            whenOpened: getUtc(),
+            id: id
+        }
+        var history = getHistoryItems()
+        deleteFromHistoryCore(history, [id])        
+        history.unshift(histItem)
+        while (history.length > 30) {
+            history.pop()
+        }
+        saveHistoryItems(history)
+    }
+
+    function deleteFromArray(array, predicate) {
+        for (let i = array.length - 1; i >= 0; i--) {
+            if (predicate(array[i], i, array)) {
+                array.splice(i, 1);
+            }
+        }
+    }    
+
+    function deleteFromHistory(ids) {
+        var history = getHistoryItems()
+        deleteFromHistoryCore(history, ids)
+        saveHistoryItems(history)
+    }
+
+    function deleteFromHistoryCore(history, ids) {
+        for (var id of ids) {
+            deleteFromArray(history, element => element.id === id)
+        }        
+    }
+
+    function getHistoryItem(histItem) {
+        var id = histItem.id
+        var parsed = parseId(id)
+        var folder = getFolderBody(id)
+        return {
+            folder_id: parsed.folderId,
+            space_id: parsed.spaceId,
+            name: folder.name,
+            type: folder.type,
+            whenOpened: histItem.whenOpened
         }
     }
 
@@ -208,6 +271,9 @@
         folder.access = "write"
         var id = buildId(spaceId, folderId)
         gFolders[id] = getFolderBody(id)
+        if (folder.type !== "folder") {
+            addToHistory(id)
+        }
         return folder
     }
 
@@ -251,6 +317,7 @@
             return {ok:false, error:ex.message}
         }
 
+        deleteFromHistory(deleted)
         return {ok:true, deleted: deleted}
     }
 
