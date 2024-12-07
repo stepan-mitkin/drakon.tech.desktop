@@ -710,6 +710,20 @@
         location.reload()
     }
 
+    async function setClipboard(type, content) {
+        console.log("setClipboard", type, content)
+        await pause(10)
+        localStorage.setItem("clipboard-type", type)
+        localStorage.setItem("clipboard-content", content)
+    }
+
+    window.onstorage = function(evt) {
+        if (evt.key === "clipboard-content") {
+            var type = localStorage.getItem("clipboard-type")
+            var content = localStorage.getItem("clipboard-content")
+            setLocalClipboard(type, content)
+        }
+    }
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -729,7 +743,8 @@
         pollSearch: pollSearch,
         searchDefinitions: searchDefinitions,
         setTitle: setTitle,
-        restartApp: restartApp
+        restartApp: restartApp,
+        setClipboard: setClipboard
     }
     
 })();

@@ -1,5 +1,40 @@
 (function() {
     var appVersion = "v 2024.12.04"
+
+    var clipboard = {
+        type: "",
+        content: ""
+    }
+
+    window.getClipboardCached = function() {
+        return JSON.parse(clipboard.content)
+    }
+    
+    window.copyToClipboardCached = function(type, subgraph) {
+        var content = JSON.stringify(subgraph);
+        setClipboardCore(type, content)
+    }
+
+    function setClipboardCore(type, content) {
+        setLocalClipboard(type, content)
+        backend.setClipboard(type, content)
+    }
+
+    function setLocalClipboard(type, content) {
+        clipboard.type = type
+        clipboard.content = content
+    }    
+
+    window.setLocalClipboard = setLocalClipboard
+    
+    window.getClipboardTypeCached = function() {
+        return clipboard.type
+    }
+    
+    window.clearClipboardCached = function () {
+        setClipboardCore("", "")
+    }
+
     function loop(begin, end, step, callback) {
         for (var i = begin; i < end; i += step) {
             callback(i)

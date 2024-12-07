@@ -4562,7 +4562,6 @@ function getChildObjectTypes(folderId) {
     result = []
     var folder = getFromCache(folderId)
     if (folder) {
-        console.log(folder)
         _sw73320000_ = folder.type;
         if (_sw73320000_ === "folder") {
             if (hasModuleAbove(folder)) {

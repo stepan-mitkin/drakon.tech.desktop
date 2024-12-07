@@ -39,6 +39,23 @@ function Clipboard() {
     this.clear = clearClipboard
 }
 
+function getClipboard() {
+    return getClipboardCached();
+}
+
+function copyToClipboard(type, subgraph) {
+    copyToClipboardCached(type, subgraph)
+    scheduleClipboardClear()
+}
+
+function getClipboardType() {
+    return getClipboardTypeCached()
+}
+
+function clearClipboard() {
+    clearClipboardCached()
+}
+
 function Storage() {
     var saveChanges = function(changes) {
     	self.logic.saveChanges(changes)
@@ -997,11 +1014,6 @@ function chooseModule() {
     sendToCentralMachine(select.value)
 }
 
-function clearClipboard() {
-    setLsItem("clipboard type", "");
-    setLsItem("clipboard", "");
-}
-
 function clearMachines() {
     var _ind2776 = 0;
     var _col2776 = globs.centralMachines;
@@ -1039,13 +1051,6 @@ function compareByGetter(left, right, getter) {
 
 function confirmExit() {
     return translate("MES_SURE_EXIT")
-}
-
-function copyToClipboard(type, subgraph) {
-    var text = JSON.stringify(subgraph);
-    setLsItem("clipboard type", type);
-    setLsItem("clipboard", text);
-    scheduleClipboardClear()
 }
 
 function createBuildWindow() {
@@ -1699,15 +1704,7 @@ function get(id) {
     }
 }
 
-function getClipboard() {
-    var text = getLsItem("clipboard");
-    var obj = JSON.parse(text);
-    return obj;
-}
 
-function getClipboardType() {
-    return getLsItem("clipboard type");
-}
 
 function getDateString() {
     var date = new Date()
