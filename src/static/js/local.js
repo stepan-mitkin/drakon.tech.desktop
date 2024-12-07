@@ -311,7 +311,11 @@
             } else if (body.operation === "copy") {
                 forEach(body.items, copyOneFolder, body.target)
             } else if (body.operation === "move") {
-                forEach(body.items, moveOneFolder, body.target)
+                if (moveAcrossProjects(body)) {
+                    forEach(body.items, copyOneFolder, body.target)
+                } else {
+                    forEach(body.items, moveOneFolder, body.target)
+                }
             }
         } catch (ex) {
             return {ok:false, error:ex.message}
@@ -319,6 +323,10 @@
 
         deleteFromHistory(deleted)
         return {ok:true, deleted: deleted}
+    }
+
+    function moveAcrossProjects(body) {
+        return body.target.space_id !== body.items[0].space_id
     }
 
     async function edit(spaceId, folderId, change) {

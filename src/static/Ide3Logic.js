@@ -1750,7 +1750,7 @@ function Paster_Start_onData(self, data) {
             "copy",
             self
         )
-        self.state = "RunningCopy";
+        self.state = "RunningOperation";
     } else {
         runManyOperation(
             data.parentId,
