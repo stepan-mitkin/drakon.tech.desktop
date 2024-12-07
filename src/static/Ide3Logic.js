@@ -3443,240 +3443,112 @@ function buildAccessChange(old, access) {
     }
 }
 
-function buildMainMenu() {
-    var _sw68970000_ = 0;
-    var gotoTitle = "MES_GO_TO"
-    var actionsTitle = "MES_ACTIONS"
+function newWindow() {
+    console.log("newWindow")
+}
+
+function openFolder() {
+    console.log("openFolder")
+}
+
+function closeFolder() {
+    console.log("closeFolder")
+}
+
+function exportProject() {
+    console.log("exportProject")
+}
+
+function importProject() {
+    console.log("importProject")
+}
+
+function openRecentFolder(folder) {
+    console.log("openRecentFolder", folder)
+}
+
+function buildGoToRecentItem(item) {
+    return {
+        text: item,
+        action: function() {openRecentFolder(item)}
+    }
+}
+
+async function buildMainMenu() {
     var showTitle = "MES_SHOW"
-    var learnTitle = "MES_LEARN"
     var green = "green"
     var yellow = "olive"
     var blue = "blue"
-    var white = "gray"
-    var rwGotoItems = []
-    rwGotoItems.push({
-    	text: "MES_HOMEPAGE",
-    	action: goHome
+    var fileItems = []
+    fileItems.push({
+    	text: "New window",
+    	action: newWindow
     })
-    rwGotoItems.push({
-    	text: "MES_TUTORIALS",
-    	action: makeGo("https://drakon.tech/read/tutorials")
+    fileItems.push({
+    	text: "Open folder",
+    	action: openFolder
     })
-    rwGotoItems.push({
-    	text: "MES_EXAMPLES",
-    	action: makeGo("https://drakon.tech/read/examples")
+    fileItems.push({
+    	text: "Close folder",
+    	action: closeFolder
     })
-    if (gUserId) {
-        rwGotoItems.push({
-        	text: "MES_DASHBOARD",
-        	action: goToDashboard
-        })
-    }
-    if (gUserId) {
-        rwGotoItems.push(
-        	{
-        		text: "MES_SPACES",
-        		action: goToProjects
-        	}
-        )
-        if (globs.wide) {
-            
-        } else {
-            rwGotoItems.push(
-            	{
-            		text: "MES_RECENT",
-            		action: goToRecent
-            	}
-            )
+    var exportItems = [
+        {
+            text: "Import project",
+            action: importProject
+        },
+        {
+            text: "Export project",
+            action: exportProject
         }
-        rwGotoItems.push(
-        	{
-        		text: "MES_TRASH",
-        		action: goToTrash,
-        		image: "trash-s2.png"
-        	}
-        )
-        rwGotoItems.push(
-        	{
-        		text: "MES_ACCOUNT",
-        		action: goToAccount,
-        		image: "user-s.png"
-        	}
-        )
-    }
-    var rwActionsItems = []
-    if (gUserId) {
-        if ((globs.current.type) && (!(isReadonly()))) {
-            rwActionsItems.push(
-            	{
-            		text: "MES_NEW_OBJECT",
-            		action: create,
-            		image: "to-primitive-s2.png"
-            	}
-            )
+    ]
+    
+    var rwShotItems = []
+    rwShotItems.push(
+        {
+            text: "MES_PROJECT_TREE",
+            action: openLeftPane
         }
-        rwActionsItems.push(
-        	{
-        		text: "MES_CREATE_SPACE",
-        		action: createProject,
-        		image: "workspace-s2.png"
-        	}
-        )
-    }
-    if (isDiagramOrFolder()) {
-        if ((gUserId) || (!(isDiagram()))) {
-            
-        } else {
-            rwActionsItems.push(
-            	{
-            		text: "MES_GET_IT",
-            		action: saveDiagram
-            	}
-            )
-        }
-        if (globs.isTryMe) {
-            
-        } else {
-            rwActionsItems.push(
-            	{
-            		text: "MES_SHARE",
-            		action: share,
-            		image: "share.png"
-            	}
-            )
-        }
-    }
-    var split = getWidget("splitter")
-    var rwShowItems = []
-    if ((globs.isTryMe) || (!(globs.wide))) {
-        
-    } else {
-        rwShowItems.push(
-        	{
-        		text: "MES_PROJECT_TREE",
-        		action: openLeftPane
-        	}
-        )
-        rwShowItems.push(
-        	{
-        		text: "MES_RECENT_PANE",
-        		action: openRightPane
-        	}
-        )
-    }
-    if (isDiagram()) {
-        rwShowItems.push(
-        	{
-        		text: "MES_HELP",
-        		action: showHelp
-        	}
-        )
-    }
-    var host = "https://drakon.tech"
-    var learnItems = []
-    if (shouldShowDemo()) {
-        learnItems.push(
-        	{
-        		text: "MES_SHOW_DEMO",
-        		action: showDemoCore
-        	}
-        )
-    }
-    pushMenuItem(
-        learnItems,
-        "MES_DOCUMENTATION",
-        host + "/read/docs"
     )
-    if (isDiagram()) {
-        _sw68970000_ = globs.current.type;
-        if (_sw68970000_ === "drakon") {
-            pushMenuItem(
-                learnItems,
-                "title-drakon",
-                host + "/drakon"
-            )
-            pushMenuItem(
-                learnItems,
-                "title-video-how-to-flowchart",
-                host + "/video-how-to-flowchart"
-            )
-            pushMenuItem(
-                learnItems,
-                "title-drakon-reference",
-                host + "/drakon-reference"
-            )
-            pushMenuItem(
-                learnItems,
-                "title-how-to-flowchart",
-                host + "/how-to-flowchart"
-            )
-        } else {
-            if (_sw68970000_ === "mind") {
-                pushMenuItem(
-                    learnItems,
-                    "title-video-how-to-mind-map",
-                    host + "/video-how-to-mind-map"
-                )
-                pushMenuItem(
-                    learnItems,
-                    "title-how-to-mind-map",
-                    host + "/how-to-mind-map"
-                )
-            } else {
-                pushMenuItem(
-                    learnItems,
-                    "title-video-how-to-flowchart",
-                    host + "/video-how-to-flowchart"
-                )
-                pushMenuItem(
-                    learnItems,
-                    "title-video-how-to-mind-map",
-                    host + "/video-how-to-mind-map"
-                )
-            }
+    rwShotItems.push(
+        {
+            text: "MES_RECENT_PANE",
+            action: openRightPane
         }
-    } else {
-        pushMenuItem(
-            learnItems,
-            "title-video-how-to-flowchart",
-            host + "/video-how-to-flowchart"
-        )
-        pushMenuItem(
-            learnItems,
-            "title-video-how-to-mind-map",
-            host + "/video-how-to-mind-map"
-        )
-    }
-    var menu
-    menu = [
+    )    
+
+    var recent = await backend.getRecent()
+    var recentItems = recent.map(buildGoToRecentItem).slice(0, 5)
+    var menu = [
     	{
-    		title: gotoTitle,
-    		items: rwGotoItems,
+    		title: "Window",
+    		items: fileItems,
     		color: green
     	},
     	{
-    		title: actionsTitle,
-    		items: rwActionsItems,
+    		title: "Export/Import",
+    		items: exportItems,
     		color: yellow
-    	}
+    	},
+        {
+            title: showTitle,
+            items: rwShotItems,
+            color: blue
+        }        
     ]
-    /*menu.push({
-    		title: learnTitle,
-    		items: learnItems,
-    		color: blue
-    })
-    */
-    if (rwShowItems.length > 0) {
-        menu.push(
-        	{
-        		title: showTitle,
-        		items: rwShowItems,
-        		color: white
-        	}
-        )
+
+    if (recentItems.length !== 0) {
+        menu.push({
+            title: "Recent",
+            items: recentItems,
+            color: "coral"
+        })  
     }
+
     return menu
 }
+
+
 
 function buildModule(folder) {
     globs.build.buildModule(folder)
@@ -7758,9 +7630,9 @@ function showLoadFromFile(spaceId, target) {
     )
 }
 
-function showMainMenu() {
+async function showMainMenu() {
     var items
-    items = buildMainMenu()
+    items = await buildMainMenu()
     browser.showMainMenu(items)
 }
 

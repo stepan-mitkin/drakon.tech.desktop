@@ -5739,26 +5739,18 @@ function showMainMenu(menus) {
     main.style.background = "white"
     main.style.color = "black"
     main.className = "popup appearing"
+    main.style.maxWidth = "400px"
     var header = make(main, "div")
     header.style.paddingLeft = "5px"
     header.style.paddingRight = "5px"
     header.style.paddingTop = "5px"
     var logo = make(header, "img")
     logo.draggable = false
-    logo.width = 66
-    logo.height = 66
-    logo.src = getDrakosha()
+    logo.width = 300
+    logo.src = "static/images/drakosha-logo-text-126.png"
     logo.style.verticalAlign = "middle"
     logo.style.cursor = "pointer"
     logo.onclick = hidePopup
-    if (globs.wide) {
-        var tlogo = make(header, "img")
-        tlogo.draggable = false
-        tlogo.width = 100
-        tlogo.height = 40
-        tlogo.src = getTextMenu()
-        tlogo.style.verticalAlign = "middle"
-    }
     var close = make(header, "img")
     close.draggable = false
     close.width = 30
@@ -5770,53 +5762,27 @@ function showMainMenu(menus) {
     close.style.cursor = "pointer"
     close.style.background = DarkBackground
     close.style.verticalAlign = "middle"
-    if (globs.wide) {
-        var menusDiv = make(main, "table")
-        menusDiv.style.marginRight = "2px"
-        var row = make(menusDiv, "tr")
-        var _ind2347 = 0;
-        var _col2347 = menus;
-        var _len2347 = _col2347.length;
-        while (true) {
-            if (_ind2347 < _len2347) {
-                
-            } else {
-                break;
-            }
-            var menu = _col2347[_ind2347];
-            var td = make(row, "td")
-            td.style.verticalAlign = "top"
-            td.style.paddingLeft = "5px"
-            td.style.paddingBottom = "4px"
-            td.style.maxWidth="300px"
-            addMenuSection(
-            	td,
-            	menu
-            )
-            _ind2347++;
+
+    main.style.overflowY = "auto"
+    var _ind2359 = 0;
+    var _col2359 = menus;
+    var _len2359 = _col2359.length;
+    while (true) {
+        if (_ind2359 < _len2359) {
+            
+        } else {
+            break;
         }
-    } else {
-        main.style.overflowY = "auto"
-        var _ind2359 = 0;
-        var _col2359 = menus;
-        var _len2359 = _col2359.length;
-        while (true) {
-            if (_ind2359 < _len2359) {
-                
-            } else {
-                break;
-            }
-            var menu = _col2359[_ind2359];
-            var section = make(main, "div")
-            section.style.paddingLeft = "5px"
-            section.style.paddingRight = "5px"
-            section.style.paddingBottom = "4px"
-            addMenuSection(
-            	section,
-            	menu
-            )
-            _ind2359++;
-        }
+        var menu = _col2359[_ind2359];
+        var section = make(main, "div")
+        section.style.paddingLeft = "5px"
+        section.style.paddingRight = "5px"
+        section.style.paddingBottom = "4px"
+        addMenuSection(
+            section,
+            menu
+        )
+        _ind2359++;
     }
     pushTempIfMobile()
     HtmlUtils.setPosCorrected(

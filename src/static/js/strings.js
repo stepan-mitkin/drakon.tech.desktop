@@ -517,7 +517,13 @@ var gStringsEn = {
 	"Recent": "Recent",
 	"Clear recent": "Clear recent",
 	"An error has occurred": "An error has occurred",
-	"Ok": "Ok"
+	"Ok": "Ok",
+	"Window": "Window",
+	"New window": "New window",
+	"Close folder": "Close folder",
+	"Export/Import": "Export/Import",
+	"Export project": "Export project",
+	"Import project": "Import project"	
 }
 
 var gStringsRu = {
@@ -1040,7 +1046,13 @@ var gStringsRu = {
 	"Recent": "Недавнее",
 	"Clear recent": "Очистить недавнее",
 	"An error has occurred": "Произошла ошибка",
-	"Ok": "Ок"
+	"Ok": "Ок",
+	"Window": "Окно",
+	"New window": "Новое окно",
+	"Close folder": "Закрыть папку",
+	"Export/Import": "Экспорт/импорт",
+	"Export project": "Экспортировать проект",
+	"Import project": "Импортировать проект"
 }
 
 function translate(text) {

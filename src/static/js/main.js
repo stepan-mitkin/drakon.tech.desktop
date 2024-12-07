@@ -507,6 +507,8 @@
 
     async function main() {
         initStyles()
+        window.addEventListener('error', onError);
+        window.addEventListener('unhandledrejection', onRejection);               
         var settings = await backend.getSettings()
         setLanguage(settings.language)
         var recent = await backend.getRecent()
@@ -571,9 +573,7 @@
         add(main, central);
     }    
 
-    function startIde(spaceId) {
-        window.addEventListener('error', onError);
-        window.addEventListener('unhandledrejection', onRejection);        
+    function startIde(spaceId) { 
         var wide = get("wide")
         wide.style.transition = ""
         wide.style.opacity = 0
