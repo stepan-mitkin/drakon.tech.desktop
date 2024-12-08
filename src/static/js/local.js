@@ -724,6 +724,29 @@
             setLocalClipboard(type, content)
         }
     }
+
+
+    function exportProject() {
+        console.log("exportProject!")
+    }
+    
+    function importProject() {
+        console.log("importProject!")
+    }    
+
+    async function closeFolder() {
+        console.log("closeFolder")
+        await pause(10)
+        gFolder = ""
+        gSpaceId = ""
+        gFolderName = ""
+        gFolders = {}
+        gSearch = undefined
+    }
+
+    function newWindow() {
+        window.open(window.location.href, '_blank');
+    }    
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -744,7 +767,11 @@
         searchDefinitions: searchDefinitions,
         setTitle: setTitle,
         restartApp: restartApp,
-        setClipboard: setClipboard
+        setClipboard: setClipboard,
+        newWindow: newWindow,
+        closeFolder: closeFolder,
+        exportProject: exportProject,
+        importProject: importProject
     }
     
 })();

@@ -383,13 +383,20 @@
     }
 
     async function tryOpenFolder(folder) {
-        try {
-            var spaceId = await backend.openFolder(folder)
-            await addToRecent(folder)
-            startIde(spaceId)
-        } catch (ex) {
-            console.error(ex)
-        }
+        var spaceId = await backend.openFolder(folder)
+        await addToRecent(folder)
+        startIde(spaceId)
+    }
+
+    async function closeFolder() {
+        await backend.closeFolder()
+        await showStartPage()
+    }
+
+    window.dtApp = {
+        openFolder: openFolder,
+        tryOpenFolder: tryOpenFolder,
+        closeFolder: closeFolder
     }
 
     function clearRecent(recentDiv) {
@@ -504,11 +511,7 @@
         forEach(recent, addRecentButton, recentDiv)
     }
     
-
-    async function main() {
-        initStyles()
-        window.addEventListener('error', onError);
-        window.addEventListener('unhandledrejection', onRejection);               
+    async function showStartPage() {
         var settings = await backend.getSettings()
         setLanguage(settings.language)
         var recent = await backend.getRecent()
@@ -521,7 +524,14 @@
         wide.style.top = "0px"
         wide.style.width = "100vw"
         wide.style.height = "100vh"
-        renderStartPage(wide, recent)
+        renderStartPage(wide, recent)        
+    }
+
+    async function main() {
+        initStyles()
+        window.addEventListener('error', onError);
+        window.addEventListener('unhandledrejection', onRejection);               
+        await showStartPage()
     }
 
     function onError(evt) {

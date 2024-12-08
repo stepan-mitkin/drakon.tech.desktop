@@ -140,20 +140,6 @@ function create() {
     canvas.onmouseleave = mouseLeave
 }
 
-function detectPassive() {
-    var supportsPassive = false;
-    try {
-      var opts = Object.defineProperty({}, 'passive', {
-        get: function() {
-          supportsPassive = true;
-        }
-      });
-      window.addEventListener("testPassive", null, opts);
-      window.removeEventListener("testPassive", null, opts);
-    } catch (e) {}
-    gPassive = supportsPassive
-}
-
 function diagramToClient(x, y) {
     var tx = x;
     var ty = y;

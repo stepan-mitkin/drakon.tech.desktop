@@ -3443,34 +3443,10 @@ function buildAccessChange(old, access) {
     }
 }
 
-function newWindow() {
-    console.log("newWindow")
-}
-
-function openFolder() {
-    console.log("openFolder")
-}
-
-function closeFolder() {
-    console.log("closeFolder")
-}
-
-function exportProject() {
-    console.log("exportProject")
-}
-
-function importProject() {
-    console.log("importProject")
-}
-
-function openRecentFolder(folder) {
-    console.log("openRecentFolder", folder)
-}
-
 function buildGoToRecentItem(item) {
     return {
         text: item,
-        action: function() {openRecentFolder(item)}
+        action: function() {dtApp.tryOpenFolder(item)}
     }
 }
 
@@ -3482,24 +3458,24 @@ async function buildMainMenu() {
     var fileItems = []
     fileItems.push({
     	text: "New window",
-    	action: newWindow
+    	action: backend.newWindow
     })
     fileItems.push({
     	text: "Open folder",
-    	action: openFolder
+    	action: dtApp.openFolder
     })
     fileItems.push({
     	text: "Close folder",
-    	action: closeFolder
+    	action: dtApp.closeFolder
     })
     var exportItems = [
         {
             text: "Import project",
-            action: importProject
+            action: backend.importProject
         },
         {
             text: "Export project",
-            action: exportProject
+            action: backend.exportProject
         }
     ]
     
