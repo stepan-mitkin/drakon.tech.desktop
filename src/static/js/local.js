@@ -741,7 +741,23 @@
         }
     }
 
-    function downloadFile(filename, content) {
+    function downloadFile(filename, dataurl) {
+        const link = document.createElement('a');
+        link.href = dataurl;
+        link.download = filename;
+
+        // Append the anchor to the body
+        document.body.appendChild(link);
+
+        // Programmatically click the anchor to trigger the download
+        link.click();
+
+        // Remove the anchor from the document
+        document.body.removeChild(link);
+    }
+
+
+    function downloadTextFile(filename, content) {
         // Create a new Blob object using the content and specifying UTF-8 encoding
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     
@@ -799,7 +815,7 @@
         var folders = getExportFolders()
         var filename = gFolderName + ".jsonl"
         var content = folders.join("\n")
-        downloadFile(filename, content)
+        downloadTextFile(filename, content)
     }  
 
     async function closeFolder() {
@@ -839,7 +855,9 @@
         newWindow: newWindow,
         closeFolder: closeFolder,
         exportProject: exportProject,
-        clearProject: clearProject
+        clearProject: clearProject,
+        downloadTextFile: downloadTextFile,
+        downloadFile: downloadFile
     }
     
 })();

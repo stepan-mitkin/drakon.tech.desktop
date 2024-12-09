@@ -25,9 +25,10 @@ function Canvas(window, document, undefined) {
 	var gFont = null
 	var gDefaultFont = null
 	var gShadows = {}
+    var gFontSize = 14
 
 	this.renderToTexture = true
-
+    this.svgOutput = false
 	
 
 	var gNextItem = 0;
@@ -623,7 +624,7 @@ function createRectangle(x, y, w, h, format, layer) {
 }
 
 function createTexture(x, y, left, top, w, h, layer, angle) {
-    if (this.renderToTexture) {
+    if (self.renderToTexture) {
         return createRealTexture(
         	x, y,
         	left, top, w, h,
@@ -1711,8 +1712,15 @@ function drawTextCore(ctx, text, x, y, color, font) {
     }
     ctx.fillStyle = color;
     ctx.textAlign = "left";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(text, x, y + 1);
+    if (self.svgOutput) {
+        ctx.textBaseline = "alphabetic";
+        y -= Math.floor(gFontSize * 0.3)
+        ctx.fillText(text, x, y + 1);
+        console.log(gFontSize, text)    
+    } else {        
+        ctx.textBaseline = "bottom";
+        ctx.fillText(text, x, y + 1);    
+    }
 }
 
 function drawTexture(item) {
@@ -2676,6 +2684,7 @@ function setDefaultFont(font) {
         	family
         )
     }
+    gFontSize = size
     gDefaultFont = new FontRecord(
     	font,
     	italic,

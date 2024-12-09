@@ -4268,16 +4268,6 @@ function exportButton(evt, type, widget, id, cellId) {
     	"MES_SAVE_AS_SVG",
     	browser.saveAsSvg
     )
-    makeTextListItem(
-    	items,
-    	"MES_SAVE_AS_JSON",
-    	diagramSource
-    )
-    makeTextListItem(
-    	items,
-    	"MES_SAVE_AS_TEXT",
-    	diagramBText
-    )
     browser.showPopupList(
         widget.id,
         items

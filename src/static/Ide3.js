@@ -1508,14 +1508,6 @@ function doSendFeedback(text) {
     )
 }
 
-function downloadFile(url, filename) {
-    console.log("downloadFile", url, filename)
-    var link = document.createElement("a")
-    link.href = url
-    link.download = filename
-    link.click()
-}
-
 function editBasement() {
     editTextProp("basement", "MES_BASEMENT")
 }
@@ -2588,7 +2580,7 @@ function makeNavFolder(spaceId, folderId) {
     return go
 }
 
-function makePngName() {
+function getDiagramNameSafe() {
     var s1 = getEditor().getName()
     var sanitized = s1.replace(/,| |:|\\|\/|\r|\n|\t/g, "-");
     if (sanitized) {
@@ -2596,7 +2588,11 @@ function makePngName() {
     } else {
         sanitized = "diagram"
     }
-    return sanitized + ".png";
+    return sanitized    
+}
+
+function makePngName() {
+    return getDiagramNameSafe() + ".png";
 }
 
 function makePropButtons(div, node, widget) {
@@ -4159,51 +4155,15 @@ function saveAsPng(zoom) {
     	"canvas"
     )
     var image = getEditor().exportPng(exportCanvas, zoom)
-    if (globs.wide) {
-        var filename = getDateString() + ".png"
-        var success = function(data) {
-        	hideWorking()
-        	var url = "/api/download/" + data.download_id
-        	window.location.href = url
-        }
-        showWorking()
-        HtmlUtils.sendRawPost(
-        	"/api/download/" + filename,
-        	image,
-        	success,
-        	panic
-        )
-    } else {
-        var name = makePngName()
-        var w = window.open('about:blank', "");
-        if (!w) return
-        
-        w.document.write("<img src='" + image + "' alt='" + name + "'/>");
-    }
+    var filename = getDiagramNameSafe() + ".png"
+    backend.downloadFile(filename, image)
     document.body.removeChild(exportCanvas)
 }
 
 function saveAsSvg() {
-    var filename = getDateString() + ".svg"
+    var filename = getDiagramNameSafe() + ".svg"
     var image = getEditor().exportSvg()
-    var fonts = getEditor().getFontsFromEditor()
-    var data = {
-    	filename: filename,
-    	image: image,
-    	fonts: fonts
-    }
-    var success = function(data) {
-    	hideWorking()
-    	var url = "/api/download/" + data.download_id
-    	window.location.href = url
-    }
-    showWorking()
-    HtmlUtils.sendPost(
-    	"/api/download_svg",
-    	data,
-    	success,
-    	panic
-    )
+    backend.downloadTextFile(filename, image)    
 }
 
 function saveDiaProps() {
@@ -6569,7 +6529,6 @@ this.showNoModules = showNoModules
 this.showChooseModule = showChooseModule
 this.showChangeDiaProps = showChangeDiaProps
 this.showSaveProjectScreen = showSaveProjectScreen
-this.downloadFile = downloadFile
 this.showLoadFromFile = showLoadFromFile
 this.upload = upload
 }

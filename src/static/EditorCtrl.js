@@ -1837,9 +1837,11 @@ function exportSvg() {
     ctx.translate(-box.left, -box.top);	
     
     canvas.renderToTexture = false
+    canvas.svgOutput = true
     editor.redraw()
     canvas.draw(ctx)
     canvas.renderToTexture = true
+    canvas.svgOutput = false
     editor.redraw()
     
     var image = ctx.getSerializedSvg(true)
