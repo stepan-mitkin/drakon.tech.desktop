@@ -399,7 +399,7 @@
         closeFolder: closeFolder
     }
 
-    function clearRecent(recentDiv) {
+    function clearRecent(recentDiv) {        
         backend.setRecent([])
         clear(recentDiv)
     }

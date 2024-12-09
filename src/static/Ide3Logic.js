@@ -1899,6 +1899,65 @@ function ProjectDeleter_Waiting_timeout(self, data) {
     self.state = "Sure2";
 }
 
+function addLineToProject(folders, line, lineNo) {
+    var obj
+    try {
+        obj = JSON.parse(line)
+    } catch (ex) {
+        console.error(ex)
+        throw new Error("JSON error at line " + lineNo + ": " + ex.message)
+    }
+    var id = checkProperty(obj, "id", lineNo)
+    var parent = checkProperty(obj, "parent", lineNo)
+    checkProperty(obj, "type", lineNo)
+    checkProperty(obj, "name", lineNo)
+    var parentRecord = folders[parent]
+    if (!parentRecord) {
+        throw new Error("Missing parent at line " + lineNo + ": " + parent)
+    }
+    if (folders[id]) {
+        throw new Error("Non-unique id or cycle at line " + lineNo + ": " + id)
+    }
+    if (obj.type === "folder") {
+        obj = createFolderRecord(obj.name)
+    } else {
+        delete obj.id
+        delete obj.parent
+    }
+    folders[id] = obj
+    parentRecord.children.push(id)
+}
+
+function checkProperty(obj, property, lineNo) {
+    if (!obj[property]) {
+        throw new Error("Required property missing in JSON at line " + lineNo + ": " + property)
+    }
+    return obj[property]
+}
+
+function createFolderRecord(name) {
+    var result = {type:"folder", children:[]}
+    if (name) {
+        result.name = name
+    }
+    return result
+}
+
+function parseJsonlProject(text) {
+    text = text || ""
+    var lines = text.split("\n")    
+    var folders = {root:createFolderRecord()}
+    var i = 1
+    for (var line of lines) {
+        line = line.trim()
+        if (line) {
+            addLineToProject(folders, line, i)
+        }
+        i++
+    }
+    return folders
+}
+
 function ProjectLoader_ChoosingFile_cancel(self, data) {
     browser.hideCentral()
     complete(self, data)
@@ -1927,13 +1986,35 @@ function ProjectLoader_Confirm_cancel(self, data) {
 function ProjectLoader_Confirm_onData(self, data) {
     browser.hideCentral()
     browser.showWorking()
-    browser.upload(
-        "/api/restore_backup/" + self.spaceId,
-        "restore",
-        self.file,
-        self
-    )
+
     self.state = "Loading";
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result; // The file's text content
+
+        // You can also use the text variable for further processing
+        var project
+        try {
+            project = parseJsonlProject(text)
+        } catch (ex) {
+            self.state = "Start";
+            browser.hideWorking()
+            browser.showNotification(ex.message)            
+            return
+        }
+        self.onData(project)
+    };
+
+    // Define the onerror callback
+    reader.onerror = function(e) {
+        self.state = "Start";
+        browser.hideWorking()
+        browser.showNotification(e.message)
+    };
+
+    // Read the file as text using UTF-8 encoding
+    reader.readAsText(self.file, 'UTF-8');
 }
 
 function ProjectLoader_Confirm_onError(self, data) {
@@ -1943,12 +2024,12 @@ function ProjectLoader_Confirm_onError(self, data) {
 
 function ProjectLoader_Loading_onData(self, data) {
     browser.hideWorking()
-    if (data.status === 200) {
-        browser.goToUrl("/ide/doc/" + 
-        	self.spaceId + "/1")
-    } else {
-        forwardError(self, data.responseText)
-    }
+    loadProject(data)
+        .then(() => {
+            sv_folder(gSpaceId, "1")
+        }).catch(ex=> {
+            forwardError(self, ex)
+        })
     self.state = null;
 }
 
@@ -1960,7 +2041,6 @@ function ProjectLoader_Loading_onError(self, data) {
 function ProjectLoader_Start_onData(self, data) {
     self.spaceId = data
     browser.showLoadFromFile(
-    	self.spaceId,
     	self
     )
     self.state = "ChoosingFile";
@@ -1968,6 +2048,26 @@ function ProjectLoader_Start_onData(self, data) {
 
 function ProjectLoader_Start_onError(self, data) {
     self.state = "Start";
+}
+
+async function loadProject(folders) {
+    await backend.clearProject(gSpaceId)
+    var root = folders["root"]
+    var parentId = "1"
+    for (var id of root.children) {
+        await importFolder(folders, id, parentId)
+    }
+}
+
+async function importFolder(folders, id, parentId) {
+    var folder = folders[id]
+    folder.parent = parentId
+    var children = folder.children || []
+    delete folder.children
+    var result = await backend.createFolder(gSpaceId, folder)
+    for (var childId of children) {
+        await importFolder(folders, childId, result.folder_id)
+    }
 }
 
 function ProjectSaver_BuildingZip_onData(self, data) {
@@ -3471,7 +3571,7 @@ async function buildMainMenu() {
     var exportItems = [
         {
             text: "Import project",
-            action: backend.importProject
+            action: showLoadProjectFromFileDialog
         },
         {
             text: "Export project",
@@ -7586,8 +7686,17 @@ function showFolderInGrid(data) {
     updateActionList()
 }
 
-function showHelp() {
-    browser.showHelp()
+
+function showLoadProjectFromFileDialog() {
+    var target = {
+        onData: hideCentral,
+        onError: browser.showNotification
+    }    
+    startMachine(
+        new ProjectLoader(),
+        undefined,
+        target
+    )
 }
 
 function showLoadFromFile(spaceId, target) {

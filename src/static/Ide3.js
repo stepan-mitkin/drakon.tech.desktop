@@ -5603,21 +5603,18 @@ function showInputBox(isAsync, header, old, onSave, validate, enterSave, x, y, c
     )
 }
 
-function showLoadFromFile(spaceId, machine) {
+function showLoadFromFile(machine) {
     var label = {
     	type: "custom",
     	builder: function(div) {
     		var top = make(div, "div")
-    		HtmlUtils.setDivText(top, translate("MES_LOAD_FROM_FILE_EX"))
+    		HtmlUtils.setDivText(top, translate("Import project"))
     		top.style.textAlign = "center"
-    		var name = make(div, "div")
-    		HtmlUtils.setDivText(name, translate("MES_SPACE") + ": " + spaceId)
-    		name.style.textAlign = "center"
-    		name.style.fontWeight = "bold"
     		var input = make(div, "input")
     		input.id = "file-input"
     		input.type = "file"
     		input.name = "Project file"
+            input.accept = ".jsonl"
     		input.addEventListener("change", onFileChange)
     		input.style.marginTop = "15px"
     		input.style.marginBottom = "15px"

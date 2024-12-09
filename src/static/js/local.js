@@ -31,12 +31,7 @@
             var projects = getProjects()
             for (var path in projects) {
                 var spaceId = projects[path]
-                var all = getAllFolders(spaceId)
-                for (var id in all) {
-                    localStorage.removeItem(id)
-                }
-                localStorage.removeItem(spaceId + "-folders")
-                localStorage.removeItem(spaceId + "-history")                
+                clearProjectCore(spaceId)
             }            
             localStorage.removeItem("projects")
             localStorage.removeItem("recent")
@@ -45,6 +40,23 @@
             localStorage.setItem("recent", recentStr)
         }
     }
+
+    async function clearProject(spaceId) {
+        console.log("clearProject", spaceId)
+        await pause(10)
+        clearProjectCore(spaceId)
+        createRoot(spaceId)
+    }
+
+    function clearProjectCore(spaceId) {
+        var all = getAllFolders(spaceId)
+        for (var id in all) {
+            localStorage.removeItem(id)
+        }
+        localStorage.removeItem(spaceId + "-folders")
+        localStorage.removeItem(spaceId + "-history")        
+    }    
+    
 
     function getSettingsCore() {
         var settingStr = localStorage.getItem("settings") || "{}"
@@ -130,14 +142,18 @@
         return parts[parts.length - 1]
     }    
 
+    function createRoot(spaceId) {
+        var body = {type:"folder"}        
+        createFolderWithId(spaceId, "1", body)
+    }
+
     async function openFolder(folder) {
         var projects = getProjects()
         var spaceId = projects[folder]
         if (!spaceId) {
             spaceId = generateId(projects, "proj")
             projects[folder] = spaceId
-            var body = {type:"folder"}        
-            createFolderWithId(spaceId, "1", body)
+            createRoot(spaceId)
             setProjects(projects)
         }
         gFolder = folder
@@ -725,14 +741,66 @@
         }
     }
 
+    function downloadFile(filename, content) {
+        // Create a new Blob object using the content and specifying UTF-8 encoding
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    
+        // Create a temporary anchor (<a>) element
+        const link = document.createElement('a');
+    
+        // Generate a URL for the Blob and set it as the href attribute
+        link.href = URL.createObjectURL(blob);
+    
+        // Set the download attribute with the desired filename
+        link.download = filename;
+    
+        // Append the link to the document body (required for Firefox)
+        document.body.appendChild(link);
+    
+        // Programmatically click the link to trigger the download
+        link.click();
+    
+        // Clean up by removing the link and revoking the object URL
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+    }
+
+    function getExportFolders() {
+        var result = []
+        var rootId = buildId(gSpaceId, "1")
+        var all = getAllFolders(gSpaceId)
+        var context = {
+            all: all,
+            result: result,
+            nextId: 2
+        }
+        exportFolders(context, rootId, "root")
+        return result
+    }
+
+    function exportFolders(context, parentId, newParentId) {
+        for (var id in context.all) {
+            var folder = getFolderBody(id)
+            if (folder.parent === parentId) {
+                folder.parent = newParentId
+                var newId = context.nextId.toString()
+                context.nextId++
+                folder.id = newId
+                var str = JSON.stringify(folder)
+                context.result.push(str)                
+                exportFolders(context, id, newId)
+            }
+        }
+    }
+    
 
     function exportProject() {
         console.log("exportProject!")
-    }
-    
-    function importProject() {
-        console.log("importProject!")
-    }    
+        var folders = getExportFolders()
+        var filename = gFolderName + ".jsonl"
+        var content = folders.join("\n")
+        downloadFile(filename, content)
+    }  
 
     async function closeFolder() {
         console.log("closeFolder")
@@ -771,7 +839,7 @@
         newWindow: newWindow,
         closeFolder: closeFolder,
         exportProject: exportProject,
-        importProject: importProject
+        clearProject: clearProject
     }
     
 })();
