@@ -5691,12 +5691,11 @@ function showLogonSignup(machine) {
 
 function showMainMenu(menus) {
     var main = createPopup()
-    main.style.opacity = 0
-    main.style.transform = "translate(0px, -50px)"
     main.style.background = "white"
     main.style.color = "black"
     main.className = "popup appearing"
     main.style.maxWidth = "400px"
+    main.style.maxHeight = "100vh"
     var header = make(main, "div")
     header.style.paddingLeft = "5px"
     header.style.paddingRight = "5px"
@@ -5742,13 +5741,18 @@ function showMainMenu(menus) {
         _ind2359++;
     }
     pushTempIfMobile()
-    HtmlUtils.setPosCorrected(
-    	0,
-    	0,
-    	main
-    )
-    main.style.opacity = 1
-    main.style.transform = "translate(0px, 0px)"
+
+    main.style.opacity = 0
+    main.style.transform = "translate(0px, -50px)"
+	main.style.display = "inline-block"
+	main.style.position = "absolute"
+	main.style.left = "0px"
+	main.style.top = "0px"
+    setTimeout(()=> {
+        main.style.transition = "opacity 300ms, transform 300ms"
+        main.style.opacity = 1
+        main.style.transform = "translate(0px, 0px)"
+    }, 1)
 }
 
 function showMany(className, display) {
