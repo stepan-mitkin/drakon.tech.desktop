@@ -598,7 +598,7 @@
         
         ide.init()    
         setTimeout(() => {
-            wide.style.transition = "opacity 200ms ease-in-out"
+            wide.style.transition = "opacity 300ms ease-in-out"
             wide.style.opacity = 1
         }, 100)
     }    
