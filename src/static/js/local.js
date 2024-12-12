@@ -266,15 +266,6 @@
         return folderId
     }
 
-    async function updateFolder(spaceId, folderId, body) {
-        console.log("updateFolder", spaceId, folderId, body)
-        await pause(10)
-        var id = buildId(spaceId, folderId)
-        var folder = getFolderBody(id)
-        Object.assign(folder, body)
-        setFolderBody(id, folder)
-    }
-
     async function getFolder(spaceId, folderId) {                
         console.log("getFolder", spaceId, folderId)        
         await pause(10)
@@ -345,14 +336,18 @@
         return body.target.space_id !== body.items[0].space_id
     }
 
-    async function edit(spaceId, folderId, change) {
-        console.log("edit", spaceId, folderId, change)
+    async function updateFolder(spaceId, folderId, change) {
+        console.log("updateFolder", spaceId, folderId, change)
         await pause(10)
         var id = buildId(spaceId, folderId)
+        if (!gFolders[id]) {
+            gFolders[id] = getFolderBody(id)
+        }
         var folder = gFolders[id]
         setProperty(folder, change, "name")
         setProperty(folder, change, "params")
         setProperty(folder, change, "keywords")
+        setProperty(folder, change, "description")
         if (change.removed) {
             forEach(change.removed, removeItem, folder)
         }
@@ -828,6 +823,52 @@
         gSearch = undefined
     }
 
+    function parseQueryString() {
+        var queryString = window.location.search
+        // If the query string starts with '?', remove it
+        if (queryString.startsWith('?')) {
+            queryString = queryString.slice(1);
+        }
+    
+        // Split the query string into key-value pairs
+        const pairs = queryString.split('&');
+        const params = {};
+    
+        // Iterate through each key-value pair
+        pairs.forEach(pair => {
+            const [key, value] = pair.split('=');
+            if (key) {
+                // Decode key and value to handle URL encoding
+                const decodedKey = decodeURIComponent(key);
+                const decodedValue = value ? decodeURIComponent(value) : undefined;
+    
+                // Handle duplicate keys by storing values in an array
+                if (params[decodedKey]) {
+                    if (Array.isArray(params[decodedKey])) {
+                        params[decodedKey].push(decodedValue);
+                    } else {
+                        params[decodedKey] = [params[decodedKey], decodedValue];
+                    }
+                } else {
+                    params[decodedKey] = decodedValue;
+                }
+            }
+        });
+    
+        return params;
+    }
+
+    async function getMyFolder() {
+        console.log("getMyFolder")
+        await pause(10)  
+        if (gFolder) {
+            return gFolder
+        }
+
+        var query = parseQueryString()
+        return query.folder
+    }
+
     function newWindow() {
         window.open(window.location.href, '_blank');
     }    
@@ -844,7 +885,6 @@
         createFolder: createFolder,
         updateFolder: updateFolder,
         changeMany: changeMany,
-        edit: edit,
         searchFolders: searchFolders,
         searchItems: searchItems,
         pollSearch: pollSearch,
@@ -857,7 +897,9 @@
         exportProject: exportProject,
         clearProject: clearProject,
         downloadTextFile: downloadTextFile,
-        downloadFile: downloadFile
+        downloadFile: downloadFile,
+        getMyFolder: getMyFolder
     }
+
     
 })();

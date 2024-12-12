@@ -1,0 +1,183 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "5"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>existing = get record by id(winInfo, folderId)</p>",
+            "one": "10"
+        },
+        "5": {
+            "type": "action",
+            "content": "<p>check that spaceId === winInfo.spaceId</p>",
+            "one": "4"
+        },
+        "9": {
+            "type": "action",
+            "content": "<p>write json(</p><p>filename: filepath,</p><p>object: existing</p><p>)</p>",
+            "one": "1"
+        },
+        "10": {
+            "type": "action",
+            "content": "<p>filepath = get filepath by id(winInfo, folderId)</p>",
+            "one": "13"
+        },
+        "11": {
+            "type": "question",
+            "content": "<p>is folder(filepath)</p>",
+            "one": "12",
+            "two": "23",
+            "flag1": 0
+        },
+        "12": {
+            "type": "question",
+            "content": "<p>\"name\" in body</p>",
+            "one": "35",
+            "two": "14",
+            "flag1": 0
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>oldName = path.parse(filepath).name</p>",
+            "one": "11"
+        },
+        "14": {
+            "type": "question",
+            "content": "<p>body[name] === oldName</p>",
+            "one": "35",
+            "two": "17",
+            "flag1": 1
+        },
+        "16": {
+            "type": "action",
+            "content": "<p>newFilename = body.name + \".\" + existing.type</p>",
+            "one": "39"
+        },
+        "17": {
+            "type": "action",
+            "content": "<p>parentFolder = get parent folder(filepath)</p>",
+            "one": "16"
+        },
+        "19": {
+            "type": "action",
+            "content": "<p>write json(</p><p>filename: newPath,</p><p>object: existing</p><p>)</p>",
+            "one": "22"
+        },
+        "21": {
+            "type": "action",
+            "content": "<p>delete file(filepath)</p>",
+            "one": "44"
+        },
+        "22": {
+            "type": "action",
+            "content": "<p>rewrite history(winInfo)</p>",
+            "one": "1"
+        },
+        "23": {
+            "type": "question",
+            "content": "<p>\"name\" in body</p>",
+            "one": "1",
+            "two": "24",
+            "flag1": 0
+        },
+        "24": {
+            "type": "question",
+            "content": "<p>body[name] === oldName</p>",
+            "one": "1",
+            "two": "26",
+            "flag1": 1
+        },
+        "26": {
+            "type": "action",
+            "content": "<p>parentFolder = get parent folder(filepath)</p>",
+            "one": "27"
+        },
+        "27": {
+            "type": "action",
+            "content": "<p>newFilename = body.name</p>",
+            "one": "41"
+        },
+        "30": {
+            "type": "action",
+            "content": "<p>rename folder(</p><p>from: filepath,</p><p>to: newPath)</p>",
+            "one": "31"
+        },
+        "31": {
+            "type": "action",
+            "content": "<p>replace filepath in children(</p><p>\twinInfo,</p><p>\tnewPath,</p><p>\tfolderId)</p>",
+            "one": "32"
+        },
+        "32": {
+            "type": "action",
+            "content": "<p>rewrite history(winInfo)</p>",
+            "one": "1"
+        },
+        "34": {
+            "type": "question",
+            "content": "<p>file or folder exists(newPath)</p>",
+            "one": "21",
+            "two": "40",
+            "flag1": 0
+        },
+        "35": {
+            "type": "action",
+            "content": "<p>copyDiagramData(body, existing)</p>",
+            "one": "36",
+            "two": ""
+        },
+        "36": {
+            "type": "action",
+            "content": "<p>apply edits(body, existing)</p>",
+            "one": "9",
+            "two": ""
+        },
+        "38": {
+            "type": "action",
+            "content": "<p>apply edits(body, existing)</p>",
+            "one": "19",
+            "two": ""
+        },
+        "39": {
+            "type": "action",
+            "content": "<p>newPath = path.join(parentFolder, newFilename)</p>",
+            "one": "34"
+        },
+        "40": {
+            "type": "action",
+            "content": "<p>throw new Error(\"ERR_NAME_NOT_UNIQUE\")</p>",
+            "one": "1"
+        },
+        "41": {
+            "type": "action",
+            "content": "<p>newPath = path.join(parentFolder, newFilename)</p>",
+            "one": "42"
+        },
+        "42": {
+            "type": "question",
+            "content": "<p>file or folder exists(newPath)</p>",
+            "one": "30",
+            "two": "43",
+            "flag1": 0
+        },
+        "43": {
+            "type": "action",
+            "content": "<p>throw new Error(\"ERR_NAME_NOT_UNIQUE\")</p>",
+            "one": "1"
+        },
+        "44": {
+            "type": "action",
+            "content": "<p>copyDiagramData(body, existing)</p>",
+            "one": "38",
+            "two": ""
+        }
+    },
+    "type": "drakon",
+    "id": "updateFolder.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>spaceId</li><li>folderId</li><li>body</li></ul>"
+}

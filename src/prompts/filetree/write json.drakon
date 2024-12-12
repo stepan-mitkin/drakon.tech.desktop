@@ -1,0 +1,25 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>content = serialize object as json with indent = 4</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>write content to file pointed to by filename using utf-8 encoding</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "id": "write json.drakon",
+    "params": "<p>parameters:</p><ul><li>filename</li><li>object</li></ul>"
+}

@@ -1,0 +1,158 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>name = body.name</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>parent = get record by id(body.parent)</p>",
+            "one": "16"
+        },
+        "5": {
+            "type": "question",
+            "content": "<p>body.type === \"folder\"</p>",
+            "one": "17",
+            "two": "23",
+            "flag1": 0
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>write json(</p><p>filename: newPath,</p><p>object: record</p><p>)</p>",
+            "one": "29",
+            "two": ""
+        },
+        "11": {
+            "type": "question",
+            "content": "<p>file or folder exists(newPath)</p>",
+            "one": "18",
+            "two": "15",
+            "flag1": 0
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>apply edits(body, record)</p>",
+            "one": "21",
+            "two": ""
+        },
+        "14": {
+            "type": "action",
+            "content": "<p>newPath = path.join(parentFolder, newFilename)</p>",
+            "one": "11",
+            "two": ""
+        },
+        "15": {
+            "type": "action",
+            "content": "<p>throw new Error(\"ERR_NAME_NOT_UNIQUE\")</p>",
+            "one": "1",
+            "two": ""
+        },
+        "16": {
+            "type": "action",
+            "content": "<p>parentFolder = get filepath by id(winInfo, body.id)</p>",
+            "one": "5"
+        },
+        "17": {
+            "type": "action",
+            "content": "<p>newFilename = body.name + \".\" + body.type</p>",
+            "one": "14"
+        },
+        "18": {
+            "type": "action",
+            "content": "<p>record = {}</p>",
+            "one": "32"
+        },
+        "19": {
+            "type": "action",
+            "content": "<p>id = generateUniqueId()</p>",
+            "one": "20",
+            "two": ""
+        },
+        "20": {
+            "type": "action",
+            "content": "<p>add to cache(</p><p>winInfo,</p><p>newPath,</p><p>id,</p><p>record)</p>",
+            "one": "8",
+            "two": ""
+        },
+        "21": {
+            "type": "action",
+            "content": "<p>record.parent = body.parent</p>",
+            "one": "19"
+        },
+        "22": {
+            "type": "action",
+            "content": "<p>newPath = path.join(parentFolder, newFilename)</p>",
+            "one": "24",
+            "two": ""
+        },
+        "23": {
+            "type": "action",
+            "content": "<p>newFilename = body.name</p>",
+            "one": "22",
+            "two": ""
+        },
+        "24": {
+            "type": "question",
+            "content": "<p>file or folder exists(newPath)</p>",
+            "one": "26",
+            "two": "25",
+            "flag1": 0
+        },
+        "25": {
+            "type": "action",
+            "content": "<p>throw new Error(\"ERR_NAME_NOT_UNIQUE\")</p>",
+            "one": "1",
+            "two": ""
+        },
+        "26": {
+            "type": "action",
+            "content": "<p>record = {</p><p>type: \"folder\",</p><p>parent: body.parent</p><p>}</p>",
+            "one": "33"
+        },
+        "28": {
+            "type": "action",
+            "content": "<p>add to cache(</p><p>winInfo,</p><p>newPath,</p><p>id,</p><p>record)</p>",
+            "one": "31",
+            "two": ""
+        },
+        "29": {
+            "type": "action",
+            "content": "<p>return {folder_id:id}</p>",
+            "one": "1"
+        },
+        "30": {
+            "type": "action",
+            "content": "<p>return {folder_id:id}</p>",
+            "one": "1"
+        },
+        "31": {
+            "type": "action",
+            "content": "<p>create folder(newPath)</p>",
+            "one": "30"
+        },
+        "32": {
+            "type": "action",
+            "content": "<p>copyDiagramData(body, record)</p>",
+            "one": "13",
+            "two": ""
+        },
+        "33": {
+            "type": "action",
+            "content": "<p>id = generateUniqueId()</p>",
+            "one": "28",
+            "two": ""
+        }
+    },
+    "type": "drakon",
+    "id": "createFolder.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>spaceId</li><li>body</li></ul>"
+}

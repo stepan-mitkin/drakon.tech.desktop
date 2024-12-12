@@ -1,0 +1,20 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>return get shadow folder path(winInfo.path) / config.exe + \"history.json\"</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "id": "build history filename.drakon",
+    "params": "<p>paramters:</p><p>winInfo</p>"
+}

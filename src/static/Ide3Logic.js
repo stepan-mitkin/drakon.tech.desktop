@@ -6934,7 +6934,7 @@ function saveApp(data) {
 }
 
 function saveChange(spaceId, folderId, change, target) {
-    backend.edit(spaceId, folderId, change).then(target.onData).catch(target.onError)
+    backend.updateFolder(spaceId, folderId, change).then(target.onData).catch(target.onError)
 }
 
 function saveChanges(changes) {

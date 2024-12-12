@@ -1,0 +1,42 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>content = read file as utf-8 string(filename)</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>result = parse json(content)</p>",
+            "one": "5"
+        },
+        "5": {
+            "type": "question",
+            "content": "<p>got exception?</p>",
+            "one": "7",
+            "two": "6",
+            "flag1": 0
+        },
+        "6": {
+            "type": "action",
+            "content": "<p>return {}</p>",
+            "one": "1"
+        },
+        "7": {
+            "type": "action",
+            "content": "<p>return result</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "id": "read json.drakon",
+    "params": "<p>parameters:</p><p>filename</p>"
+}

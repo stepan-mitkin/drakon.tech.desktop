@@ -383,9 +383,14 @@
     }
 
     async function tryOpenFolder(folder) {
-        var spaceId = await backend.openFolder(folder)
-        await addToRecent(folder)
-        startIde(spaceId)
+        try {
+            var spaceId = await backend.openFolder(folder)
+            await addToRecent(folder)
+            startIde(spaceId)
+        } catch (ex) {
+            console.error(ex)
+            await showStartPage()
+        }
     }
 
     async function closeFolder() {
@@ -515,6 +520,11 @@
         var settings = await backend.getSettings()
         setLanguage(settings.language)
         var recent = await backend.getRecent()
+        prepareScreen()
+        renderStartPage(wide, recent)        
+    }
+
+    function prepareScreen() {
         removeExisting("loading")
         var wide = get("wide")
         clear(wide)
@@ -523,15 +533,19 @@
         wide.style.left = "0px"
         wide.style.top = "0px"
         wide.style.width = "100vw"
-        wide.style.height = "100vh"
-        renderStartPage(wide, recent)        
+        wide.style.height = "100vh"        
     }
 
     async function main() {
         initStyles()
         window.addEventListener('error', onError);
-        window.addEventListener('unhandledrejection', onRejection);               
-        await showStartPage()
+        window.addEventListener('unhandledrejection', onRejection);      
+        var folder = await backend.getMyFolder()
+        if (folder) {
+            await tryOpenFolder(folder)
+        } else {
+            await showStartPage()
+        }
     }
 
     function onError(evt) {
@@ -584,6 +598,7 @@
     }    
 
     function startIde(spaceId) { 
+        prepareScreen()
         var wide = get("wide")
         wide.style.transition = ""
         wide.style.opacity = 0

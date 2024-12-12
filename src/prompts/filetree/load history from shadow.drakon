@@ -1,0 +1,42 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>obj = read json(filename)</p>",
+            "one": "5"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>return obj.history || []</p>",
+            "one": "1"
+        },
+        "5": {
+            "type": "question",
+            "content": "<p>any errors occurred?</p>",
+            "one": "4",
+            "two": "6",
+            "flag1": 0
+        },
+        "6": {
+            "type": "action",
+            "content": "<p>return []</p>",
+            "one": "1"
+        },
+        "7": {
+            "type": "action",
+            "content": "<p>filename = build history filename(winInfo)</p>",
+            "one": "3"
+        }
+    },
+    "type": "drakon",
+    "id": "loadHistoryFromShadow.drakon",
+    "params": "<p>parameters:</p><p>winInfo</p>"
+}

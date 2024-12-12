@@ -1,0 +1,20 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>winInfo.records[id] = body</p><p>winInfo.idToPath[id] = filepath</p><p>winInfo.pathToId[filepath] = id</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "id": "addToCache.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>filepath</li><li>id</li><li>body</li></ul>"
+}

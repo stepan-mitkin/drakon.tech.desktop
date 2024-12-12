@@ -1,0 +1,76 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>childIds = get child ids(winInfo, parentId)</p>",
+            "one": "5"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "1"
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "6",
+            "content": "<p>for each id in childIds</p>"
+        },
+        "6": {
+            "type": "action",
+            "content": "<p>record = get record by id(winInfo, id)</p>",
+            "one": "8"
+        },
+        "7": {
+            "type": "question",
+            "content": "<p>record.type === \"folder\"</p>",
+            "one": "4",
+            "two": "14",
+            "flag1": 0
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>oldPath = get filepath by id(winInfo, id)</p>",
+            "one": "9"
+        },
+        "9": {
+            "type": "action",
+            "content": "<p>oldName = path.parse(oldPath).base</p>",
+            "one": "10"
+        },
+        "10": {
+            "type": "action",
+            "content": "<p>newPath = path.join(parentPath, oldName)</p>",
+            "one": "11"
+        },
+        "11": {
+            "type": "action",
+            "content": "<p>delete winInfo.pathToId[oldPath]</p>",
+            "one": "12"
+        },
+        "12": {
+            "type": "action",
+            "content": "<p>winInfo.pathToId[newPath] = id</p>",
+            "one": "13"
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>winInfo.idToPath[id] = newPath</p>",
+            "one": "7"
+        },
+        "14": {
+            "type": "action",
+            "content": "<p>replace filepath in children(</p><p>winInfo,</p><p>newPath,</p><p>id)</p>",
+            "one": "4"
+        }
+    },
+    "type": "drakon",
+    "id": "replace filepath in children.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>parentPath</li><li>parentId</li></ul>"
+}

@@ -1,0 +1,56 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>history = winInfo.history</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>filepath = get filename by id(winInfo, folderId)</p>",
+            "one": "11"
+        },
+        "5": {
+            "type": "action",
+            "content": "<p>insert at the start of history:</p><p>{</p><p>\tid: folderId,</p><p>\twhenOpened: UTC now as a zulu-string</p><p>}</p>",
+            "one": "8"
+        },
+        "6": {
+            "type": "question",
+            "content": "<p>history is longer than 30</p>",
+            "one": "12",
+            "two": "7",
+            "flag1": 0
+        },
+        "7": {
+            "type": "action",
+            "content": "<p>remove last item from history</p>",
+            "one": "8"
+        },
+        "8": {
+            "type": "arrow-loop",
+            "one": "6"
+        },
+        "11": {
+            "type": "action",
+            "content": "<p>remove all items from history where:</p><p>item.id === folderId</p>",
+            "one": "5"
+        },
+        "12": {
+            "type": "action",
+            "content": "<p>rewrite history(winInfo)</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "id": "add to history.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>folderId</li></ul>"
+}

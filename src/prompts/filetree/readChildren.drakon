@@ -1,0 +1,141 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>files = read folder content(folderPath)</p>",
+            "one": "8"
+        },
+        "5": {
+            "type": "loopend",
+            "one": "9"
+        },
+        "6": {
+            "type": "loopbegin",
+            "one": "7",
+            "content": "<p>for each filename in files</p>"
+        },
+        "7": {
+            "type": "action",
+            "content": "<p>fullpath = path.join(folderPath, filename)</p>",
+            "one": "16"
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>children = []</p>",
+            "one": "6"
+        },
+        "9": {
+            "type": "action",
+            "content": "<p>return children</p>",
+            "one": "1"
+        },
+        "10": {
+            "type": "question",
+            "content": "<p>is directory(fullpath)</p>",
+            "one": "12",
+            "two": "23",
+            "flag1": 0
+        },
+        "12": {
+            "type": "question",
+            "content": "<p>path.parse(fullpath).ext === \".drakon\"</p>",
+            "one": "17",
+            "two": "5",
+            "flag1": 1
+        },
+        "14": {
+            "type": "action",
+            "content": "<p>fromDisc = read json(fullpath)</p>",
+            "one": "21"
+        },
+        "15": {
+            "type": "action",
+            "content": "<p>add to cache(</p><p>winInfo, </p><p>fullpath,</p><p>id,</p><p>record</p><p>)</p>",
+            "one": "22"
+        },
+        "16": {
+            "type": "action",
+            "content": "<p>name = path.parse(fullpath).name</p>",
+            "one": "10"
+        },
+        "17": {
+            "type": "question",
+            "content": "<p>fullpath in folderInfo.pathToId</p>",
+            "one": "18",
+            "two": "29",
+            "flag1": 1
+        },
+        "18": {
+            "type": "action",
+            "content": "<p>id = folderInfo.pathToId[fullpath]</p>",
+            "one": "14"
+        },
+        "20": {
+            "type": "action",
+            "content": "<p>copyDiagramData(fromDisc, record)</p>",
+            "one": "15",
+            "two": ""
+        },
+        "21": {
+            "type": "action",
+            "content": "<p>record = {</p><p>parent: parent</p><p>}</p>",
+            "one": "20"
+        },
+        "22": {
+            "type": "action",
+            "content": "<p>children.push({</p><p>\tid:id,</p><p>\tspace_id: winInfo.spaceId,</p><p>\ttype:\"drakon\",</p><p>\tname:name</p><p>})</p>",
+            "one": "5"
+        },
+        "23": {
+            "type": "question",
+            "content": "<p>fullpath in folderInfo.pathToId</p>",
+            "one": "24",
+            "two": "30",
+            "flag1": 1
+        },
+        "24": {
+            "type": "action",
+            "content": "<p>id = folderInfo.pathToId[fullpath]</p>",
+            "one": "26",
+            "two": ""
+        },
+        "26": {
+            "type": "action",
+            "content": "<p>record = {</p><p>parent: parent,</p><p>type:\"folder\"</p><p>}</p>",
+            "one": "27"
+        },
+        "27": {
+            "type": "action",
+            "content": "<p>add to cache(</p><p>winInfo, </p><p>fullpath,</p><p>id,</p><p>record</p><p>)</p>",
+            "one": "28"
+        },
+        "28": {
+            "type": "action",
+            "content": "<p>children.push({</p><p>\tid:id,</p><p>\tspace_id: winInfo.spaceId,</p><p>\ttype:\"drakon\",</p><p>\tname:name</p><p>})</p>",
+            "one": "5"
+        },
+        "29": {
+            "type": "action",
+            "content": "<p>id = generateUniqueId()</p>",
+            "one": "14",
+            "two": ""
+        },
+        "30": {
+            "type": "action",
+            "content": "<p>id = generateUniqueId()</p>",
+            "one": "26",
+            "two": ""
+        }
+    },
+    "type": "drakon",
+    "id": "read folder.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>folderPath</li><li>parent</li></ul>"
+}

@@ -1,0 +1,30 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>content = UTC time now as a zulu-string</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>filename = path.join(shadow folder path, \"opened.txt\")</p>",
+            "one": "5"
+        },
+        "5": {
+            "type": "action",
+            "content": "<p>write content to filename</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "id": "write access file.drakon",
+    "params": "<p>parameters:</p><p>folderPath</p>"
+}

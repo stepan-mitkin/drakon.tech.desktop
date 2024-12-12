@@ -1,0 +1,74 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>check that spaceId === winInfo.spaceId</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>existing = get record by id(winInfo, folderId)</p>",
+            "one": "5"
+        },
+        "5": {
+            "type": "action",
+            "content": "<p>filepath = get file path from id (winInfo, folderId)</p>",
+            "one": "8"
+        },
+        "6": {
+            "type": "question",
+            "content": "<p>is directory(filepath)</p>",
+            "one": "7",
+            "two": "11",
+            "flag1": 0
+        },
+        "7": {
+            "type": "action",
+            "content": "<p>record = read json(filepath)</p>",
+            "one": "14"
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>body = {</p><p>id: folderId,</p><p>space_id: winInfo.spaceId,</p><p>access: winInfo.access,</p><p>parent: existing.parent,</p><p>name: path.parse(filepath).name,</p><p>path: buildFolderPath(winInfo, folderId),</p><p>items: {},</p><p>children: []</p><p>}</p>",
+            "one": "6"
+        },
+        "11": {
+            "type": "action",
+            "content": "<p>body.type = \"folder\"</p>",
+            "one": "12"
+        },
+        "12": {
+            "type": "action",
+            "content": "<p>body.children = readChildren(winInfo, filepath, folderId)</p>",
+            "one": "1"
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>add to history(winInfo, folderId)</p>",
+            "one": "1"
+        },
+        "14": {
+            "type": "action",
+            "content": "<p>copyDiagramData(record, body)</p>",
+            "one": "15",
+            "two": ""
+        },
+        "15": {
+            "type": "action",
+            "content": "<p>copyDiagramData(record, existing)</p>",
+            "one": "13",
+            "two": ""
+        }
+    },
+    "type": "drakon",
+    "id": "open folder.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>spaceId</li><li>folderId</li></ul>"
+}

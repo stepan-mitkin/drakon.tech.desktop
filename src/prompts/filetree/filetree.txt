@@ -1,0 +1,856 @@
+parameters:
+
+- winInfo
+- filepath
+- id
+- body
+
+
+Procedure "add to cache"
+
+Algorithm:
+winInfo.records[id] = body
+winInfo.idToPath[id] = filepath
+winInfo.pathToId[filepath] = id
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- folderId
+
+
+Procedure "add to history"
+
+Algorithm:
+history = winInfo.history
+
+filepath = get filename by id(winInfo, folderId)
+
+remove all items from history where:
+item.id === folderId
+
+insert at the start of history:
+{
+id: folderId,
+whenOpened: UTC now as a zulu-string
+}
+
+Loop forever
+    If history is longer than 30
+        remove last item from history
+
+    Else
+        break
+rewrite history(winInfo)
+
+End of procedure
+
+
+parameters:
+
+- body
+- target
+
+
+Procedure "apply edits"
+
+Algorithm:
+Call subroutine: "Create items"
+
+Subroutine: "Create items"
+If target.items
+    Call subroutine "Added"
+Else
+    target.items = {}
+
+    Call subroutine "Added"
+End of subroutine
+
+Subroutine: "Added"
+If body.added
+    for each edit in body.added
+        item = shallow copy object(edit)
+        delete item.id
+
+        target.items[edit.id] = item
+
+    Call subroutine "Updated"
+Else
+    Call subroutine "Updated"
+End of subroutine
+
+Subroutine: "Updated"
+If body.updated
+    for each edit in body.updated
+        item = shallow copy object(edit)
+        delete item.id
+
+        existing = target.items[edit.id]
+
+        Object.assign(existing, item)
+
+    Call subroutine "Removed"
+Else
+    Call subroutine "Removed"
+End of subroutine
+
+Subroutine: "Removed"
+If body.removed
+    for each id in body.removed
+        delete target.items[id]
+
+    Call subroutine "Exit"
+Else
+    Call subroutine "Exit"
+End of subroutine
+
+Subroutine: "Exit"
+End of subroutine
+End of procedure
+
+
+paramters:
+winInfo
+
+Procedure "build history filename"
+
+Algorithm:
+return get shadow folder path(winInfo.path) / config.exe + "history.json"
+
+End of procedure
+
+
+paramters:
+
+- winInfo
+- folderId
+
+
+Procedure "buildFolderPath"
+
+Algorithm:
+result = []
+
+Loop forever
+    filename = get filepath by id(winInfo, folderId)
+
+    name = path.parse(filename).name
+
+    record = get record by id(winInfo, folderId)
+
+    result.push({
+    space_id: winInfo.spaceId,
+    id: folderId,
+    name: name
+    })
+
+    folderId = record.parent
+
+    If not (folderId)
+        break
+result.reverse()
+
+return result
+
+End of procedure
+
+
+parameters:
+
+- from
+- to
+- property
+
+
+Procedure "copy property if exists"
+
+Algorithm:
+If property in from
+    to[property] = from[property]
+
+End of procedure
+
+
+parameters
+
+- source
+- target
+
+
+Procedure "copyDiagramData"
+
+Algorithm:
+properties = ["items", "keywords", "params", "description", "type"]
+
+for each property in properties
+    copy property if exists(
+    from: source,
+    to: target,
+    property: property)
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- spaceId
+- body
+
+
+Procedure "createFolder"
+
+Algorithm:
+name = body.name
+
+parent = get record by id(body.parent)
+
+parentFolder = get filepath by id(winInfo, body.id)
+
+If body.type === "folder"
+    newFilename = body.name
+
+    newPath = path.join(parentFolder, newFilename)
+
+    If file or folder exists(newPath)
+        throw new Error("ERR_NAME_NOT_UNIQUE")
+
+    Else
+        record = {
+        type: "folder",
+        parent: body.parent
+        }
+
+        id = generateUniqueId()
+
+        add to cache(
+        winInfo,
+        newPath,
+        id,
+        record)
+
+        create folder(newPath)
+
+        return {folder_id:id}
+
+Else
+    newFilename = body.name + "." + body.type
+
+    newPath = path.join(parentFolder, newFilename)
+
+    If file or folder exists(newPath)
+        throw new Error("ERR_NAME_NOT_UNIQUE")
+
+    Else
+        record = {}
+
+        copyDiagramData(body, record)
+
+        apply edits(body, record)
+
+        record.parent = body.parent
+
+        id = generateUniqueId()
+
+        add to cache(
+        winInfo,
+        newPath,
+        id,
+        record)
+
+        write json(
+        filename: newPath,
+        object: record
+        )
+
+        return {folder_id:id}
+
+End of procedure
+
+
+parameters:
+winInfo
+item
+
+Procedure "createHistoryItem"
+
+Algorithm:
+record = get record by id(winInfo, item.id)
+
+return {
+folder_id: item.id,
+space_id: winInfo.spaceId,
+name: get record name(winInfo, item.id),
+type: record.type,
+whenOpened: item.whenOpened
+}
+
+End of procedure
+
+
+parameters:
+
+- parentFolder
+- filename
+
+
+Procedure "find unique filename"
+
+Algorithm:
+parsed = path.parse(filename)
+
+name = parsed.name
+
+Loop forever
+    filename2 = name + parsed.ext
+
+    fullPath = path.join(parentFolder, filename2)
+
+    If file or folder exists(fullPath)
+        name = name + "-x2"
+
+    Else
+        break
+return filename2
+
+End of procedure
+
+
+Procedure "generateUniqueId"
+
+Algorithm:
+id = globalIdCounter.toString()
+
+globalIdCounter++
+
+return id
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- id
+
+
+Procedure "get record name"
+
+Algorithm:
+filepath = get filepath by id(winInfo, id)
+
+return path.parse(filepath).name
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- parentId
+
+
+Procedure "getChildIds"
+
+Algorithm:
+result = []
+
+for each id in winInfo.records
+    record = winInfo.records[id]
+
+    If record.parent === parentId
+        result.push(id)
+
+return result
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- spaceId
+- folderId
+
+
+Procedure "getFolder"
+
+Algorithm:
+check that spaceId === winInfo.spaceId
+
+existing = get record by id(winInfo, folderId)
+
+filepath = get file path from id (winInfo, folderId)
+
+body = {
+id: folderId,
+space_id: winInfo.spaceId,
+access: winInfo.access,
+parent: existing.parent,
+name: path.parse(filepath).name,
+path: buildFolderPath(winInfo, folderId),
+items: {},
+children: []
+}
+
+If is directory(filepath)
+    body.type = "folder"
+
+    body.children = readChildren(winInfo, filepath, folderId)
+
+Else
+    record = read json(filepath)
+
+    copyDiagramData(record, body)
+
+    copyDiagramData(record, existing)
+
+    add to history(winInfo, folderId)
+
+End of procedure
+
+
+parameters:
+winInfo
+
+Procedure "getHistory"
+
+Algorithm:
+return {
+recent:winInfo.history.map(item => createHistoryItem(winInfo, item))
+}
+
+End of procedure
+
+
+parameters:
+winInfo
+
+Procedure "load history from shadow"
+
+Algorithm:
+filename = build history filename(winInfo)
+
+obj = read json(filename)
+
+If any errors occurred?
+    return []
+
+Else
+    return obj.history || []
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- filepath
+
+
+Procedure "load record from disc to cache"
+
+Algorithm:
+If filepath in winInfo.pathToId
+    return winInfo.pathToId[filepath]
+
+Else
+    parentPath = get path to parent directory(filepath)
+
+    parent = load record from disc to cache(parentPath)
+
+    If is directory (filepath)
+        body = {
+        type: "folder"
+        }
+
+    Else
+        body = read json(filepath)
+
+    body.parent = parent
+
+    id = generateUniqueId()
+
+    add to cache(
+    winInfo,
+    filepath,
+    id,
+    body)
+
+    return id
+
+End of procedure
+
+
+Arguments:
+
+- winInfo
+- folderPath
+
+
+The path to shadow folder is path.join(folderPath, "." + config.exe)
+
+Procedure "openFolder"
+
+Algorithm:
+Call subroutine: "Determine access"
+
+Subroutine: "Determine access"
+folderPath = path.resolve(folderPath)
+
+If not (folderPath is directory)
+    throw error
+
+If shadow folder exists
+    write access file
+
+    If success?
+        access = "write"
+
+    Else
+        access = "read"
+
+Else
+    create shadow folder
+
+    If success?
+        write access file
+
+        If success?
+            access = "write"
+
+        Else
+            access = "read"
+
+    Else
+        access = "read"
+
+winInfo.path = folderPath
+winInfo.access = access
+
+Call subroutine "Create memory structures"
+End of subroutine
+
+Subroutine: "Create memory structures"
+winInfo.spaceId = generateUniqueId()
+
+winInfo.path = folderPath
+
+Create structures for the memory cache:
+winInfo.records = {}
+winInfo.idToPath = {}
+winInfo.pathToId = {}
+winInfo.history = []
+winInfo.records is a map from id to record content
+A record corresponds either to a file or to a folder
+winInfo.idToPath is a map from id to full path of a file or folder.
+winInfo.pathToId is a map from full path to id
+winInfo.history is a list of previously opened files. Contains ids of the records that corresponds to the files.
+
+Call subroutine "Create root record"
+End of subroutine
+
+Subroutine: "Create root record"
+rootId = "1"
+
+add to cache(winInfo, folderPath, rootId, {type:"folder"})
+
+Call subroutine "Load history"
+End of subroutine
+
+Subroutine: "Load history"
+history = load history from shadow(folderPath)
+
+for each item in history
+    id = load record from disc to cache(winInfo, item.path)
+
+    history.push({
+    id: id,
+    whenOpened: item.whenOpened
+    })
+
+winInfo.history = history
+
+Call subroutine "Exit"
+End of subroutine
+
+Subroutine: "Exit"
+End of subroutine
+End of procedure
+
+
+parameters:
+filename
+
+Procedure "read json"
+
+Algorithm:
+content = read file as utf-8 string(filename)
+
+result = parse json(content)
+
+If got exception?
+    return {}
+
+Else
+    return result
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- folderPath
+- parent
+
+
+Procedure "readChildren"
+
+Algorithm:
+files = read folder content(folderPath)
+
+children = []
+
+for each filename in files
+    fullpath = path.join(folderPath, filename)
+
+    name = path.parse(fullpath).name
+
+    If is directory(fullpath)
+        If fullpath in folderInfo.pathToId
+            id = folderInfo.pathToId[fullpath]
+
+        Else
+            id = generateUniqueId()
+
+        record = {
+        parent: parent,
+        type:"folder"
+        }
+
+        add to cache(
+        winInfo,
+        fullpath,
+        id,
+        record
+        )
+
+        children.push({
+        id:id,
+        space_id: winInfo.spaceId,
+        type:"drakon",
+        name:name
+        })
+
+    Else
+        If path.parse(fullpath).ext === ".drakon"
+            If fullpath in folderInfo.pathToId
+                id = folderInfo.pathToId[fullpath]
+
+            Else
+                id = generateUniqueId()
+
+            fromDisc = read json(fullpath)
+
+            record = {
+            parent: parent
+            }
+
+            copyDiagramData(fromDisc, record)
+
+            add to cache(
+            winInfo,
+            fullpath,
+            id,
+            record
+            )
+
+            children.push({
+            id:id,
+            space_id: winInfo.spaceId,
+            type:"drakon",
+            name:name
+            })
+
+return children
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- parentPath
+- parentId
+
+
+Procedure "replace filepath in children"
+
+Algorithm:
+childIds = get child ids(winInfo, parentId)
+
+for each id in childIds
+    record = get record by id(winInfo, id)
+
+    oldPath = get filepath by id(winInfo, id)
+
+    oldName = path.parse(oldPath).base
+
+    newPath = path.join(parentPath, oldName)
+
+    delete winInfo.pathToId[oldPath]
+
+    winInfo.pathToId[newPath] = id
+
+    winInfo.idToPath[id] = newPath
+
+    If record.type === "folder"
+        replace filepath in children(
+        winInfo,
+        newPath,
+        id)
+
+End of procedure
+
+
+parameters:
+winInfo
+
+Procedure "rewrite history"
+
+Algorithm:
+pathList = winInfo.history.map(
+item => {
+path: get filepath by id(winInfo, item.id),
+whenOpened: item.whenOpened
+})
+
+obj = {
+history: pathList
+}
+
+filename = build history filename(winInfo)
+
+writeJson(
+filename,
+obj)
+
+End of procedure
+
+
+parameters:
+
+- winInfo
+- spaceId
+- folderId
+- body
+
+
+Procedure "updateFolder"
+
+Algorithm:
+check that spaceId === winInfo.spaceId
+
+existing = get record by id(winInfo, folderId)
+
+filepath = get filepath by id(winInfo, folderId)
+
+oldName = path.parse(filepath).name
+
+If is folder(filepath)
+    If not (not ("name" in body) or body[name] === oldName)
+        parentFolder = get parent folder(filepath)
+
+        newFilename = body.name
+
+        newPath = path.join(parentFolder, newFilename)
+
+        If file or folder exists(newPath)
+            throw new Error("ERR_NAME_NOT_UNIQUE")
+
+        Else
+            rename folder(
+            from: filepath,
+            to: newPath)
+
+            replace filepath in children(
+            winInfo,
+            newPath,
+            folderId)
+
+            rewrite history(winInfo)
+
+Else
+    If not ("name" in body) or body[name] === oldName
+        copyDiagramData(body, existing)
+
+        apply edits(body, existing)
+
+        write json(
+        filename: filepath,
+        object: existing
+        )
+
+    Else
+        parentFolder = get parent folder(filepath)
+
+        newFilename = body.name + "." + existing.type
+
+        newPath = path.join(parentFolder, newFilename)
+
+        If file or folder exists(newPath)
+            throw new Error("ERR_NAME_NOT_UNIQUE")
+
+        Else
+            delete file(filepath)
+
+            copyDiagramData(body, existing)
+
+            apply edits(body, existing)
+
+            write json(
+            filename: newPath,
+            object: existing
+            )
+
+            rewrite history(winInfo)
+
+End of procedure
+
+
+parameters:
+folderPath
+
+Procedure "write access file"
+
+Algorithm:
+content = UTC time now as a zulu-string
+
+filename = path.join(shadow folder path, "opened.txt")
+
+write content to filename
+
+End of procedure
+
+
+parameters:
+
+- filename
+- object
+
+
+Procedure "write json"
+
+Algorithm:
+content = serialize object as json with indent = 4
+
+write content to file pointed to by filename using utf-8 encoding
+
+End of procedure
+
+
+

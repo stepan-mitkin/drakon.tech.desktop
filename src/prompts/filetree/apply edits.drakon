@@ -1,0 +1,138 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "7",
+            "content": "<p>Create items</p>"
+        },
+        "7": {
+            "type": "question",
+            "content": "<p>target.items</p>",
+            "one": "11",
+            "two": "8",
+            "flag1": 1
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>target.items = {}</p>",
+            "one": "11"
+        },
+        "10": {
+            "type": "branch",
+            "content": "Exit",
+            "one": "1",
+            "branchId": 5
+        },
+        "11": {
+            "type": "branch",
+            "content": "<p>Added</p>",
+            "one": "14",
+            "branchId": 2
+        },
+        "12": {
+            "type": "branch",
+            "branchId": 3,
+            "content": "<p>Updated</p>",
+            "one": "19"
+        },
+        "13": {
+            "type": "branch",
+            "branchId": 4,
+            "content": "<p>Removed</p>",
+            "one": "25"
+        },
+        "14": {
+            "type": "question",
+            "content": "<p>body.added</p>",
+            "one": "16",
+            "two": "12",
+            "flag1": 1
+        },
+        "15": {
+            "type": "loopend",
+            "one": "12",
+            "two": ""
+        },
+        "16": {
+            "type": "loopbegin",
+            "one": "17",
+            "content": "<p>for each edit in body.added</p>",
+            "two": ""
+        },
+        "17": {
+            "type": "action",
+            "content": "<p>item = shallow copy object(edit)</p><p>delete item.id</p>",
+            "one": "18",
+            "two": ""
+        },
+        "18": {
+            "type": "action",
+            "content": "<p>target.items[edit.id] = item</p>",
+            "one": "15",
+            "two": ""
+        },
+        "19": {
+            "type": "question",
+            "content": "<p>body.updated</p>",
+            "one": "21",
+            "two": "13",
+            "flag1": 1
+        },
+        "20": {
+            "type": "loopend",
+            "one": "13",
+            "two": ""
+        },
+        "21": {
+            "type": "loopbegin",
+            "one": "22",
+            "content": "<p>for each edit in body.updated</p>",
+            "two": ""
+        },
+        "22": {
+            "type": "action",
+            "content": "<p>item = shallow copy object(edit)</p><p>delete item.id</p>",
+            "one": "23",
+            "two": ""
+        },
+        "23": {
+            "type": "action",
+            "content": "<p>existing = target.items[edit.id]</p>",
+            "one": "24",
+            "two": ""
+        },
+        "24": {
+            "type": "action",
+            "content": "<p>Object.assign(existing, item)</p>",
+            "one": "20"
+        },
+        "25": {
+            "type": "question",
+            "content": "<p>body.removed</p>",
+            "one": "27",
+            "two": "10",
+            "flag1": 1
+        },
+        "26": {
+            "type": "loopend",
+            "one": "10"
+        },
+        "27": {
+            "type": "loopbegin",
+            "one": "28",
+            "content": "<p>for each id in body.removed</p>"
+        },
+        "28": {
+            "type": "action",
+            "content": "<p>delete target.items[id]</p>",
+            "one": "26"
+        }
+    },
+    "type": "drakon",
+    "id": "apply edits.drakon",
+    "params": "<p>parameters:</p><ul><li>body</li><li>target</li></ul>"
+}

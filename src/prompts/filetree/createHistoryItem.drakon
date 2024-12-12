@@ -1,0 +1,25 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>return {</p><p>    folder_id: item.id,</p><p>    space_id: winInfo.spaceId,</p><p>    name: get record name(winInfo, item.id),</p><p>    type: record.type,</p><p>    whenOpened: item.whenOpened</p><p>}</p>",
+            "one": "1"
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>record = get record by id(winInfo, item.id)</p>",
+            "one": "3"
+        }
+    },
+    "type": "drakon",
+    "id": "createHistoryItem.drakon",
+    "params": "<p>parameters:</p><p>winInfo</p><p>item</p>"
+}

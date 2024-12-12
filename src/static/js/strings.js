@@ -1070,3 +1070,10 @@ function getLanguage() {
 function setLanguage(language) {
     gLanguage = language
 }
+
+if (typeof module !== "undefined") {
+	module.exports = {
+		translate: translate,
+		setLanguage: setLanguage
+	}
+}

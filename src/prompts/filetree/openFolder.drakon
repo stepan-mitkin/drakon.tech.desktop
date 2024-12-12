@@ -1,0 +1,157 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "3",
+            "content": "<p>Determine access</p>"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>folderPath = path.resolve(folderPath)</p>",
+            "one": "4"
+        },
+        "4": {
+            "type": "question",
+            "content": "<p>folderPath is directory</p>",
+            "one": "6",
+            "two": "5",
+            "flag1": 1
+        },
+        "5": {
+            "type": "action",
+            "content": "<p>throw error</p>",
+            "one": "6"
+        },
+        "6": {
+            "type": "question",
+            "content": "<p>shadow folder exists</p>",
+            "one": "12",
+            "two": "10",
+            "flag1": 1
+        },
+        "7": {
+            "type": "question",
+            "content": "<p>success?</p>",
+            "one": "12",
+            "two": "14",
+            "flag1": 1
+        },
+        "8": {
+            "type": "branch",
+            "content": "Exit",
+            "one": "1",
+            "branchId": 5
+        },
+        "9": {
+            "type": "branch",
+            "content": "<p>Create memory structures</p>",
+            "one": "15",
+            "branchId": 2
+        },
+        "10": {
+            "type": "action",
+            "content": "<p>create shadow folder</p>",
+            "one": "7"
+        },
+        "11": {
+            "type": "question",
+            "content": "<p>success?</p>",
+            "one": "13",
+            "two": "14",
+            "flag1": 1
+        },
+        "12": {
+            "type": "action",
+            "content": "<p>write access file</p>",
+            "one": "11"
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>access = \"write\"</p>",
+            "one": "28"
+        },
+        "14": {
+            "type": "action",
+            "content": "<p>access = \"read\"</p>",
+            "one": "28"
+        },
+        "15": {
+            "type": "action",
+            "content": "<p>winInfo.spaceId = generateUniqueId()</p>",
+            "one": "18"
+        },
+        "16": {
+            "type": "action",
+            "content": "<p>Create structures for the memory cache:</p><p>winInfo.records = {}</p><p>winInfo.idToPath = {}</p><p>winInfo.pathToId = {}</p><p>winInfo.history = []</p><p>winInfo.records is a map from id to record content</p><p>A record corresponds either to a file or to a folder</p><p>winInfo.idToPath is a map from id to full path of a file or folder.</p><p>winInfo.pathToId is a map from full path to id</p><p>winInfo.history is a list of previously opened files. Contains ids of the records that corresponds to the files.</p>",
+            "one": "17"
+        },
+        "17": {
+            "type": "branch",
+            "branchId": 3,
+            "content": "<p>Create root record</p>",
+            "one": "19"
+        },
+        "18": {
+            "type": "action",
+            "content": "<p>winInfo.path = folderPath</p>",
+            "one": "16"
+        },
+        "19": {
+            "type": "action",
+            "content": "<p>rootId = \"1\"</p>",
+            "one": "20"
+        },
+        "20": {
+            "type": "action",
+            "content": "<p>add to cache(winInfo, folderPath, rootId, {type:\"folder\"})</p>",
+            "one": "21"
+        },
+        "21": {
+            "type": "branch",
+            "branchId": 4,
+            "content": "<p>Load history</p>",
+            "one": "22"
+        },
+        "22": {
+            "type": "action",
+            "content": "<p>history = load history from shadow(folderPath)</p>",
+            "one": "25"
+        },
+        "23": {
+            "type": "action",
+            "content": "<p>winInfo.history = history</p>",
+            "one": "8"
+        },
+        "24": {
+            "type": "loopend",
+            "one": "23"
+        },
+        "25": {
+            "type": "loopbegin",
+            "one": "26",
+            "content": "<p>for each item in history</p>"
+        },
+        "26": {
+            "type": "action",
+            "content": "<p>id = load record from disc to cache(winInfo, item.path)</p>",
+            "one": "27"
+        },
+        "27": {
+            "type": "action",
+            "content": "<p>history.push({</p><p>\tid: id,</p><p>\twhenOpened: item.whenOpened</p><p>})</p>",
+            "one": "24"
+        },
+        "28": {
+            "type": "action",
+            "content": "<p>winInfo.path = folderPath</p><p>winInfo.access = access</p>",
+            "one": "9"
+        }
+    },
+    "type": "drakon",
+    "id": "openFolder.drakon",
+    "params": "<p>Arguments:</p><ul><li>winInfo</li><li>folderPath</li></ul><p><br /></p><p>The path to shadow folder is path.join(folderPath, \".\" + config.exe)</p>"
+}

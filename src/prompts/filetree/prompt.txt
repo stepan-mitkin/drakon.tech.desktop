@@ -1,0 +1,20 @@
+Write a CommonJS module that implements the pseudo-code that I will send you in the next message.
+
+Use fs.promises
+
+Preserve the original logic as much as possible.
+
+Export the following functions:
+  createFolder,
+  getFolder,
+  updateFolder,
+  openFolder,
+  getHistory
+
+Make all exported functions async.
+
+If a function is not exported and does not contain "await", that function must not be async.
+
+To generate unique ids, create this global object:
+let globalIdCounter = 2;
+Do not create any other global objects.

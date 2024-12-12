@@ -1,0 +1,80 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "question",
+            "content": "<p>filepath in winInfo.pathToId</p>",
+            "one": "4",
+            "two": "5",
+            "flag1": 1
+        },
+        "4": {
+            "type": "action",
+            "content": "<p>return winInfo.pathToId[filepath]</p>",
+            "one": "1"
+        },
+        "5": {
+            "type": "action",
+            "content": "<p>parentPath = get path to parent directory(filepath)</p>",
+            "one": "7",
+            "two": ""
+        },
+        "6": {
+            "type": "question",
+            "content": "<p>is directory (filepath)</p>",
+            "one": "9",
+            "two": "8",
+            "flag1": 0
+        },
+        "7": {
+            "type": "action",
+            "content": "<p>parent = load record from disc to cache(parentPath)</p>",
+            "one": "6",
+            "two": ""
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>body = {</p><p>\ttype: \"folder\"</p><p>}</p>",
+            "one": "10",
+            "two": ""
+        },
+        "9": {
+            "type": "action",
+            "content": "<p>body = read json(filepath)</p>",
+            "one": "10",
+            "two": ""
+        },
+        "10": {
+            "type": "action",
+            "content": "<p>body.parent = parent</p>",
+            "one": "14",
+            "two": ""
+        },
+        "12": {
+            "type": "action",
+            "content": "<p>add to cache(</p><p>winInfo,</p><p>filepath,</p><p>id,</p><p>body)</p>",
+            "one": "13"
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>return id</p>",
+            "one": "1"
+        },
+        "14": {
+            "type": "action",
+            "content": "<p>id = generateUniqueId()</p>",
+            "one": "12",
+            "two": ""
+        }
+    },
+    "type": "drakon",
+    "id": "load record from disc to cache.drakon",
+    "params": "<p>parameters:</p><ul><li>winInfo</li><li>filepath</li></ul>"
+}
