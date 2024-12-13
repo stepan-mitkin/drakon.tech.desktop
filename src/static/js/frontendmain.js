@@ -385,6 +385,7 @@
     async function tryOpenFolder(folder) {
         try {
             var spaceId = await backend.openFolder(folder)
+            if (!spaceId) {return}
             await addToRecent(folder)
             startIde(spaceId)
         } catch (ex) {

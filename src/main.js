@@ -9,7 +9,8 @@ const {
     getFolder,
     updateFolder,
     getHistory,
-    openFolder,
+    openFolderCore,
+    changeMany
 } = require("./filetree")
 
 var logg = undefined
@@ -49,8 +50,9 @@ async function setRecent(winInfo, recent) {
 
 async function getRecent() {
     var filename = getRecentPath()
-    var obj = readJson(filename)
-    return obj.recent || []
+    var obj = await readJson(filename)
+    var result = obj.recent || []
+    return result
 }
 
 async function openUrl(winInfo, url) {
@@ -63,6 +65,7 @@ async function getSettings() {
     if (!obj.language) {
         obj.language = "en"
     }
+    setLanguage(obj.language)
     return obj
 }
 
@@ -106,6 +109,7 @@ async function readJson(filename) {
         var content = await readUtf8File(filename)
         return JSON.parse(content || "{}")
     } catch (ex) {
+        console.log("readJson", ex.message)
         return {}
     }
 }
@@ -121,10 +125,6 @@ async function writeUtf8File(filename, content) {
 
 async function readUtf8File(filename) {
     return await fs.readFile(filename, "utf8")
-}
-
-async function changeMany() {
-
 }
 
 async function searchFolders() {
@@ -147,12 +147,33 @@ async function setTitle(winInfo, title) {
     winInfo.window.setTitle(title)
 }
 
-async function setClipboard() {
-    
+async function setClipboard(winInfo, type, content) {
+    globals.clipboard = {
+        type,
+        content
+    }
+    invokeClipboardUpdated()
+}
+
+function invokeClipboardUpdated() {
+    for (var winId in globals.windows) {
+        var winInfo = globals.windows[winId]
+        winInfo.window.webContents.send("setLocalClipboard", globals.clipboard.type, globals.clipboard.content)
+    }
+}
+
+async function openFolder(winInfo, folderPath) {
+    var win = findWindowByPathExact(folderPath)
+    if (win) {
+        raiseWindow(win)
+        return undefined
+    } else {
+        return await openFolderCore(winInfo, folderPath)
+    }
 }
 
 async function newWindow() {
-    
+    createWindow(undefined)
 }
 
 async function restartApp(winInfo) {
@@ -161,8 +182,10 @@ async function restartApp(winInfo) {
     winInfo.window.close()
 }
 
-async function closeFolder() {
-    
+async function closeFolder(winInfo) {
+    winInfo.myFolder = undefined
+    winInfo.path = undefined
+    setTitle(winInfo, config.app)    
 }
 
 async function exportProject() {
@@ -195,8 +218,8 @@ function registerMainCallbacks() {
     registerHandler(getHistory)
     registerHandler(createFolder)
     registerHandler(updateFolder)
-
     registerHandler(changeMany)
+
     registerHandler(searchFolders)
     registerHandler(searchItems)
     registerHandler(pollSearch)
@@ -253,43 +276,6 @@ function handleSquirrelEvent() {
     }
 
     return false
-}
-
-async function ensureFolderExists(folderpath) {
-    var stats = await fs.stat(folderpath)
-    if (!stats.isDirectory()) {
-        throw new Error(folderpath + " is not a directory")
-    }
-}
-
-function buildShadowName(folderpath) {
-    var shadow = "." + config.exe
-    return path.join(folderpath, shadow)
-}
-
-async function createShadowFolder(folderpath) {
-    var shadowPath = buildShadowName(folderpath)
-    var stats = undefined
-    try {
-        stats = await fs.stat(shadowPath)
-    } catch (ex) {
-
-    }
-    if (stats) {
-        if (stats.isDirectory()) {
-            return
-        } else {
-            await fs.rm(shadowPath)
-        }
-    }
-    fs.mkdir(shadowPath)
-}
-
-async function writeAccessFile(folderpath) {
-    var shadowFolder = buildShadowName(folderpath)
-    var accessFilePath = path.join(shadowFolder, "opened.txt")
-    var now = (new Date()).toISOString()
-    await fs.writeFile(accessFilePath, now, "utf8")
 }
 
 function handleContextMenu(winInfo, event, props) {

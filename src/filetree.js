@@ -4,6 +4,23 @@ const config = require("./config")
 
 let globalIdCounter = 2;
 
+function objFor(obj, callback, target) {
+    for (var key in obj) {
+        var value = obj[key]
+        callback(key, value, target)
+    }
+}
+
+
+function forEach(array, callback, target) {
+    var length = array.length
+    for (var i = 0; i < length; i++) {
+        var value = array[i]
+        callback(value, target, i)
+    }
+}
+
+
 function addToCache(winInfo, filepath, id, body) {
     winInfo.records[id] = body;
     winInfo.idToPath[id] = filepath;
@@ -339,7 +356,7 @@ async function loadRecordFromDiscToCache(winInfo, filepath) {
 
 
 
-async function openFolder(winInfo, folderPath) {
+async function openFolderCore(winInfo, folderPath) {
     await determineAccess(winInfo, folderPath);
     createMemoryStructures(winInfo, folderPath);
     await loadHistory(winInfo, folderPath);
@@ -358,7 +375,7 @@ async function determineAccess(winInfo, folderPath) {
         await writeAccessFile(folderPath);
         access = 'write';
     } catch (ex) {
-        console.log(ex)
+        console.log("determineAccess", ex)
         access = "read"
     }
 
@@ -428,7 +445,6 @@ async function updateFolder(winInfo, spaceId, folderId, body) {
 async function saveDiagramToDisc(filepath, obj) {
     var copy = clone(obj)
     delete copy.parent
-    console.log(copy)
     await writeJson(filepath, copy);
 }
 
@@ -440,7 +456,7 @@ function clone(obj) {
 
 async function deleteFile(filepath) {
     try {
-        await fs.unlink(filepath);  // Deletes the file at the given filepath
+        await fs.rm(filepath, { recursive: true, force: true })
     } catch (err) {
         throw new Error(`Failed to delete file: ${filepath} ${err.message}`);
     }
@@ -531,6 +547,55 @@ async function createShadowFolder(folderPath) {
     await createFolderOnDisk(fullpath)
 }
 
+function collectIdTree(winInfo, folderId, output) {
+    output.push(folderId)    
+    const childIds = getChildIds(winInfo, folderId);
+    for (const id of childIds) {
+        collectIdTree(winInfo, id, output);
+    }
+}
+
+async function deleteOneFolder(winInfo, item, deleted) {
+    collectIdTree(winInfo, item.id, deleted)
+    var filepath = getFilePathById(winInfo, item.id)
+    await deleteFile(filepath)
+}
+
+async function deleteFromEverywhere(winInfo, deleted) {
+    for (var id of deleted) {
+        var filepath = getFilePathById(winInfo, id)
+        delete winInfo.idToPath[id]
+        delete winInfo.pathToId[filepath]
+        delete winInfo.records[id]
+    }
+    winInfo.history = winInfo.history.filter(item => deleted.indexOf(item.id) === -1)
+    await rewriteHistory(winInfo)
+}
+
+async function changeMany(winInfo, body) {
+    var deleted = []
+    try {
+        if (body.operation === "delete") {
+            for (var item of body.items) {
+                await deleteOneFolder(winInfo, item, deleted)
+            }            
+            await deleteFromEverywhere(winInfo, deleted)
+        } else if (body.operation === "copy") {
+            forEach(body.items, copyOneFolder, body.target)
+        } else if (body.operation === "move") {
+            if (moveAcrossProjects(body)) {
+                forEach(body.items, copyOneFolder, body.target)
+            } else {
+                forEach(body.items, moveOneFolder, body.target)
+            }
+        }
+    } catch (ex) {
+        return {ok:false, error:ex.message}
+    }
+    
+    return {ok:true, deleted: deleted}
+}
+
 // Helper functions for file checks, reading/writing, etc.
 
 async function fileOrFolderExists(filepath) {
@@ -572,5 +637,6 @@ module.exports = {
     getFolder,
     updateFolder,
     getHistory,
-    openFolder,
+    openFolderCore,
+    changeMany
 };
