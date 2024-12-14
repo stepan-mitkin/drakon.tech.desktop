@@ -389,7 +389,7 @@
             await addToRecent(folder)
             startIde(spaceId)
         } catch (ex) {
-            console.error(ex)
+            console.log(ex)
             await showStartPage()
         }
     }
@@ -571,7 +571,7 @@
     }
 
     function panic(ex) {
-        console.error(ex);
+        console.log(ex);
         var wide = get("wide")
         clear(wide)
         removeById("working")

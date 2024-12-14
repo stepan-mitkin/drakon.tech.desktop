@@ -64,7 +64,6 @@ async function rewriteHistory(winInfo) {
     await writeJson(filename, obj);
 }
 
-
 function applyEdits(body, target) {
     createItems(body, target);
     addedEdits(body, target);
@@ -176,7 +175,7 @@ async function createFolder(winInfo, spaceId, body) {
             await writeJson(newPath, record);
             record.parent = body.parent;
             id = generateUniqueId();
-            addToCache(winInfo, newPath, id, record);            
+            addToCache(winInfo, newPath, id, record);
             return { folder_id: id };
         }
     }
@@ -214,7 +213,7 @@ async function getFolder(winInfo, spaceId, folderId) {
 function createHistoryItem(winInfo, item) {
     // Get the record for the given item ID from winInfo
     const record = getRecordById(winInfo, item.id);
-    const name = getFolderName(winInfo, item.id)    
+    const name = getFolderName(winInfo, item.id)
     var result = {
         folder_id: item.id,
         space_id: winInfo.spaceId,
@@ -386,7 +385,7 @@ async function determineAccess(winInfo, folderPath) {
 async function updateFolder(winInfo, spaceId, folderId, body) {
     // Check that the spaceId matches
     if (spaceId !== winInfo.spaceId) throw new Error('Invalid spaceId');
-    
+
     // Get the existing record for the folder
     const existing = await getRecordById(winInfo, folderId);
     const filepath = await getFilePathById(winInfo, folderId);
@@ -492,7 +491,7 @@ function getChildIds(winInfo, parentId) {
 
 function replaceFilePathInChildren(winInfo, newPath, folderId) {
     var oldPath = getFilePathById(winInfo, folderId)
-        // Update the path mappings in memory
+    // Update the path mappings in memory
     delete winInfo.pathToId[oldPath];  // Remove the old path mapping
     winInfo.pathToId[newPath] = folderId;  // Add the new path mapping
     winInfo.idToPath[folderId] = newPath;  // Update the id-to-path mapping    
@@ -548,7 +547,7 @@ async function createShadowFolder(folderPath) {
 }
 
 function collectIdTree(winInfo, folderId, output) {
-    output.push(folderId)    
+    output.push(folderId)
     const childIds = getChildIds(winInfo, folderId);
     for (const id of childIds) {
         collectIdTree(winInfo, id, output);
@@ -572,28 +571,89 @@ async function deleteFromEverywhere(winInfo, deleted) {
     await rewriteHistory(winInfo)
 }
 
-async function changeMany(winInfo, body) {
+async function changeManyCore(winInfo, body) {
     var deleted = []
     try {
         if (body.operation === "delete") {
             for (var item of body.items) {
                 await deleteOneFolder(winInfo, item, deleted)
-            }            
+            }
             await deleteFromEverywhere(winInfo, deleted)
         } else if (body.operation === "copy") {
-            forEach(body.items, copyOneFolder, body.target)
+            for (var item of body.items) {
+                await copyOneFolder(winInfo, item, body.target)
+            }
         } else if (body.operation === "move") {
             if (moveAcrossProjects(body)) {
-                forEach(body.items, copyOneFolder, body.target)
+                for (var item of body.items) {
+                    await copyOneFolder(winInfo, item, body.target)
+                }
             } else {
-                forEach(body.items, moveOneFolder, body.target)
+                for (var item of body.items) {
+                    await moveOneFolder(winInfo, item, body.target)
+                }
+                await rewriteHistory(winInfo)
             }
         }
     } catch (ex) {
-        return {ok:false, error:ex.message}
+        console.log(ex)
+        return { ok: false, error: ex.message }
     }
-    
-    return {ok:true, deleted: deleted}
+
+    return { ok: true, deleted: deleted }
+}
+
+async function copyOneFolder(winInfo, item, target) {
+    var targetFolder = getFilePathById(winInfo, target.folder_id)
+    var filename = path.parse(item.filepath).base
+    var targetPath = await buildUniqueFilename(targetFolder, filename)
+    await copyFileOrFolder(item.filepath, targetPath)
+}
+
+async function moveOneFolder(winInfo, item, target) {
+    var record = getRecordById(winInfo, item.id)
+    if (record.parent === target.folder_id) {
+        return
+    }
+    var targetFolder = getFilePathById(winInfo, target.folder_id)
+    var filename = path.parse(item.filepath).base
+    var targetPath = await buildUniqueFilename(targetFolder, filename)
+    await fs.rename(item.filepath, targetPath)
+    replaceFilePathInChildren(winInfo, targetPath, item.id)
+}
+
+async function buildUniqueFilename(targetFolder, filename) {
+    var parsed = path.parse(filename)
+    var ext = parsed.ext
+    var name = parsed.name
+    while (true) {
+        var fullPath = path.join(targetFolder, name + ext)
+        var exists = await fileOrFolderExists(fullPath)
+        if (exists) {
+            name = name + "-x2"
+        } else {
+            return fullPath
+        }
+    }
+}
+
+async function copyFileOrFolder(src, dest) {
+    const stat = await fs.stat(src);
+    if (stat.isDirectory()) {
+        await fs.mkdir(dest, { recursive: true });
+        const files = await fs.readdir(src);
+        for (const file of files) {
+            const srcPath = path.join(src, file);
+            const destPath = path.join(dest, file);
+            await copyFileOrFolder(srcPath, destPath)
+        }
+    } else {
+        await fs.copyFile(src, dest);
+    }
+}
+
+function moveAcrossProjects(body) {
+    return body.target.space_id !== body.items[0].space_id
 }
 
 // Helper functions for file checks, reading/writing, etc.
@@ -616,11 +676,11 @@ async function createFolderOnDisk(newPath) {
     await fs.mkdir(newPath, { recursive: true });
 }
 
-async function readJson(filepath) {    
+async function readJson(filepath) {
     try {
         const content = await fs.readFile(filepath, 'utf-8');
         return JSON.parse(content);
-    } catch(ex) {
+    } catch (ex) {
         console.log("Error", filepath, ex)
         return {};
     }
@@ -638,5 +698,6 @@ module.exports = {
     updateFolder,
     getHistory,
     openFolderCore,
-    changeMany
+    changeManyCore,
+    getFilePathById
 };

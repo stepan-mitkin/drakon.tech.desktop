@@ -10,7 +10,8 @@ const {
     updateFolder,
     getHistory,
     openFolderCore,
-    changeMany
+    changeManyCore,
+    getFilePathById
 } = require("./filetree")
 
 var logg = undefined
@@ -172,6 +173,16 @@ async function openFolder(winInfo, folderPath) {
     }
 }
 
+async function changeMany(winInfo, body) {
+    body.items.forEach(enrichManyItem)
+    return await changeManyCore(winInfo, body)
+}
+
+function enrichManyItem(item) {
+    var winInfo = findWindowBySpaceId(item.space_id)
+    item.filepath = getFilePathById(winInfo, item.id)
+}
+
 async function newWindow() {
     createWindow(undefined)
 }
@@ -316,6 +327,17 @@ function findWindowByPathExact(path) {
     }
 
     return undefined
+}
+
+function findWindowBySpaceId(spaceId) {
+    for (var winId in globals.windows) {
+        var winInfo = globals.windows[winId]
+        if (winInfo.spaceId === spaceId) {
+            return winInfo
+        }
+    }
+
+    return undefined  
 }
 
 function raiseFirstWindow() {
