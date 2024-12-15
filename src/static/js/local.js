@@ -684,7 +684,6 @@
     function startItemsSearch(spaceId, needles) {
         var needlesChecked = prepareNeedles(needles)        
         if (gSearch) {
-            gSearch.stop()
             gSearch = undefined
         }
         if (needlesChecked.length === 0) {

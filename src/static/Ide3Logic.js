@@ -6933,7 +6933,23 @@ function saveApp(data) {
     console.log("saveApp", data)
 }
 
+function textToContent(change) {
+    textContentInChangeList(change.added)
+    textContentInChangeList(change.updated)
+}
+
+function textContentInChangeList(changes) {
+    if (!changes) { return }
+    for (var change of changes) {
+        if ("text" in change) {
+            change.content = change.text
+            delete change.text
+        }
+    }
+}
+
 function saveChange(spaceId, folderId, change, target) {
+    textToContent(change)
     backend.updateFolder(spaceId, folderId, change).then(target.onData).catch(target.onError)
 }
 

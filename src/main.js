@@ -11,7 +11,12 @@ const {
     getHistory,
     openFolderCore,
     changeManyCore,
-    getFilePathById
+    getFilePathById,
+    searchFolders,
+    searchDefinitions,
+    searchItems,
+    pollSearch,
+    stopSearch
 } = require("./filetree")
 
 var logg = undefined
@@ -99,12 +104,6 @@ async function getMyFolder(winInfo) {
     return winInfo.myFolder
 }
 
-
-async function loadHistory(winInfo) {
-
-}
-
-
 async function readJson(filename) {
     try {
         var content = await readUtf8File(filename)
@@ -126,22 +125,6 @@ async function writeUtf8File(filename, content) {
 
 async function readUtf8File(filename) {
     return await fs.readFile(filename, "utf8")
-}
-
-async function searchFolders() {
-    
-}
-
-async function pollSearch() {
-    
-}
-
-async function searchItems() {
-    
-}
-
-async function searchDefinitions() {
-    return {"items":[]}
 }
 
 async function setTitle(winInfo, title) {
@@ -196,6 +179,7 @@ async function restartApp(winInfo) {
 async function closeFolder(winInfo) {
     winInfo.myFolder = undefined
     winInfo.path = undefined
+    stopSearch(winInfo)
     setTitle(winInfo, config.app)    
 }
 
@@ -230,11 +214,11 @@ function registerMainCallbacks() {
     registerHandler(createFolder)
     registerHandler(updateFolder)
     registerHandler(changeMany)
-
     registerHandler(searchFolders)
     registerHandler(searchItems)
     registerHandler(pollSearch)
     registerHandler(searchDefinitions)
+
     registerHandler(setTitle)
     registerHandler(restartApp)
     registerHandler(setClipboard)

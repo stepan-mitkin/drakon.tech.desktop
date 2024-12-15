@@ -4,6 +4,97 @@ const config = require("./config")
 
 let globalIdCounter = 2;
 
+function createItemSearch(winInfo, needles) {
+    var found = []
+    var completed = false
+    async function start() {
+        if (completed) {throw new Error("Search has completed")}
+        await scanFolders(
+            winInfo,
+            winInfo.path,
+            filepath => itemSearchVisitor(
+                winInfo,
+                filepath
+            )
+        )
+        completed = true
+    }
+
+    function stop() {
+        completed = true
+    }
+
+    async function itemSearchVisitor(
+        winInfo,
+        filepath) {
+        if (completed) {
+            return true
+        }
+        if (await isDirectory(filepath)) {
+            return false
+        }
+        var diagram = await readJson(filepath)
+        await searchItem(winInfo, filepath, "params", diagram.params)
+        var items = diagram.items || {}
+        for (var itemId in items) {
+            var item = items[itemId]
+            await searchItem(winInfo, filepath, itemId, item.content)
+        }
+        return false
+    }
+
+    function getLines(content) {
+        content = content || ""
+        var parts = content
+        .split("\n")
+        .map(part => part.trim())
+        .filter(part => !!part)    
+        return parts  
+    }
+    
+    async function searchItem(winInfo, filepath, itemId, content) {
+        var lines = getLines(content)
+        var name = path.parse(filepath).name
+        for (var line of lines) {
+            var low = line.toLowerCase()
+            for (var needle of needles) {
+                if (low.indexOf(needle) !== -1) {
+                    var id = await loadRecordFromDiscToCache(winInfo, filepath)
+                    found.push(createFoundItem(winInfo, id, itemId, name, line))
+                }
+            }
+        }  
+    }
+
+    function createFoundItem(winInfo, id, itemId, name, text) {
+        var record = getRecordById(winInfo, id)
+        return {
+            space_id: winInfo.spaceId,
+            folder_id: id,
+            name: name,
+            path: buildPathForSearch(winInfo, id),
+            type: record.type,
+            item_id: itemId,
+            text: text
+        }
+    }
+
+    function getResults() {
+        var result = {
+            completed: completed,
+            items: found
+        }
+        found = []
+        return result
+    }
+
+    return {
+        start: start,
+        getResults: getResults,
+        stop: stop
+    }
+}
+
 function objFor(obj, callback, target) {
     for (var key in obj) {
         var value = obj[key]
@@ -603,6 +694,168 @@ async function changeManyCore(winInfo, body) {
     return { ok: true, deleted: deleted }
 }
 
+function prepareNeedles(needles) {
+    return needles
+        .map(prepareNeedle)
+        .filter(nee => !!nee)          
+}
+
+function prepareNeedle(text) {
+    text = text || ""
+    text = text.trim()
+    return text.toLowerCase()
+}
+
+function sortByRankThenName(left, right) {
+    if (left.rank < right.rank) {return -1}
+    if (left.rank > right.rank) {return 1}
+    if (left.name < right.name) {return -1}
+    if (left.name > right.name) {return 1}  
+    return 0
+}
+
+async function searchFolders(winInfo, body) {
+    return await searchFolderCore(winInfo, [body.needle], 10)
+}
+
+async function searchDefinitions(winInfo, body) {
+    return await searchFolderCore(winInfo, body.tokens, 1)
+}
+
+async function searchItems(winInfo, body) { 
+    var spaceId = body.spaces[0]
+    startItemsSearch(winInfo, [body.needle])
+    return {}
+}  
+
+function stopSearch(winInfo) {
+    if (winInfo.search) {
+        winInfo.search.stop()
+        winInfo.search = undefined
+    }
+}
+
+function startItemsSearch(winInfo, needles) {
+    var needlesChecked = prepareNeedles(needles)  
+    stopSearch(winInfo)
+    if (needlesChecked.length === 0) {
+        return
+    }
+    winInfo.search = createItemSearch(winInfo, needlesChecked)
+    winInfo.search.start()     
+}
+
+function getMatchRank(name, needles) {
+    var rank = 10000
+    for (var needle of needles) {
+        var nrank
+        if (name === needle) {
+            nrank = 1
+        } else if (name.indexOf(needle) !== -1) {
+            nrank = 10
+        } else {
+            continue
+        }
+        rank = Math.min(rank, nrank)
+    }
+    return rank
+}
+
+async function folderSearchVisitor(
+    winInfo,
+    needlesChecked,
+    filepath,
+    maxRank,
+    results) {
+    var parsed = path.parse(filepath)
+    var name = parsed.name.toLowerCase()
+    var rank = getMatchRank(name, needlesChecked)
+    if (rank <= maxRank) {
+        const id = await loadRecordFromDiscToCache(winInfo, filepath)
+        var record = getRecordById(winInfo, id)
+        if (record.parent) {
+            results.push({
+                id: id,
+                name: parsed.name,
+                type: record.type,
+                rank: rank
+            })
+        }
+    } 
+    return false
+}
+
+async function searchFolderCore(winInfo, needles, maxRank) {
+    var results = []
+    var needlesChecked = prepareNeedles(needles)        
+    await scanFolders(
+        winInfo,
+        winInfo.path,
+        filepath => folderSearchVisitor(
+            winInfo,
+            needlesChecked,
+            filepath,
+            maxRank,
+            results
+        )
+    )
+    results.sort(sortByRankThenName)
+    return {
+        folders: results.map(item => transformSearchResultFolder(winInfo, item))
+    }        
+}
+
+function transformSearchResultFolder(winInfo, item) {
+    return {
+        folder_id: item.id,
+        space_id: winInfo.spaceId,
+        name: item.name,
+        type: item.type,
+        path: buildPathForSearch(winInfo, item.id)
+    }
+}
+
+function buildPathForSearch(winInfo, id) {
+    return buildFolderPath(winInfo, id).map(step => step.name)
+}
+
+async function scanFolders(winInfo, folderPath, visitor) {
+    var parsed = path.parse(folderPath)
+    if (parsed.name.startsWith(".")) {
+        return
+    }
+    var isDir = await isDirectory(folderPath)
+    if (isDir || parsed.ext === ".drakon") {
+        var mustStop = await visitor(folderPath)
+        if (mustStop) {
+            return
+        }
+    }
+
+    if (isDir) {
+        var files = await fs.readdir(folderPath) 
+        for (var file of files ) {
+            var childPath = path.join(folderPath, file)
+            await scanFolders(winInfo, childPath, visitor)
+        }
+    }
+}
+
+async function pollSearch(winInfo) {
+    var result = {
+        completed: true,
+        items: []
+    }
+    if (!winInfo.search) {
+        return result
+    }
+    result = winInfo.search.getResults()
+    if (result.completed) {
+        winInfo.search = undefined
+    }
+    return result
+}
+
 async function copyOneFolder(winInfo, item, target) {
     var targetFolder = getFilePathById(winInfo, target.folder_id)
     var filename = path.parse(item.filepath).base
@@ -699,5 +952,10 @@ module.exports = {
     getHistory,
     openFolderCore,
     changeManyCore,
-    getFilePathById
+    getFilePathById,
+    searchFolders,
+    searchDefinitions,
+    searchItems,
+    pollSearch,
+    stopSearch
 };
