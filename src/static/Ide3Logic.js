@@ -37,6 +37,10 @@ function AccessShower_AccessScreen_addUser(self, data) {
 }
 
 function shutdown() {
+    hidePopups()
+}
+
+function hidePopups() {
     browser.hideCentral()
     HtmlUtils.hidePopup()
     HtmlUtils.hideSoftPopup()  
@@ -1142,6 +1146,7 @@ function FolderCutterDeleter_Start_onData(self, data) {
         self.state = "RunningOperation";
     } else {
         browser.hideWorking()
+        hidePopups()
         var dialog = makeSureDelete()
         browser.createCentral(dialog, self)
         self.state = "Sure1";
