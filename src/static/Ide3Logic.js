@@ -36,6 +36,13 @@ function AccessShower_AccessScreen_addUser(self, data) {
     self.state = "AddingUser";
 }
 
+function shutdown() {
+    browser.hideCentral()
+    HtmlUtils.hidePopup()
+    HtmlUtils.hideSoftPopup()  
+    getEditor().hideSearch()
+}
+
 function AccessShower_AccessScreen_cancel(self, data) {
     browser.hideCentral()
     complete(self, data)
@@ -10368,4 +10375,5 @@ this.changeDiagramProperties = changeDiagramProperties
 this.saveApp = saveApp
 this.goToFolder = goToFolder
 this.startBuildAll = startBuildAll
+this.shutdown = shutdown
 }

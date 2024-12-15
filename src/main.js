@@ -26,6 +26,10 @@ var globals = {
     defaultImagePath: app.getPath("pictures")
 }
 
+
+async function getAppVersion() {
+    return "v2024.12.16"
+}
 async function log(text) {
     console.log(text)
     if (logg) {
@@ -163,7 +167,11 @@ async function changeMany(winInfo, body) {
 
 function enrichManyItem(item) {
     var winInfo = findWindowBySpaceId(item.space_id)
+    if (!winInfo) {
+        return false
+    }
     item.filepath = getFilePathById(winInfo, item.id)
+    return true
 }
 
 async function newWindow() {
@@ -177,6 +185,7 @@ async function restartApp(winInfo) {
 }
 
 async function closeFolder(winInfo) {
+    setClipboard(undefined, "", "")    
     winInfo.myFolder = undefined
     winInfo.path = undefined
     stopSearch(winInfo)
@@ -228,6 +237,7 @@ function registerMainCallbacks() {
     registerHandler(clearProject)
     registerHandler(downloadTextFile)
     registerHandler(downloadFile)
+    registerHandler(getAppVersion)
 }
 
 function registerHandler(fun) {
@@ -377,8 +387,6 @@ const createWindow = async (folderpath) => {
             preload: path.join(__dirname, 'static/js/preload.js')
         }
     })
-    //win.setMenu(null)
-    win.webContents.openDevTools()
 
     var id = win.webContents.id.toString()
     var winInfo = {
@@ -394,6 +402,8 @@ const createWindow = async (folderpath) => {
     
     if (process.argv.indexOf("--dev") !== -1) {
         win.webContents.openDevTools()
+    } else {
+        win.setMenu(null)
     }
 
     win.on("closed", () => {

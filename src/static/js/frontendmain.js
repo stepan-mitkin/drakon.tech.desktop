@@ -1,5 +1,6 @@
 (function() {
-    var appVersion = "v 2024.12.04"
+    var appVersion = ""
+    var gLogic
 
     var clipboard = {
         type: "",
@@ -384,6 +385,8 @@
 
     async function tryOpenFolder(folder) {
         try {
+            var settings = await backend.getSettings()
+            setLanguage(settings.language)            
             var spaceId = await backend.openFolder(folder)
             if (!spaceId) {return}
             await addToRecent(folder)
@@ -395,6 +398,7 @@
     }
 
     async function closeFolder() {
+        gLogic.shutdown()
         await backend.closeFolder()
         await showStartPage()
     }
@@ -539,6 +543,7 @@
 
     async function main() {
         initStyles()
+        appVersion = await backend.getAppVersion()
         window.addEventListener('error', onError);
         window.addEventListener('unhandledrejection', onRejection);      
         var folder = await backend.getMyFolder()
@@ -608,7 +613,7 @@
         var ide = new Ide3(window, document, translate, userId, panic)
         var logic = new Ide3Logic(spaceId, userId, ide, translate)
         ide.logic = logic        
-        
+        gLogic = logic
         window.onresize = ide.orderResize	        
         window.onmouseout = function(evt) { evt.preventDefault() }
         

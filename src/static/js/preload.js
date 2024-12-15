@@ -28,5 +28,6 @@ contextBridge.exposeInMainWorld('backend', {
     downloadTextFile: (filename, content) => ipcRenderer.invoke("downloadTextFile", filename, content),
     downloadFile: (filename, dataurl) => ipcRenderer.invoke("downloadFile", filename, dataurl),
     getMyFolder: () => ipcRenderer.invoke("getMyFolder"),
+    getAppVersion: () => ipcRenderer.invoke("getAppVersion"),
     setLocalClipboard: (callback) => ipcRenderer.on('setLocalClipboard', callback),
 })
