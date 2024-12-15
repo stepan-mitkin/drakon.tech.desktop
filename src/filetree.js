@@ -118,7 +118,10 @@ function addToCache(winInfo, filepath, id, body) {
     winInfo.pathToId[filepath] = id;
 }
 
+
+
 async function addToHistory(winInfo, folderId) {
+    if (isReadonly(winInfo)) { return }
     // Remove items with the same folderId
     winInfo.history = winInfo.history.filter(item => item.id !== folderId);
 
@@ -819,7 +822,9 @@ function buildPathForSearch(winInfo, id) {
 }
 
 async function clearProject(winInfo) {
-    if (winInfo.access !== "write") { return }
+    if (winInfo.access !== "write") { 
+        throw new Error("The folder is read-only")
+    }
     var files = await fs.readdir(winInfo.path) 
     for (var file of files ) {
         var childPath = path.join(winInfo.path, file)
@@ -966,6 +971,14 @@ async function fileOrFolderExists(filepath) {
     } catch {
         return false;
     }
+}
+
+function isReadonly(winInfo) {
+    if (winInfo.access === "write") {
+        return false
+    }
+
+    return true
 }
 
 async function isDirectory(filepath) {
