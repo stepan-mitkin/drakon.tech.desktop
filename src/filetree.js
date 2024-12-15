@@ -454,11 +454,10 @@ async function openFolderCore(winInfo, folderPath) {
 }
 
 async function determineAccess(winInfo, folderPath) {
-    const resolvedPath = path.resolve(folderPath);
-    if (!(await isDirectory(resolvedPath))) {
+    folderPath = path.resolve(folderPath);
+    if (!(await isDirectory(folderPath))) {
         throw new Error('Invalid folder path');
     }
-    const shadowFolderExists = await fileOrFolderExists(getShadowFolderPath(folderPath));
     var access
     try {
         await createShadowFolder(folderPath);
@@ -468,7 +467,7 @@ async function determineAccess(winInfo, folderPath) {
         console.log("determineAccess", ex)
         access = "read"
     }
-
+    winInfo.name = path.parse(folderPath).name
     winInfo.path = folderPath;
     winInfo.access = access;
 }
@@ -819,6 +818,55 @@ function buildPathForSearch(winInfo, id) {
     return buildFolderPath(winInfo, id).map(step => step.name)
 }
 
+async function clearProject(winInfo) {
+    if (winInfo.access !== "write") { return }
+    var files = await fs.readdir(winInfo.path) 
+    for (var file of files ) {
+        var childPath = path.join(winInfo.path, file)
+        var parsed = path.parse(childPath)
+        if (!parsed.name.startsWith(".")) {
+            await deleteFile(childPath)
+        }        
+    }
+    winInfo.history = []
+    await rewriteHistory(winInfo)
+}
+
+async function exportProjectCore(winInfo) {
+    var context = {
+        nextId: 2,
+        output: [],
+        pathToId: {}
+    }
+    context.pathToId[winInfo.path] = "root"
+    await scanFolders(
+        winInfo, 
+        winInfo.path,
+        filepath => exportOneFolder(filepath, context)
+    )
+    return context.output
+}
+
+async function exportOneFolder(filepath, context) {
+    var parsed = path.parse(filepath)
+    var parent = context.pathToId[parsed.dir]
+    if (!parent) { return }
+    var id = context.nextId.toString()
+    context.nextId++
+    context.pathToId[filepath] = id
+    var body
+    if (await isDirectory(filepath)) {
+        body = {type:"folder", name:parsed.name}
+    } else {
+        body = await readJson(filepath)
+        body.type = "drakon"
+        body.name = parsed.name
+    }
+    body.id = id
+    body.parent = parent
+    context.output.push(JSON.stringify(body))
+}
+
 async function scanFolders(winInfo, folderPath, visitor) {
     var parsed = path.parse(folderPath)
     if (parsed.name.startsWith(".")) {
@@ -957,5 +1005,7 @@ module.exports = {
     searchDefinitions,
     searchItems,
     pollSearch,
-    stopSearch
+    stopSearch,
+    clearProject,
+    exportProjectCore
 };

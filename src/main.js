@@ -16,7 +16,9 @@ const {
     searchDefinitions,
     searchItems,
     pollSearch,
-    stopSearch
+    stopSearch,
+    clearProject,
+    exportProjectCore
 } = require("./filetree")
 
 var logg = undefined
@@ -192,13 +194,6 @@ async function closeFolder(winInfo) {
     setTitle(winInfo, config.app)    
 }
 
-async function exportProject() {
-    
-}
-
-async function clearProject() {
-    
-}
 
 async function downloadTextFile(winInfo, name, content) {
     var dialogResult = await dialog.showSaveDialog(
@@ -244,6 +239,13 @@ async function saveAsPng(winInfo, name, uri) {
     await fs.writeFile(filename, data, "base64")
 }
 
+async function exportProject(winInfo) {
+    var folders = await exportProjectCore(winInfo)
+    var filename = winInfo.name + ".jsonl"
+    var content = folders.join("\n")
+    await downloadTextFile(winInfo, filename, content)
+}
+
 function registerMainCallbacks() {
     registerHandler(getRecent)
     registerHandler(setRecent)
@@ -270,7 +272,7 @@ function registerMainCallbacks() {
     registerHandler(getAppVersion)
     registerHandler(downloadTextFile)
     registerHandler(saveAsPng)
-    
+
     registerHandler(exportProject)
     registerHandler(clearProject)
 }

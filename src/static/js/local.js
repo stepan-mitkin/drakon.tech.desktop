@@ -1,4 +1,8 @@
 (function() {
+    async function getAppVersion() {
+        return "v2024.12.16"
+    }
+
     var gFolder = ""
     var gSpaceId = ""
     var gFolderName = ""
@@ -803,7 +807,6 @@
         }
     }
     
-
     function exportProject() {
         console.log("exportProject!")
         var folders = getExportFolders()
@@ -897,7 +900,8 @@
         clearProject: clearProject,
         downloadTextFile: downloadTextFile,
         saveAsPng: saveAsPng,
-        getMyFolder: getMyFolder
+        getMyFolder: getMyFolder,
+        getAppVersion: getAppVersion
     }
 
     
