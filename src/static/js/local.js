@@ -735,7 +735,7 @@
         }
     }
 
-    function downloadFile(filename, dataurl) {
+    async function saveAsPng(filename, dataurl) {
         const link = document.createElement('a');
         link.href = dataurl;
         link.download = filename;
@@ -896,7 +896,7 @@
         exportProject: exportProject,
         clearProject: clearProject,
         downloadTextFile: downloadTextFile,
-        downloadFile: downloadFile,
+        saveAsPng: saveAsPng,
         getMyFolder: getMyFolder
     }
 

@@ -4140,15 +4140,15 @@ function saveApp(widget) {
     self.logic.saveApp(widget.data)
 }
 
-function saveAsPng(zoom) {
+async function saveAsPng(zoom) {
     var exportCanvas = make(
     	document.body,
     	"canvas"
     )
     var image = getEditor().exportPng(exportCanvas, zoom)
-    var filename = getDiagramNameSafe() + ".png"
-    backend.downloadFile(filename, image)
     document.body.removeChild(exportCanvas)
+    var filename = getDiagramNameSafe() + ".png"
+    await backend.saveAsPng(filename, image)
 }
 
 function saveAsSvg() {

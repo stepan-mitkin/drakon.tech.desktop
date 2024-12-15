@@ -200,14 +200,49 @@ async function clearProject() {
     
 }
 
-async function downloadTextFile() {
-    
+async function downloadTextFile(winInfo, name, content) {
+    var dialogResult = await dialog.showSaveDialog(
+        winInfo.window,
+        {
+            defaultPath: path.join(globals.defaultImagePath, name),
+            filters: [
+            ] 
+        }
+    )
+
+    if (dialogResult.canceled) {
+        return
+    }
+
+    var filename = dialogResult.filePath
+    var parsed = path.parse(filename)
+    globals.defaultImagePath = parsed.dir
+
+    await writeUtf8File(filename, content)
 }
 
-async function downloadFile() {
-    
-}
+async function saveAsPng(winInfo, name, uri) {
+    var dialogResult = await dialog.showSaveDialog(
+        winInfo.window,
+        {
+            defaultPath: path.join(globals.defaultImagePath, name),
+            filters: [
+                { name: 'PNG', extensions: ["png"] }
+            ] 
+        }
+    )
 
+    if (dialogResult.canceled) {
+        return
+    }
+
+    var filename = dialogResult.filePath
+    var parsed = path.parse(filename)
+    globals.defaultImagePath = parsed.dir
+
+    var data = uri.split(',')[1]; 
+    await fs.writeFile(filename, data, "base64")
+}
 
 function registerMainCallbacks() {
     registerHandler(getRecent)
@@ -227,17 +262,17 @@ function registerMainCallbacks() {
     registerHandler(searchItems)
     registerHandler(pollSearch)
     registerHandler(searchDefinitions)
-
     registerHandler(setTitle)
     registerHandler(restartApp)
     registerHandler(setClipboard)
     registerHandler(newWindow)
     registerHandler(closeFolder)
+    registerHandler(getAppVersion)
+    registerHandler(downloadTextFile)
+    registerHandler(saveAsPng)
+    
     registerHandler(exportProject)
     registerHandler(clearProject)
-    registerHandler(downloadTextFile)
-    registerHandler(downloadFile)
-    registerHandler(getAppVersion)
 }
 
 function registerHandler(fun) {

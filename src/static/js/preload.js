@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('backend', {
     exportProject: () => ipcRenderer.invoke("exportProject"),
     clearProject: (spaceId) => ipcRenderer.invoke("clearProject", spaceId),
     downloadTextFile: (filename, content) => ipcRenderer.invoke("downloadTextFile", filename, content),
-    downloadFile: (filename, dataurl) => ipcRenderer.invoke("downloadFile", filename, dataurl),
+    saveAsPng: (filename, dataurl) => ipcRenderer.invoke("saveAsPng", filename, dataurl),
     getMyFolder: () => ipcRenderer.invoke("getMyFolder"),
     getAppVersion: () => ipcRenderer.invoke("getAppVersion"),
     setLocalClipboard: (callback) => ipcRenderer.on('setLocalClipboard', callback),

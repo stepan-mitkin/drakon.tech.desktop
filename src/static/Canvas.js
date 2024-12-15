@@ -1716,7 +1716,6 @@ function drawTextCore(ctx, text, x, y, color, font) {
         ctx.textBaseline = "alphabetic";
         y -= Math.floor(gFontSize * 0.3)
         ctx.fillText(text, x, y + 1);
-        console.log(gFontSize, text)    
     } else {        
         ctx.textBaseline = "bottom";
         ctx.fillText(text, x, y + 1);    
