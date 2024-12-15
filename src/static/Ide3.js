@@ -1952,7 +1952,6 @@ function init() {
     globs.widgets.onEvent = onEvent
     self.logic.init()
     registerShortcuts()
-    Nav.onStateChange = self.logic.onStateChange
     if (globs.isTryMe) {
         //window.onbeforeunload = confirmExit
         window.onbeforeunload = null
@@ -3912,14 +3911,6 @@ function promiseError(ex) {
     	ex.lineNumber,
     	null,
     	ex
-    )
-}
-
-function pushState(onState, title, url) {
-    Nav.pushState(
-    	onState,
-    	title,
-    	window.location.origin + url
     )
 }
 
@@ -6477,8 +6468,6 @@ this.getEditor = getEditor
 this.loadFontCore = loadFontCore
 this.showNotification = showNotification
 this.placeFeedback = placeFeedback
-
-this.pushState = pushState
 
 this.createCentral = createCentral
 this.addCentral = addCentral

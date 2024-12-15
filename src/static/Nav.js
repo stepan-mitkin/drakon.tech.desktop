@@ -81,4 +81,3 @@ self.onDeleteFolder = onDeleteFolder
 return self
 }
 
-var Nav = NavModule()

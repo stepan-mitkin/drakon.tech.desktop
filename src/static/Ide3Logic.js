@@ -1,5 +1,7 @@
 function Ide3Logic(gSpaceId, gUserId, browser, translate) {
 
+var Nav = NavModule()
+
 var gSkipPushState = false
 var FEATURE_SAVE_PROJECT = true
 var Root = "https://drakonhub.com/"
@@ -5040,6 +5042,8 @@ function init() {
     } else {
         globs.wide = false
     }
+    Nav.onStateChange = onStateChange
+
     globs.isDev = false
     globs.isTryMe = false
     globs.clipboard = new browser.Clipboard()
@@ -6581,15 +6585,6 @@ function pushMenuItem(items, text, url) {
     })
 }
 
-function pushNavDashboard() {
-    var state = {
-    	type: "dashboard"
-    }
-    var url = makeDashboardUrl()
-    var title = getAppName()
-    browser.pushState(state, title, url)
-}
-
 function pushNavFolder(id, name) {
     var data, ids, title, url
     data = {
@@ -6606,49 +6601,21 @@ function pushNavFolder(id, name) {
         ids.folderId,
         name
     )
-    browser.pushState(
+    pushState(
         data,
         title,
         url
     )
 }
 
-function pushNavRecent() {
-    var state = {
-    	type: "recent"
-    }
-    var url = makeRecentUrl()
-    var title = makeRecentTitle()
-    browser.pushState(state, title, url)
-}
-
-function pushNavSpaces() {
-    var data, title, url
-    data = {
-        type : "projects"
-    }
-    url = makeSpacesUrl()
-    title = makeSpacesTitle()
-    browser.pushState(
-        data,
-        title,
-        url
+function pushState(onState, title, url) {
+    Nav.pushState(
+    	onState,
+    	title,
+    	window.location.origin + url
     )
 }
 
-function pushNavTrash() {
-    var state, title, url
-    state = {
-        type : "trash"
-    }
-    url = makeTrashUrl()
-    title = makeTrashTitle()
-    browser.pushState(
-        state,
-        title,
-        url
-    )
-}
 
 function pushTag(saver, tag) {
     saver.oldTag = saver.newTag
