@@ -25,7 +25,7 @@ var logg = undefined
 
 var globals = {
     windows: {},
-    defaultImagePath: app.getPath("pictures")
+    defaultDownloadPath: app.getPath("downloads")
 }
 
 
@@ -199,7 +199,7 @@ async function downloadTextFile(winInfo, name, content) {
     var dialogResult = await dialog.showSaveDialog(
         winInfo.window,
         {
-            defaultPath: path.join(globals.defaultImagePath, name),
+            defaultPath: path.join(globals.defaultDownloadPath, name),
             filters: [
             ] 
         }
@@ -211,7 +211,7 @@ async function downloadTextFile(winInfo, name, content) {
 
     var filename = dialogResult.filePath
     var parsed = path.parse(filename)
-    globals.defaultImagePath = parsed.dir
+    globals.defaultDownloadPath = parsed.dir
 
     await writeUtf8File(filename, content)
 }
@@ -220,7 +220,7 @@ async function saveAsPng(winInfo, name, uri) {
     var dialogResult = await dialog.showSaveDialog(
         winInfo.window,
         {
-            defaultPath: path.join(globals.defaultImagePath, name),
+            defaultPath: path.join(globals.defaultDownloadPath, name),
             filters: [
                 { name: 'PNG', extensions: ["png"] }
             ] 
@@ -233,7 +233,7 @@ async function saveAsPng(winInfo, name, uri) {
 
     var filename = dialogResult.filePath
     var parsed = path.parse(filename)
-    globals.defaultImagePath = parsed.dir
+    globals.defaultDownloadPath = parsed.dir
 
     var data = uri.split(',')[1]; 
     await fs.writeFile(filename, data, "base64")

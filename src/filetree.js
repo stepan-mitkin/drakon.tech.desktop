@@ -390,14 +390,40 @@ async function getHistory(winInfo) {
     };
 }
 
+function isSubfolder(upperFolder, deeperFolder) {
+    var upper = path.resolve(upperFolder)
+    var deeper = path.resolve(deeperFolder)
+    var parsed = path.parse(deeper)
+    while (parsed.dir && parsed.dir !== parsed.root) {
+        if (parsed.dir === upper) { return true }
+        parsed = path.parse(parsed.dir)
+    }
+    return false
+}
+
+function historyBelongsToFolder(winInfo, history) {
+    for (var item of history) {
+        if (!isSubfolder(winInfo.path, item.path)) {
+            return false
+        }
+    }
+    return true
+}
+
 async function loadHistory(winInfo) {
     const filename = buildHistoryFilename(winInfo);
     const obj = await readJson(filename);  // Read history from the shadow folder
 
+    winInfo.history = []
     // If there are any issues reading the file or no history exists, return an empty array
     if (!obj.history) {
         return [];
     }
+
+    if (!historyBelongsToFolder(winInfo, obj.history)) {
+        return []
+    }
+
 
     // Iterate through the history and load the records into memory
     const history = [];
