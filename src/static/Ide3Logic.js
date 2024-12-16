@@ -3392,6 +3392,7 @@ function addToRecent(id, data) {
             index
         )
     }
+    data.whenOpened = (new Date()).toISOString()
     item = makeRecentObject(data)
     recent.unshift(item)
     updateHistoryList()
@@ -5493,6 +5494,7 @@ function makeRecentObject(folder) {
         text : folder.name,
         type : folder.type,
         space_id : folder.space_id,
+        whenOpened: folder.whenOpened,
         module : folder.module,
         module_name : folder.module_name
     }
@@ -8324,9 +8326,59 @@ function updateGui() {
 }
 
 function updateHistoryList() {
-    var recent
-    recent = getWidget("recent")
-    recent.setItems(getRecent())
+    var items = getRecent()
+    sortAndMarkColors(items)
+    console.log(items)
+    var recent = getWidget("recent")
+    recent.setItems(items)
+}
+
+function sortAndMarkColors(items) {
+    var list = items.map(takeIdAndWhenOpened)
+    list.sort(compareWhenOpened)
+    var idToOrdinal = {}
+    list.forEach((item, i) => {idToOrdinal[item.id] = i})
+    items.forEach(
+        item => setItemBackground(item, idToOrdinal, items.length)
+    )
+    items.sort(byText)
+}
+
+function setItemBackground(item, idToOrdinal, length) {
+    var ordinal = idToOrdinal[item.id]
+    var value = Math.floor(55 * (1 - ordinal / length))
+    var blue = 200 + value
+    item.background = "rgb(" + blue + ", " + blue + ", 255)"
+}
+
+function byText(left, right) {
+    var le = left.text.toLowerCase()
+    var ri = right.text.toLowerCase()
+    if (le < ri) {
+        return -1
+    } else if (le > ri) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+
+function compareWhenOpened(left, right) {
+    if (left.whenOpened < right.whenOpened) {
+        return -1
+    } else if (left.whenOpened > right.whenOpened) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+function takeIdAndWhenOpened(item) {
+    return {
+        id: item.id,
+        whenOpened: item.whenOpened
+    }
 }
 
 function validateFolderName(name) {

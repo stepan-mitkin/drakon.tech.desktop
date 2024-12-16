@@ -373,6 +373,9 @@ function List_addItem(widget, item) {
     row.id = makeItemId(widget.id, item.id)
     setListRowFormat(row)
     HtmlUtils.setDivText(row, item.text)
+    if (item.background) {
+        row.style.background = item.background
+    }
     bindEvent(
         row,
         "click",

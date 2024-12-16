@@ -190,7 +190,7 @@
     }
 
     function getUtc() {
-        return Math.floor(Date.now() / 1000)
+        return (new Date()).toISOString()
     }
 
     function getHistoryItems() {
