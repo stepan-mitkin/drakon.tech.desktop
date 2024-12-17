@@ -501,6 +501,10 @@ async function determineAccess(winInfo, folderPath) {
     winInfo.access = access;
 }
 
+async function getProjectName(winInfo) {
+    return winInfo.name
+}
+
 async function updateFolder(winInfo, spaceId, folderId, body) {
     // Check that the spaceId matches
     if (spaceId !== winInfo.spaceId) throw new Error('Invalid spaceId');
@@ -1046,5 +1050,6 @@ module.exports = {
     pollSearch,
     stopSearch,
     clearProject,
-    exportProjectCore
+    exportProjectCore,
+    getProjectName
 };

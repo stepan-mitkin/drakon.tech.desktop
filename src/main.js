@@ -18,7 +18,8 @@ const {
     pollSearch,
     stopSearch,
     clearProject,
-    exportProjectCore
+    exportProjectCore,
+    getProjectName
 } = require("./filetree")
 
 var logg = undefined
@@ -275,6 +276,7 @@ function registerMainCallbacks() {
 
     registerHandler(exportProject)
     registerHandler(clearProject)
+    registerHandler(getProjectName)
 }
 
 function registerHandler(fun) {

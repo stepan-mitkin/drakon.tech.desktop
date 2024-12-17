@@ -860,6 +860,13 @@
         return params;
     }
 
+    
+    async function getProjectName() {
+        console.log("getProjectName")
+        await pause(10)  
+        return gFolderName
+    }
+
     async function getMyFolder() {
         console.log("getMyFolder")
         await pause(10)  
@@ -901,7 +908,8 @@
         downloadTextFile: downloadTextFile,
         saveAsPng: saveAsPng,
         getMyFolder: getMyFolder,
-        getAppVersion: getAppVersion
+        getAppVersion: getAppVersion,
+        getProjectName: getProjectName
     }
 
     

@@ -523,7 +523,8 @@ var gStringsEn = {
 	"Close folder": "Close folder",
 	"Export/Import": "Export/Import",
 	"Export project": "Export project",
-	"Import project": "Import project"	
+	"Import project": "Import project",
+	"Cannot build a read-only project": "Cannot build a read-only project"
 }
 
 var gStringsRu = {
@@ -1052,7 +1053,8 @@ var gStringsRu = {
 	"Close folder": "Закрыть папку",
 	"Export/Import": "Экспорт/импорт",
 	"Export project": "Экспортировать проект",
-	"Import project": "Импортировать проект"
+	"Import project": "Импортировать проект",
+	"Cannot build a read-only project": "Невозможно генерировать код для проекта в режиме только для чтения"
 }
 
 function translate(text) {

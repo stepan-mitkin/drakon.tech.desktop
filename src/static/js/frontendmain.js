@@ -390,7 +390,8 @@
             var spaceId = await backend.openFolder(folder)
             if (!spaceId) {return}
             await addToRecent(folder)
-            startIde(spaceId)
+            var folderName = await backend.getProjectName()
+            startIde(spaceId, folderName)
         } catch (ex) {
             console.log(ex)
             await showStartPage()
@@ -603,7 +604,7 @@
         add(main, central);
     }    
 
-    function startIde(spaceId) { 
+    function startIde(spaceId, folderName) { 
         prepareScreen()
         var wide = get("wide")
         wide.style.transition = ""
@@ -611,7 +612,7 @@
         clear(wide)        
         var userId = "Dar Veter"
         var ide = new Ide3(window, document, translate, userId, panic)
-        var logic = new Ide3Logic(spaceId, userId, ide, translate)
+        var logic = new Ide3Logic(spaceId, folderName, userId, ide, translate)
         ide.logic = logic        
         gLogic = logic
         window.onresize = ide.orderResize	        

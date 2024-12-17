@@ -6524,4 +6524,5 @@ this.showChangeDiaProps = showChangeDiaProps
 this.showSaveProjectScreen = showSaveProjectScreen
 this.showLoadFromFile = showLoadFromFile
 this.upload = upload
+this.cancelBuild = cancelBuild
 }

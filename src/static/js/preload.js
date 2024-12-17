@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld('backend', {
     downloadTextFile: (filename, content) => ipcRenderer.invoke("downloadTextFile", filename, content),
     saveAsPng: (filename, dataurl) => ipcRenderer.invoke("saveAsPng", filename, dataurl),
     getMyFolder: () => ipcRenderer.invoke("getMyFolder"),
+    getProjectName: () => ipcRenderer.invoke("getProjectName"),
     getAppVersion: () => ipcRenderer.invoke("getAppVersion"),
     setLocalClipboard: (callback) => ipcRenderer.on('setLocalClipboard', callback),
 })
