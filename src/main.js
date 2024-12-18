@@ -3,6 +3,7 @@ const { setLanguage, translate } = require("./static/js/strings")
 const path = require('path');
 const fs = require('fs').promises;
 const config = require("./config")
+const package = require("./package")
 
 const {
     createFolder,
@@ -29,9 +30,8 @@ var globals = {
     defaultDownloadPath: app.getPath("downloads")
 }
 
-
 async function getAppVersion() {
-    return "v2024.12.16"
+    return "v" + package.version
 }
 async function log(text) {
     console.log(text)

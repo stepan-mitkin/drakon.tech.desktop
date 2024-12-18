@@ -1,6 +1,6 @@
 (function() {
     async function getAppVersion() {
-        return "v2024.12.16"
+        return "v2024.12.18"
     }
 
     var gFolder = ""
