@@ -6293,19 +6293,7 @@ function onTreeContext(evt, type, widget, id) {
 }
 
 function onTreeContextBack(evt, tree) {
-    var list
-    list = []
-    makeTextListItem(
-        list,
-        "MES_CREATE_SPACE",
-        createProject,
-        null,
-        "workspace-s2.png"
-    )
-    showContextMenu(
-        evt,
-        list
-    )
+
     return false
 }
 
