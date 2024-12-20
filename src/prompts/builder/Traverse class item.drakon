@@ -1,0 +1,93 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "4": {
+            "type": "case",
+            "one": "21",
+            "two": "19",
+            "content": "<p>function</p>"
+        },
+        "5": {
+            "type": "case",
+            "one": "9",
+            "two": "26",
+            "content": "<p>module.drakon</p>"
+        },
+        "6": {
+            "type": "case",
+            "one": "12",
+            "two": "5",
+            "content": "<p>folder</p>"
+        },
+        "7": {
+            "type": "select",
+            "one": "6",
+            "content": "<p>type</p>"
+        },
+        "9": {
+            "type": "action",
+            "content": "<p>report error</p>",
+            "one": "1"
+        },
+        "11": {
+            "type": "loopend",
+            "one": "1"
+        },
+        "12": {
+            "type": "loopbegin",
+            "one": "13",
+            "content": "<p>for each child</p>"
+        },
+        "13": {
+            "type": "insertion",
+            "content": "<p>Traverse class item</p>",
+            "one": "11"
+        },
+        "19": {
+            "one": "23",
+            "type": "case",
+            "content": "<p>algoprop</p>",
+            "two": "24"
+        },
+        "21": {
+            "type": "action",
+            "content": "<p>create class function</p>",
+            "one": "1"
+        },
+        "23": {
+            "type": "action",
+            "content": "<p>create class algoprop</p>",
+            "one": "1",
+            "two": ""
+        },
+        "24": {
+            "one": "25",
+            "type": "case",
+            "content": "<p>other</p>"
+        },
+        "25": {
+            "type": "action",
+            "content": "<p>ignore</p>",
+            "one": "1"
+        },
+        "26": {
+            "type": "case",
+            "one": "27",
+            "two": "4",
+            "content": "<p>class.drakon</p>"
+        },
+        "27": {
+            "type": "action",
+            "content": "<p>report error</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon"
+}

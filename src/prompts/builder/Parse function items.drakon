@@ -1,0 +1,220 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "4",
+            "content": "<p>Arguments</p>"
+        },
+        "3": {
+            "type": "action",
+            "content": "<p>parse params</p>",
+            "one": "24"
+        },
+        "4": {
+            "type": "question",
+            "content": "<p>has params</p>",
+            "one": "7",
+            "two": "9",
+            "flag1": 1
+        },
+        "7": {
+            "type": "question",
+            "content": "<p>is algoprop</p>",
+            "one": "3",
+            "two": "8",
+            "flag1": 0
+        },
+        "8": {
+            "type": "action",
+            "content": "<p>report error</p>",
+            "one": "24"
+        },
+        "9": {
+            "type": "action",
+            "content": "<p>empty params</p>",
+            "one": "24"
+        },
+        "10": {
+            "type": "branch",
+            "content": "Exit",
+            "one": "42",
+            "branchId": 3
+        },
+        "11": {
+            "type": "branch",
+            "content": "<p>Items</p>",
+            "one": "13",
+            "branchId": 2
+        },
+        "12": {
+            "type": "loopend",
+            "one": "10"
+        },
+        "13": {
+            "type": "loopbegin",
+            "one": "17",
+            "content": "<p>for each item</p>"
+        },
+        "14": {
+            "type": "case",
+            "one": "35"
+        },
+        "15": {
+            "type": "case",
+            "one": "32",
+            "two": "18",
+            "content": "<p>loop start</p>"
+        },
+        "16": {
+            "type": "case",
+            "one": "39",
+            "two": "15",
+            "content": "<p>action</p>"
+        },
+        "17": {
+            "type": "select",
+            "one": "16",
+            "content": "<p>type</p>"
+        },
+        "18": {
+            "one": "28",
+            "type": "case",
+            "two": "29",
+            "content": "<p>select</p>"
+        },
+        "19": {
+            "one": "26",
+            "type": "case",
+            "two": "20",
+            "content": "<p>question</p>"
+        },
+        "20": {
+            "one": "25",
+            "type": "case",
+            "two": "21",
+            "content": "<p>branch</p>"
+        },
+        "21": {
+            "one": "12",
+            "type": "case",
+            "two": "22",
+            "content": "<p>comment</p>"
+        },
+        "22": {
+            "one": "12",
+            "type": "case",
+            "two": "23",
+            "content": "<p>arrow</p>"
+        },
+        "23": {
+            "one": "12",
+            "type": "case",
+            "two": "14",
+            "content": "<p>end</p>"
+        },
+        "24": {
+            "type": "action",
+            "content": "<p>create scope</p>",
+            "one": "41"
+        },
+        "25": {
+            "type": "action",
+            "content": "<p>ensure content not empty</p>",
+            "one": "12"
+        },
+        "26": {
+            "type": "action",
+            "content": "<p>ensure content not empty</p>",
+            "one": "27"
+        },
+        "27": {
+            "type": "action",
+            "content": "<p>ensure content is not assignment</p>",
+            "one": "12"
+        },
+        "28": {
+            "type": "action",
+            "content": "<p>ensure content not empty</p>",
+            "one": "34"
+        },
+        "29": {
+            "one": "30",
+            "type": "case",
+            "two": "19",
+            "content": "<p>case</p>"
+        },
+        "30": {
+            "type": "question",
+            "content": "<p>is last</p>",
+            "one": "31",
+            "two": "33",
+            "flag1": 0
+        },
+        "31": {
+            "type": "action",
+            "content": "<p>ensure content not empty</p>",
+            "one": "33"
+        },
+        "32": {
+            "type": "action",
+            "content": "<p>ensure content not empty</p>",
+            "one": "36"
+        },
+        "33": {
+            "type": "action",
+            "content": "<p>ensure content is not assignment</p>",
+            "one": "12"
+        },
+        "34": {
+            "type": "action",
+            "content": "<p>ensure content is not assignment</p>",
+            "one": "12"
+        },
+        "35": {
+            "type": "action",
+            "content": "<p>report unsupported icon type</p>",
+            "one": "12"
+        },
+        "36": {
+            "type": "action",
+            "content": "<p>parse</p>",
+            "one": "37"
+        },
+        "37": {
+            "type": "action",
+            "content": "<p>check 1, 2, 3</p>",
+            "one": "38"
+        },
+        "38": {
+            "type": "action",
+            "content": "<p>put assignments, declares and loop vars to scope.loop</p>",
+            "one": "12"
+        },
+        "39": {
+            "type": "action",
+            "content": "<p>parse</p>",
+            "one": "40"
+        },
+        "40": {
+            "type": "action",
+            "content": "<p>put assignments to scope.assignments</p>",
+            "one": "12"
+        },
+        "41": {
+            "type": "action",
+            "content": "<p>add arguments to scope</p>",
+            "one": "11"
+        },
+        "42": {
+            "type": "action",
+            "content": "<p>return scope</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon",
+    "style": "{\"maxWidth\":180}"
+}

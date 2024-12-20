@@ -1,0 +1,58 @@
+{
+    "items": {
+        "5": {
+            "type": "idea",
+            "content": "<p>Types</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "6": {
+            "type": "idea",
+            "content": "<p>Flags</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "7": {
+            "type": "idea",
+            "content": "<p>public function</p>",
+            "parent": "5",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "9": {
+            "type": "idea",
+            "content": "<p>algoprop</p>",
+            "parent": "5",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "10": {
+            "type": "idea",
+            "content": "<p>lazy algoprop</p>",
+            "parent": "5",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "11": {
+            "type": "idea",
+            "content": "<p>enforce async</p>",
+            "parent": "6",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "12": {
+            "type": "idea",
+            "content": "<p>function</p>",
+            "parent": "5",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "root": {
+            "treeType": "vertical",
+            "type": "header"
+        }
+    },
+    "type": "graf"
+}

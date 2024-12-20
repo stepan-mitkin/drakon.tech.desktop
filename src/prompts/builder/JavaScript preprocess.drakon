@@ -1,0 +1,181 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "12",
+            "content": "<p>Find functions and classes</p>"
+        },
+        "11": {
+            "type": "loopend",
+            "one": "18"
+        },
+        "12": {
+            "type": "loopbegin",
+            "one": "13",
+            "content": "<p>for each child in the project folder except module.drakon</p>"
+        },
+        "13": {
+            "type": "action",
+            "content": "<p>Ensure not class.drakon</p>",
+            "one": "14"
+        },
+        "14": {
+            "type": "insertion",
+            "content": "<p>Traverse module item</p>",
+            "one": "11"
+        },
+        "17": {
+            "type": "branch",
+            "content": "<p>Dependencies</p>",
+            "one": "46",
+            "branchId": 5
+        },
+        "18": {
+            "type": "branch",
+            "content": "<p>module</p>",
+            "one": "19",
+            "branchId": 2
+        },
+        "19": {
+            "type": "question",
+            "content": "<p>module.drakon is in the project folder?</p>",
+            "one": "20",
+            "two": "22",
+            "flag1": 1
+        },
+        "20": {
+            "type": "action",
+            "content": "<p>root scope = Parse function items(module.drakon)</p>",
+            "one": "21"
+        },
+        "21": {
+            "type": "action",
+            "content": "<p>divide module.drakon into</p><ul><li>requires</li><li>header</li></ul>",
+            "one": "23"
+        },
+        "22": {
+            "type": "action",
+            "content": "<p>root scope = new empty scope</p>",
+            "one": "23"
+        },
+        "23": {
+            "type": "branch",
+            "branchId": 3,
+            "content": "<p>Parse</p>",
+            "one": "25"
+        },
+        "24": {
+            "type": "loopend",
+            "one": "28"
+        },
+        "25": {
+            "type": "loopbegin",
+            "one": "33",
+            "content": "<p>for each function</p>"
+        },
+        "27": {
+            "type": "loopend",
+            "one": "31",
+            "two": ""
+        },
+        "28": {
+            "type": "loopbegin",
+            "one": "34",
+            "content": "<p>for each algoprop</p>",
+            "two": ""
+        },
+        "30": {
+            "type": "loopend",
+            "one": "36",
+            "two": ""
+        },
+        "31": {
+            "type": "loopbegin",
+            "one": "35",
+            "content": "<p>for each class</p>",
+            "two": ""
+        },
+        "33": {
+            "type": "insertion",
+            "content": "<p>Parse function items</p>",
+            "one": "24"
+        },
+        "34": {
+            "type": "insertion",
+            "content": "<p>Parse function items</p>",
+            "one": "27"
+        },
+        "35": {
+            "type": "insertion",
+            "content": "<p>Parse class</p>",
+            "one": "30"
+        },
+        "36": {
+            "type": "branch",
+            "branchId": 4,
+            "content": "<p>Declare variables</p>",
+            "one": "38"
+        },
+        "37": {
+            "type": "loopend",
+            "one": "40",
+            "two": ""
+        },
+        "38": {
+            "type": "loopbegin",
+            "one": "43",
+            "content": "<p>for each function</p>",
+            "two": ""
+        },
+        "39": {
+            "type": "loopend",
+            "one": "42",
+            "two": ""
+        },
+        "40": {
+            "type": "loopbegin",
+            "one": "44",
+            "content": "<p>for each algoprop</p>",
+            "two": ""
+        },
+        "41": {
+            "type": "loopend",
+            "one": "17",
+            "two": ""
+        },
+        "42": {
+            "type": "loopbegin",
+            "one": "45",
+            "content": "<p>for each class</p>",
+            "two": ""
+        },
+        "43": {
+            "type": "insertion",
+            "content": "<p>Traverse function items</p>",
+            "one": "37",
+            "two": ""
+        },
+        "44": {
+            "type": "insertion",
+            "content": "<p>Traverse function items</p>",
+            "one": "39",
+            "two": ""
+        },
+        "45": {
+            "type": "insertion",
+            "content": "<p>Traverse class items</p>",
+            "one": "41",
+            "two": ""
+        },
+        "46": {
+            "type": "action",
+            "content": "<p>Build algoprop dependencies</p>",
+            "one": "1"
+        }
+    },
+    "type": "drakon"
+}

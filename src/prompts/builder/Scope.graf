@@ -1,0 +1,86 @@
+{
+    "items": {
+        "5": {
+            "type": "idea",
+            "content": "<p>parent</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "9": {
+            "type": "idea",
+            "content": "<p>variables</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "11": {
+            "type": "idea",
+            "content": "<p>declared</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "12": {
+            "type": "idea",
+            "content": "<p>auto</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "13": {
+            "type": "idea",
+            "content": "<p>all</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "14": {
+            "type": "idea",
+            "content": "<p>loop</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 4
+        },
+        "15": {
+            "type": "idea",
+            "content": "<p>algoprops</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 5
+        },
+        "16": {
+            "type": "idea",
+            "content": "<p>functions</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 6
+        },
+        "17": {
+            "type": "idea",
+            "content": "<p>classes</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 7
+        },
+        "18": {
+            "type": "idea",
+            "content": "<p>assignments</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "19": {
+            "type": "idea",
+            "content": "<p>args</p>",
+            "parent": "9",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "root": {
+            "treeType": "treeview",
+            "type": "header"
+        }
+    },
+    "type": "graf"
+}

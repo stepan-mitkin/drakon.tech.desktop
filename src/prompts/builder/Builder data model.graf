@@ -1,0 +1,124 @@
+{
+    "items": {
+        "1": {
+            "type": "idea",
+            "content": "<p>functions</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "2": {
+            "type": "idea",
+            "content": "<p>module</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "3": {
+            "type": "idea",
+            "content": "<p>algoprops</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "4": {
+            "type": "idea",
+            "content": "<p>requires</p>",
+            "parent": "2",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "5": {
+            "type": "idea",
+            "content": "<p>header</p>",
+            "parent": "2",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "6": {
+            "type": "idea",
+            "content": "<p>scope</p>",
+            "parent": "2",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "7": {
+            "type": "idea",
+            "content": "<p>args</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "8": {
+            "type": "idea",
+            "content": "<p>body</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "9": {
+            "type": "idea",
+            "content": "<p>scope</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "10": {
+            "type": "idea",
+            "content": "<p>body</p>",
+            "parent": "3",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "11": {
+            "type": "idea",
+            "content": "<p>scope</p>",
+            "parent": "3",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "12": {
+            "type": "idea",
+            "content": "<p>classes</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "13": {
+            "type": "idea",
+            "content": "<p>args</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "14": {
+            "type": "idea",
+            "content": "<p>body</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "15": {
+            "type": "idea",
+            "content": "<p>scope</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "16": {
+            "type": "idea",
+            "content": "<p>functions</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "17": {
+            "type": "idea",
+            "content": "<p>algoprops</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 4
+        }
+    },
+    "type": "graf"
+}
