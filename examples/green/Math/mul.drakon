@@ -1,0 +1,26 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "return multiply(left, right)"
+        }
+    },
+    "keywords": {
+        "export": true,
+        "function": true,
+        "scenario": false,
+        "async": false,
+        "algoprop": false
+    },
+    "params": "left\nright",
+    "type": "drakon"
+}

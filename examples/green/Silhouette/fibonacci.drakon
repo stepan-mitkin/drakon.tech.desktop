@@ -1,0 +1,90 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "9",
+            "content": "Simple case"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "result = ordinal"
+        },
+        "4": {
+            "type": "branch",
+            "one": "10",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "5": {
+            "type": "branch",
+            "one": "13",
+            "branchId": 2,
+            "content": "Normal case"
+        },
+        "6": {
+            "type": "case",
+            "one": "5"
+        },
+        "7": {
+            "type": "case",
+            "one": "3",
+            "two": "6",
+            "content": "1"
+        },
+        "8": {
+            "type": "case",
+            "one": "3",
+            "two": "7",
+            "content": "0"
+        },
+        "9": {
+            "type": "select",
+            "one": "8",
+            "content": "ordinal"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "content": "return result"
+        },
+        "11": {
+            "type": "loopend",
+            "one": "4",
+            "content": ""
+        },
+        "12": {
+            "type": "loopbegin",
+            "one": "14",
+            "content": "i = 2; i <= ordinal; i++"
+        },
+        "13": {
+            "type": "action",
+            "one": "12",
+            "content": "i_2 = 0\ni_1 = 1"
+        },
+        "14": {
+            "type": "action",
+            "one": "16",
+            "content": "result = i_2 + i_1"
+        },
+        "16": {
+            "type": "action",
+            "one": "11",
+            "content": "i_2 = i_1\ni_1 = result"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "export": true,
+        "function": true,
+        "scenario": false,
+        "async": false,
+        "algoprop": false
+    },
+    "params": "ordinal"
+}

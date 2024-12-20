@@ -1,0 +1,41 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "array.sort(\n    (a, b) => {\n        left = a[sortProp]\n        right = b[sortProp]\n        if (left < right) {\n            return -1\n        }\n        if (left > right) {\n            return 1\n        }\n        return 0\n    }\n)"
+        },
+        "4": {
+            "type": "action",
+            "one": "3",
+            "content": "result = undefined\nvar found = undefined"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "forEachUntil(\n    array,\n    function (element) {\n        e2 = element * 2\n        if (e2 > cutoff) {\n            result = e2\n            found = element\n            return true\n        }\n        return false\n    }\n)"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "return {\n    result,\n    found\n}"
+        }
+    },
+    "keywords": {
+        "export": true,
+        "function": true,
+        "scenario": false,
+        "async": false,
+        "algoprop": false
+    },
+    "params": "array\nsortProp\ncutoff",
+    "type": "drakon"
+}

@@ -1,0 +1,62 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "return 'FizzBuzz'"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "7",
+            "flag1": 1,
+            "content": "number % 3"
+        },
+        "5": {
+            "type": "question",
+            "one": "3",
+            "two": "6",
+            "flag1": 1,
+            "content": "number % 5"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "return 'Fizz'"
+        },
+        "7": {
+            "type": "question",
+            "one": "8",
+            "two": "9",
+            "flag1": 1,
+            "content": "number % 5"
+        },
+        "8": {
+            "type": "action",
+            "one": "1",
+            "content": "return 'Buzz'"
+        },
+        "9": {
+            "type": "action",
+            "one": "1",
+            "content": "return undefined"
+        }
+    },
+    "keywords": {
+        "export": true,
+        "function": true,
+        "scenario": false,
+        "async": false,
+        "algoprop": false
+    },
+    "params": "number",
+    "type": "drakon"
+}
