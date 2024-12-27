@@ -405,9 +405,14 @@ function isSubfolder(upperFolder, deeperFolder) {
     return false
 }
 
-function historyBelongsToFolder(winInfo, history) {
+async function historyBelongsToFolder(winInfo, history) {
     for (var item of history) {
         if (!isSubfolder(winInfo.path, item.path)) {
+            return false
+        }
+        try {
+            await fs.stat(item.path)
+        } catch (ex) {
             return false
         }
     }
@@ -424,7 +429,8 @@ async function loadHistory(winInfo) {
         return [];
     }
 
-    if (!historyBelongsToFolder(winInfo, obj.history)) {
+    var historyOk = await historyBelongsToFolder(winInfo, obj.history)
+    if (!historyOk) {
         return []
     }
 
