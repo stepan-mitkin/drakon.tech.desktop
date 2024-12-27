@@ -258,7 +258,7 @@ function BuildManager_Building_onData(self, msg) {
     var options
     options = {
         state : msg.state,
-        module : self.current.module_name,
+        module : msg.module,
         url : msg.url
     }
     if (msg.state == "error") {

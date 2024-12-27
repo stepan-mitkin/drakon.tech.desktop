@@ -30,5 +30,10 @@ contextBridge.exposeInMainWorld('backend', {
     getMyFolder: () => ipcRenderer.invoke("getMyFolder"),
     getProjectName: () => ipcRenderer.invoke("getProjectName"),
     getAppVersion: () => ipcRenderer.invoke("getAppVersion"),
+    getRootHandle: () => ipcRenderer.invoke("getRootHandle"),
+    saveGeneratedFile: (content) => ipcRenderer.invoke("saveGeneratedFile", content),
+    showGeneratedFile: (content) => ipcRenderer.invoke("showGeneratedFile", content),
+    getObjectByHandle: (handle) => ipcRenderer.invoke("getObjectByHandle", handle),
+    getFolderInfoByHandle: (handle) => ipcRenderer.invoke("getFolderInfoByHandle", handle),
     setLocalClipboard: (callback) => ipcRenderer.on('setLocalClipboard', callback),
 })

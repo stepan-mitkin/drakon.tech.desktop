@@ -20,7 +20,12 @@ const {
     stopSearch,
     clearProject,
     exportProjectCore,
-    getProjectName
+    getProjectName,
+    getRootHandle,
+    saveGeneratedFile,
+    getObjectByHandle,
+    getFolderInfoByHandle,
+    showGeneratedFile
 } = require("./filetree")
 
 var logg = undefined
@@ -277,6 +282,12 @@ function registerMainCallbacks() {
     registerHandler(exportProject)
     registerHandler(clearProject)
     registerHandler(getProjectName)
+
+    registerHandler(getRootHandle)
+    registerHandler(saveGeneratedFile)
+    registerHandler(getObjectByHandle)
+    registerHandler(getFolderInfoByHandle)
+    registerHandler(showGeneratedFile)
 }
 
 function registerHandler(fun) {

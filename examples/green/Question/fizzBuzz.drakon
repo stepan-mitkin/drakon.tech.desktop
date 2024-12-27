@@ -18,14 +18,14 @@
             "one": "5",
             "two": "7",
             "flag1": 1,
-            "content": "number % 3"
+            "content": "number % 3 === 0"
         },
         "5": {
             "type": "question",
             "one": "3",
             "two": "6",
             "flag1": 1,
-            "content": "number % 5"
+            "content": "number % 5 === 0"
         },
         "6": {
             "type": "action",
@@ -37,7 +37,7 @@
             "one": "8",
             "two": "9",
             "flag1": 1,
-            "content": "number % 5"
+            "content": "number % 5 === 0"
         },
         "8": {
             "type": "action",

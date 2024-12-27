@@ -39,7 +39,6 @@
             "content": "value2 = item + value"
         }
     },
-    "type": "drakon",
     "keywords": {
         "export": true,
         "function": true,
@@ -47,5 +46,6 @@
         "async": false,
         "algoprop": false
     },
-    "params": "array\nvalue"
+    "params": "array\nvalue",
+    "type": "drakon"
 }

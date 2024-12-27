@@ -1,3 +1,4 @@
+const { shell } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 const config = require("./config")
@@ -276,7 +277,7 @@ async function createFolder(winInfo, spaceId, body) {
 }
 
 async function getFolder(winInfo, spaceId, folderId) {
-    if (spaceId !== winInfo.spaceId) throw new Error('Invalid spaceId');
+    if (spaceId !== winInfo.spaceId) throw new Error('Invalid spaceId=' + spaceId);
     const existing = getRecordById(winInfo, folderId);
     const filepath = getFilePathById(winInfo, folderId);
 
@@ -354,22 +355,7 @@ async function readChildren(winInfo, folderPath, parent) {
             const ext = path.parse(fullpath).ext;
 
             if (ext === '.drakon') {
-                let id;
-                if (winInfo.pathToId[fullpath]) {
-                    id = winInfo.pathToId[fullpath];
-                } else {
-                    id = generateUniqueId();
-                }
-
-                const fromDisc = await readJson(fullpath);
-                const record = {
-                    parent: parent,
-                };
-
-                copyDiagramData(fromDisc, record);
-
-                addToCache(winInfo, fullpath, id, record);
-
+                let id = await loadRecordFromDiscToCache(winInfo, fullpath)
                 children.push({
                     id: id,
                     space_id: winInfo.spaceId,
@@ -383,6 +369,24 @@ async function readChildren(winInfo, folderPath, parent) {
     return children;
 }
 
+async function getIdFromCacheOrLoad(winInfo, fullpath, parent) {
+    let id;
+    if (winInfo.pathToId[fullpath]) {
+        id = winInfo.pathToId[fullpath];
+    } else {
+        id = generateUniqueId();
+    }
+
+    const fromDisc = await readJson(fullpath);
+    const record = {
+        parent: parent,
+    };
+
+    copyDiagramData(fromDisc, record);
+
+    addToCache(winInfo, fullpath, id, record);
+    return id    
+}
 
 async function getHistory(winInfo) {
     return {
@@ -1035,6 +1039,62 @@ async function writeJson(filepath, object) {
     await fs.writeFile(filepath, content, 'utf-8');
 }
 
+function getGeneratedFilename(winInfo) {
+    return path.join(winInfo.path, winInfo.name + ".js")
+}
+
+async function getRootHandle(winInfo) {
+    return winInfo.path
+}
+
+async function saveGeneratedFile(winInfo, content) {
+    var filename = getGeneratedFilename(winInfo)
+    await fs.writeFile(filename, content, 'utf-8')
+}
+
+function isGoodName(filename) {
+    if (filename.startsWith(".")) {return false}
+    return true
+}
+
+async function getObjectByHandle(winInfo, filepath) {
+    var stats = await fs.stat(filepath)
+    var parsed = path.parse(filepath)
+    if (stats.isDirectory()) {
+        var files = await fs.readdir(filepath)
+        var goodNames = files.filter(isGoodName)
+        return {
+            path: filepath,
+            type: "folder",
+            name: parsed.base,
+            children: goodNames.map(file => path.join(filepath, file))
+        }
+    } else {
+        if (parsed.ext === ".drakon" || parsed.ext === ".json") {
+            var content = await fs.readFile(filepath, "utf-8")
+            var obj = JSON.parse(content)
+            obj.path = filepath
+            obj.name = parsed.name
+            return obj
+        }
+        return undefined
+    }    
+}
+
+async function getFolderInfoByHandle(winInfo, filepath) {
+    var name = path.parse(filepath).name
+    var id = await loadRecordFromDiscToCache(winInfo, filepath)
+    return {
+        id: winInfo.spaceId + " " + id,
+        name: name
+    }
+}
+
+async function showGeneratedFile(winInfo) {
+    var filename = getGeneratedFilename(winInfo)
+    shell.showItemInFolder(filename)
+}
+
 // Exported functions
 module.exports = {
     createFolder,
@@ -1051,5 +1111,10 @@ module.exports = {
     stopSearch,
     clearProject,
     exportProjectCore,
-    getProjectName
+    getProjectName,
+    getRootHandle,
+    saveGeneratedFile,
+    getObjectByHandle,
+    getFolderInfoByHandle,
+    showGeneratedFile
 };

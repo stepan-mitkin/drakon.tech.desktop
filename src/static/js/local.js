@@ -1,6 +1,6 @@
 (function() {
     async function getAppVersion() {
-        return "v2024.12.18"
+        return "v2024.12.27"
     }
 
     var gFolder = ""
@@ -8,6 +8,7 @@
     var gFolderName = ""
     var gFolders = {}
     var gSearch = undefined
+    var gGenerated = ""
 
     function objFor(obj, callback, target) {
         for (var key in obj) {
@@ -779,9 +780,13 @@
         URL.revokeObjectURL(link.href);
     }
 
+    function getRootId() {
+        return buildId(gSpaceId, "1")
+    }
+
     function getExportFolders() {
         var result = []
-        var rootId = buildId(gSpaceId, "1")
+        var rootId = getRootId()
         var all = getAllFolders(gSpaceId)
         var context = {
             all: all,
@@ -881,6 +886,64 @@
     function newWindow() {
         window.open(window.location.href, '_blank');
     }    
+
+    async function getRootHandle() {
+        console.log("getRootHandle")
+        await pause(10)        
+        return getRootId()
+    }
+    
+    async function saveGeneratedFile(content) {
+        console.log("saveGeneratedFile", content.length)
+        await pause(10)
+        gGenerated = content
+    }
+
+    
+    async function getObjectByHandle(id) {
+        console.log("getObjectByHandle", id)
+        await pause(10)        
+
+        var spaceId = gSpaceId
+        var all = getAllFolders(spaceId)
+        var folder = getFolderBody(id)
+        folder.path = id
+        folder.children = []
+        for (var objId in all) {
+            var obj = getFolderBody(objId)
+            if (obj.parent === id) {
+                folder.children.push(objId)
+            }
+        }
+        fixFolderName(folder)        
+        return folder
+    }
+    
+    async function getFolderInfoByHandle(filepath) {
+        var name = path.parse(filepath).name
+        var id = await loadRecordFromDiscToCache(winInfo, filepath)
+        return {
+            id: winInfo.spaceId + " " + id,
+            name: name
+        }
+    }
+    
+    async function showGeneratedFile() {
+        console.log("showGeneratedFile", gFolderName)
+        const blob = new Blob([gGenerated], { type: 'text/javascript' });
+
+        // Create an object URL from the Blob
+        const url = URL.createObjectURL(blob);
+        
+        // Open a new tab with the URL
+        window.open(url, '_blank');
+        
+        // Optionally, release the object URL when you're done
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 10000);         
+    }
+    
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -909,7 +972,12 @@
         saveAsPng: saveAsPng,
         getMyFolder: getMyFolder,
         getAppVersion: getAppVersion,
-        getProjectName: getProjectName
+        getProjectName: getProjectName,
+        getRootHandle: getRootHandle,
+        getObjectByHandle: getObjectByHandle,
+        saveGeneratedFile: saveGeneratedFile,
+        getFolderInfoByHandle: getFolderInfoByHandle,
+        showGeneratedFile: showGeneratedFile
     }
 
     

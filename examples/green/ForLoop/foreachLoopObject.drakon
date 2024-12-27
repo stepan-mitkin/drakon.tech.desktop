@@ -21,7 +21,7 @@
         "5": {
             "type": "loopbegin",
             "one": "8",
-            "content": "key, item; object"
+            "content": "key, item; wrapper.collection"
         },
         "6": {
             "type": "action",
@@ -30,13 +30,18 @@
         },
         "7": {
             "type": "action",
-            "one": "5",
+            "one": "9",
             "content": "copy = {}"
         },
         "8": {
             "type": "action",
             "one": "6",
             "content": "value2 = item + value"
+        },
+        "9": {
+            "type": "action",
+            "one": "5",
+            "content": "wrapper = {collection: object}"
         }
     },
     "keywords": {

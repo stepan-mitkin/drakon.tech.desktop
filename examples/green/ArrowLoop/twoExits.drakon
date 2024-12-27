@@ -6,12 +6,7 @@
         "2": {
             "type": "branch",
             "branchId": 0,
-            "one": "12"
-        },
-        "3": {
-            "type": "action",
-            "one": "4",
-            "content": "let i = 0"
+            "one": "14"
         },
         "4": {
             "type": "question",
@@ -49,15 +44,31 @@
         },
         "12": {
             "type": "arrow-loop",
-            "one": "3"
+            "one": "4"
         },
         "13": {
             "type": "action",
             "one": "1",
             "content": "return index"
+        },
+        "14": {
+            "type": "question",
+            "one": "16",
+            "two": "15",
+            "flag1": 1,
+            "content": "array"
+        },
+        "15": {
+            "type": "action",
+            "one": "16",
+            "content": "array = []"
+        },
+        "16": {
+            "type": "action",
+            "one": "12",
+            "content": "i = 0"
         }
     },
-    "type": "drakon",
     "keywords": {
         "export": true,
         "function": true,
@@ -65,5 +76,6 @@
         "async": false,
         "algoprop": false
     },
-    "params": "array\nvalue"
+    "params": "array\nvalue",
+    "type": "drakon"
 }

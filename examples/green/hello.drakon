@@ -11,7 +11,7 @@
         "3": {
             "type": "action",
             "one": "1",
-            "content": "console.log(\"Hello, world\")"
+            "content": "console.log(\"Hello, DrakonTech\")"
         }
     },
     "type": "drakon",

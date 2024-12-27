@@ -4796,9 +4796,11 @@ function showBuild(options) {
             linkContainer.style.margin = "15px 5px"
             linkContainer.className = "dont-break-out"
             var link = make(linkContainer, "a")
-            link.href = url
-            link.target = "_blank"
-            HtmlUtils.setDivText(link, translate("MES_RUN_IN_BROWSER"))
+            link.addEventListener("click", backend.showGeneratedFile)
+            link.style.textDecoration = "underline"
+            link.style.cursor = "pointer"
+            link.style.margin = "10px"
+            HtmlUtils.setDivText(link, translate("MES_SHOW_GENERATED_FILE"))
         }
         var close = make(client, "div")
         close.className = "panic_button"
@@ -5363,7 +5365,7 @@ function showContextMenu(x, y, menu, onBackground, item) {
     )
     var extended = {}
     globs.extended = extended
-    if ((((item) && (!(globs.tryMe))) && (canDefQueryFrom(item))) && ((item.lines) || (item.tokens))) {
+    if ((((item) && (!(globs.tryMe))) && (canDefQueryFrom(item))) && (item.tokens)) {
         var queryId = Utils.randomString(10)
         extended.urls = getItemUrls(item.text)
         extended.queryId = queryId
