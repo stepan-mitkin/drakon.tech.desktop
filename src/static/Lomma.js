@@ -1991,8 +1991,10 @@ function TraverseStep(node1, node2) {
 }
 
 function Undo() {
-    this.next = 0
-    this.steps = []
+    return {
+    	next: 0,
+    	steps: []
+    }
 }
 
 function Visuals() {
@@ -2743,6 +2745,14 @@ function addToUndoCore(undo, before, commands, after) {
         info : CallTrace.peek()
     }
     newSteps.push(step)
+    while (true) {
+        if (newSteps.length > 50) {
+            
+        } else {
+            break;
+        }
+        newSteps.shift()
+    }
     undo.steps = newSteps
     undo.next = newSteps.length
 }
@@ -4310,7 +4320,7 @@ function clearSockets() {
 }
 
 function clearUndo() {
-    module.undo = new Undo()
+    module.undo = Undo()
     rebuildSearchState()
 }
 
@@ -7876,6 +7886,10 @@ function getTokenColor(token, source) {
     }
 }
 
+function getUndoBuffer() {
+    return JSON.stringify(module.undo, null, 4)
+}
+
 function getUp(node) {
     return node.up.head
 }
@@ -9456,7 +9470,7 @@ function linkSkewersGeneric(links, low, high, distance) {
     )
 }
 
-function loadDiagram(diagram) {
+function loadDiagram(diagram, undoStr) {
     var storage
     addTrace(
         "loadDiagram",
@@ -9481,7 +9495,12 @@ function loadDiagram(diagram) {
     }
     recalculateNextId()
     buildVisualsForEdit()
-    clearUndo()
+    if (undoStr) {
+        module.undo = JSON.parse(undoStr)
+        rebuildSearchState()
+    } else {
+        clearUndo()
+    }
 }
 
 function longOp1(text) {
@@ -15057,6 +15076,7 @@ this.getFontsForItems = getFontsForItems
 
 this.loadDiagram = loadDiagram
 this.createDiagram = createDiagram
+this.getUndoBuffer = getUndoBuffer
 
 editMethod("addParameters", addParameters)
 editMethod("deleteSelection", deleteSelection)

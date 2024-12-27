@@ -16,6 +16,7 @@ globals.movable = null
 globals.leftButts = []
 globals.rightButts = []
 globals.positions = {}
+globals.undos = {}
 
 var fontFiles = {}
 
@@ -3795,7 +3796,14 @@ function setDiagram(data, resize) {
     var editor = globals.editor
     var view = globals.view
     var diagram
+    if (globals.id) {
+        var undo = editor.getUndoBuffer()
+        if (undo) {
+            globals.undos[globals.id] = undo
+        }
+    }
     globals.id = data.space_id + "/" + data.id
+    var undo = globals.undos[globals.id]
     globals.name = data.name
     globals.type = data.type
     globals.background = data.background || ""
@@ -3809,7 +3817,7 @@ function setDiagram(data, resize) {
     if (diagram.items.length == 0) {
         editor.createDiagram(data)
     } else {
-        editor.loadDiagram(diagram)
+        editor.loadDiagram(diagram, undo)
     }
     if ((resize) && (!(globals.readonly))) {
         autoResize()
@@ -3818,7 +3826,6 @@ function setDiagram(data, resize) {
     }
     reset()
     editor.redraw()
-    editor.clearUndo()
     view.rebuild()
     globals.beh.resetMachines()
     CallTrace.reset()
