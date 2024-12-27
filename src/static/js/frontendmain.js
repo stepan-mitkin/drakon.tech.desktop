@@ -443,7 +443,7 @@
 
     function renderStartPage(container, recent) {
         clear(container)
-        var motherSite = "https://drakonhub.com/"
+        var motherSite = "https://github.com/stepan-mitkin/drakon.tech.desktop"
         var logoUrl = "static/images/drakosha-logo-text-126.png"
         var logoHeight = 63
             // Create header
