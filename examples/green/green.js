@@ -182,10 +182,13 @@ function getSecret() {
     return secretValue;
 }
 function hello() {
-    console.log('Hello, DrakonTech');
+    console.log('Hello, world');
 }
 function mul(left, right) {
     return multiply(left, right);
+}
+function pause(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 function questionMerge(left, right) {
     var result;
@@ -303,6 +306,11 @@ function simpleOr(valueA, valueB, valueC) {
         return false;
     }
 }
+async function slow() {
+    console.log('slow', 'start');
+    await pause(1000);
+    console.log('slow', 'end');
+}
 function twoExits(array, value) {
     var i, index, item;
     if (!array) {
@@ -364,6 +372,7 @@ module.exports = {
     selectWithoutDefault,
     simpleAnd,
     simpleOr,
+    slow,
     twoExits,
     whileDo
 };

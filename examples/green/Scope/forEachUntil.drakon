@@ -31,7 +31,6 @@
             "content": "mustExit"
         }
     },
-    "type": "drakon",
     "keywords": {
         "export": false,
         "function": true,
@@ -39,5 +38,6 @@
         "async": false,
         "algoprop": false
     },
-    "params": "array\naction"
+    "params": "array\naction",
+    "type": "drakon"
 }

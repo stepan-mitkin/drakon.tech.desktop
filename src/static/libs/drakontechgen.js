@@ -397,6 +397,10 @@ function createDrakonTechGenerator(options) {
 
     function treeToAst(fun, tree) {
         var funAst = createFunction(fun.name, fun.arguments)
+        if (fun.keywords && fun.keywords.async) {
+            funAst.async = true
+        }
+
         var functionBody = funAst.body.body
         if (tree.branches.length === 0) {
             return funAst

@@ -11,16 +11,16 @@
         "3": {
             "type": "action",
             "one": "1",
-            "content": "console.log(\"Hello, world\")"
+            "content": "return new Promise(\n    resolve => setTimeout(\n        resolve,\n        milliseconds\n    )\n);"
         }
     },
     "keywords": {
-        "export": true,
+        "export": false,
         "function": true,
         "scenario": false,
         "async": false,
         "algoprop": false
     },
-    "params": "",
+    "params": "milliseconds",
     "type": "drakon"
 }

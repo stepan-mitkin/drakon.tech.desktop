@@ -40,7 +40,6 @@
             "content": "return false"
         }
     },
-    "type": "drakon",
     "keywords": {
         "export": true,
         "function": true,
@@ -48,5 +47,6 @@
         "async": false,
         "algoprop": false
     },
-    "params": "valueA\nvalueB\nvalueC"
+    "params": "valueA\nvalueB\nvalueC",
+    "type": "drakon"
 }
