@@ -69,7 +69,7 @@
 
         var root = await backend.getRootHandle()
         var onData = backend.saveGeneratedFile
-        generator = generateJavaScript(name, root, backend.getObjectByHandle, onError, onData)
+        generator = drakontechgen.buildGenerator(name, root, backend.getObjectByHandle, onError, onData)
 
         runBuild()
 

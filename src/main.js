@@ -427,11 +427,12 @@ async function onClose(winInfo) {
 
 
 const createWindow = async (folderpath) => {
+    var dev = process.argv.indexOf("--dev") !== -1
     if (folderpath) {
         folderpath = path.resolve(folderpath)
     }
     const win = new BrowserWindow({
-        width: 1200,
+        width: dev ? 1400: 1200,
         height: 800,
         webPreferences: {
             preload: path.join(__dirname, 'static/js/preload.js')
@@ -450,7 +451,7 @@ const createWindow = async (folderpath) => {
 
     win.loadFile('index.html')
     
-    if (process.argv.indexOf("--dev") !== -1) {
+    if (dev) {
         win.webContents.openDevTools()
     } else {
         win.setMenu(null)

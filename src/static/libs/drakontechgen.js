@@ -1,21 +1,22 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const { createDrakonTechGenerator } = require("./drakontechgen")
 
-window.generateJavaScript = function (name, root, getObjectByHandle, onError, onData) {
-    var genOptions = {
-        toTree: window.toTree,
-        escodegen: window.escodegen,
-        esprima: window.esprima,
-        name: name,
-        root: root,
-        getObjectByHandle: getObjectByHandle,
-        onError: onError,
-        onData: onData
+window.drakontechgen = {
+    buildGenerator: function (name, root, getObjectByHandle, onError, onData) {
+        var genOptions = {
+            toTree: window.drakongen.toTree,
+            escodegen: window.escodegen,
+            esprima: window.esprima,
+            name: name,
+            root: root,
+            getObjectByHandle: getObjectByHandle,
+            onError: onError,
+            onData: onData
+        }
+
+        return createDrakonTechGenerator(genOptions)
     }
-
-    return createDrakonTechGenerator(genOptions)    
 }
-
 },{"./drakontechgen":2}],2:[function(require,module,exports){
 const { findFirst, addRange } = require("./tools")
 

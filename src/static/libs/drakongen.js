@@ -502,20 +502,22 @@ function markLoopBody(nodes, start, filename) {
 module.exports = { drakonToStruct, drakonToGraph };
 },{"./structFlow":6,"./tools":8}],4:[function(require,module,exports){
 const { drakonToPseudocode } = require('./drakonToPromptStruct');
-const {htmlToString} = require("./browserTools")
+const { htmlToString } = require("./browserTools")
 const { setUpLanguage, translate } = require("./translate")
-const {drakonToStruct} = require("./drakonToStruct");
+const { drakonToStruct } = require("./drakonToStruct");
 
 
-window.toPseudocode = function(drakonJson, name, filename, language) {
-    setUpLanguage(language)
-    return drakonToPseudocode(drakonJson, name, filename, htmlToString, translate).text
-}
+window.drakongen = {
+    toPseudocode: function (drakonJson, name, filename, language) {
+        setUpLanguage(language)
+        return drakonToPseudocode(drakonJson, name, filename, htmlToString, translate).text
+    },
 
-window.toTree = function(drakonJson, name, filename, language) {
-    setUpLanguage(language)
-    var result = drakonToStruct(drakonJson, name, filename, translate)
-    return JSON.stringify(result, null, 4)
+    toTree: function (drakonJson, name, filename, language) {
+        setUpLanguage(language)
+        var result = drakonToStruct(drakonJson, name, filename, translate)
+        return JSON.stringify(result, null, 4)
+    }
 }
 },{"./browserTools":1,"./drakonToPromptStruct":2,"./drakonToStruct":3,"./translate":9}],5:[function(require,module,exports){
 var {addRange} = require("./tools")
