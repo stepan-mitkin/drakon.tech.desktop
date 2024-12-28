@@ -11,13 +11,14 @@ function GreyClass(value) {
     return self;
 }
 function YellowClass(name, color) {
-    var title;
     var self = {};
+    var title;
     title = 'Dr.';
     const greeting = 'Hello';
     function getFullInfo() {
+        var result;
         log('getFullInfo');
-        var result = {
+        result = {
             name: name,
             color: color,
             address: self.address

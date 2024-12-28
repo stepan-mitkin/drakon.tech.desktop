@@ -20,6 +20,8 @@ window.drakontechgen = {
 },{"./drakontechgen":2}],2:[function(require,module,exports){
 const { findFirst, addRange } = require("./tools")
 
+var verbose = false
+
 async function pause(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
@@ -227,11 +229,9 @@ function createDrakonTechGenerator(options) {
             buildAst(project.moduleInit)
         }        
         for (var name in project.functions) {
-            checkCancellation()
             buildAst(project.functions[name])
         }
         for (var name in project.classes) {
-            checkCancellation()
             buildClassAst(project.classes[name])
         }
     }
@@ -575,14 +575,16 @@ function createDrakonTechGenerator(options) {
             var treeStr = options.toTree(drakonJson, fun.name, fun.path, options.language)
             var tree = JSON.parse(treeStr)            
             var ast = treeToAst(fun, tree)
-            try {
-                options.escodegen.generate(ast)
-            } catch (ex) {
-                console.log(ex.message)
-                console.log(fun.name, fun.path)    
-                console.log(JSON.stringify(ast, null, 4))            
-                reportError("Internal error", fun.path)
-                ast = createIdentifier("error")
+            if (verbose) {
+                try {
+                    options.escodegen.generate(ast)
+                } catch (ex) {
+                    console.log(ex.message)
+                    console.log(fun.name, fun.path)    
+                    console.log(JSON.stringify(ast, null, 4))            
+                    reportError("Internal error", fun.path)
+                    ast = createIdentifier("error")
+                }
             }
             gAsts[fun.path] = ast
         } catch (ex) {
@@ -598,29 +600,6 @@ function createDrakonTechGenerator(options) {
             var fun = scope.functions[name]            
             buildAst(scope.functions[name])
         }
-        var body = gAsts[cls.path].body.body
-        body.unshift(createDeclaration("self", createObjectExpression([])))
-        var names = Object.keys(scope.functions)        
-        names.sort()
-        var exported = []
-        for (var name of names) {            
-            var fun = scope.functions[name]
-            var ast = gAsts[fun.path]            
-            body.push(ast)
-            if (isExported(fun)) {
-                exported.push(name)
-            }
-        }     
-        for (var name of exported) {
-            body.push(createExpression(createAssignment(
-                createDotMember(
-                    createIdentifier("self"), 
-                    name
-                ),
-                createIdentifier(name)
-            )))
-        }
-        body.push(createReturn(createIdentifier("self")))
     }
 
     function isExported(fun) {
@@ -1129,6 +1108,9 @@ function createDrakonTechGenerator(options) {
         for (var name of names) {            
             var fun = project.functions[name] || project.classes[name]
             var ast = gAsts[fun.path]
+            if (isClass(fun)) {
+                addMembersToClass(fun, ast)
+            }
             root.body.push(ast)
             if (isExported(fun)) {
                 exported.push(name)
@@ -1141,13 +1123,43 @@ function createDrakonTechGenerator(options) {
         return src
     }
 
+    function addMembersToClass(fun, ast) {
+        var body = ast.body.body
+        var scope = fun.scope
+        body.unshift(createDeclaration("self", createObjectExpression([])))
+        var names = Object.keys(scope.functions)        
+        names.sort()
+        var exported = []
+        for (var name of names) {            
+            var fun = scope.functions[name]
+            var ast = gAsts[fun.path]            
+            body.push(ast)
+            if (isExported(fun)) {
+                exported.push(name)
+            }
+        }     
+        for (var name of exported) {
+            body.push(createExpression(createAssignment(
+                createDotMember(
+                    createIdentifier("self"), 
+                    name
+                ),
+                createIdentifier(name)
+            )))
+        }
+        body.push(createReturn(createIdentifier("self")))        
+    }
+
     function scanAsts() {
         project.allowDeclare = true
         if (project.moduleInit) {
             addVariableDeclarations(project, project.moduleInit)
         }
         scanFunctionsAsts(project.functions);
-        scanFunctionsAsts(project.classes);
+        for (var name in project.classes) {
+            var cls = project.classes[name]
+            scanClassAst(cls)
+        }
     }
 
     function scanFunctionsAsts(functions) {
@@ -1156,6 +1168,11 @@ function createDrakonTechGenerator(options) {
             addVariableDeclarations(fun.scope, fun);
         }
     }   
+
+    function scanClassAst(cls) {
+        addVariableDeclarations(cls.scope, cls);
+        scanFunctionsAsts(cls.scope.functions)
+    }
 
     function addVariableDeclarations(scope, fun) {        
         var ast = gAsts[fun.path]  

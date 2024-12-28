@@ -12,7 +12,7 @@
         "3": {
             "type": "action",
             "one": "4",
-            "content": "var result = {\n    name: name,\n    color: color,\n    address: self.address\n}"
+            "content": "result = {\n    name: name,\n    color: color,\n    address: self.address\n}"
         },
         "4": {
             "type": "action",
