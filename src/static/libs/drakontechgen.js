@@ -83,7 +83,7 @@ function createDrakonTechGenerator(options) {
     }
 
     function isClass(folder) {
-        return folder.type === "drakon" && folder.name === "class"
+        return folder.type === "drakon" && folder.name === "class" || folder.isCtr
     }
 
     function isFunction(folder) {
@@ -94,13 +94,34 @@ function createDrakonTechGenerator(options) {
         return folder.type === "drakon" && folder.keywords.algoprop
     }
 
-    function addFunction(scope, folder) {
+    function createFunctionScope(folder, scopeName, parentScope) {
+        if (scopeName in scopes) {
+            reportError("Scope name is not unique", folder.path, undefined, scopeName)
+        }
+        folder.scope = createScope(scopeName, "function", parentScope)   
+    }
+
+    function addFunction(scope, folder, scopeName, parentScope) {
+        createFunctionScope(folder, scopeName, parentScope)
         var name = folder.name
         if (name in scope.all) {
             reportError("Function name is not unique", folder.path, undefined, name)
         }
         scope.functions[name] = folder
         scope.all[name] = "function"
+    }
+
+    function addClass(folder, ctr) {        
+        var name = folder.name
+        if (name in project.all) {
+            reportError("Class name is not unique", folder.path, undefined, name)
+        }        
+        createFunctionScope(ctr, name, project.name)
+        ctr.scope.allowDeclare = true
+        ctr.isCtr = true
+        ctr.name = name
+        project.classes[name] = ctr
+        project.all[name] = "class"
     }
 
     function addDeclaration(scope, name) {
@@ -132,9 +153,9 @@ function createDrakonTechGenerator(options) {
             var children = await readChildren(folder)
             var ctr = findFirst(children, isClass)
             if (ctr) {
-                var cls = createClass(folder)
+                addClass(folder, ctr)
                 for (var child of children) {
-                    await traverseClassItem(cls, child)
+                    await traverseClassItem(ctr, child, true)
                 }
             } else {
                 for (var child of children) {
@@ -144,9 +165,31 @@ function createDrakonTechGenerator(options) {
         } else if (isModule(folder)) {
             reportError("module not expected here", folder.path)
         } else if (isFunction(folder)) {
-            addFunction(project, folder)
+            addFunction(project, folder, folder.name, project.name)
         } else if (isAlgoprop(folder)) {
-            createGlobalAlgoprop(folder)
+            addAlgoProp(project, folder)
+        }
+    }
+
+    async function traverseClassItem(cls, folder, classAllowed) {
+        checkCancellation()
+        var scope = cls.scope
+        if (folder.type === "folder") {
+            var children = await readChildren(folder)
+            for (var child of children) {
+                await traverseClassItem(cls, child, false)
+            }
+        } else if (isClass(folder)) {
+            if (!classAllowed) {
+                reportError("class not expected here", folder.path)
+            }
+        } else if (isModule(folder)) {
+            reportError("module not expected here", folder.path)
+        } else if (isFunction(folder)) {
+            var scopeName = cls.name + "." + folder.name
+            addFunction(scope, folder, scopeName, cls.name)
+        } else if (isAlgoprop(folder)) {
+            addAlgoProp(scope, folder)
         }
     }
 
@@ -170,8 +213,13 @@ function createDrakonTechGenerator(options) {
 
         for (var name in project.functions) {
             checkCancellation()
-            parseFunctionItems(project.functions[name], project.name)
+            parseFunctionItems(project.functions[name])
         }
+
+        for (var name in project.classes) {
+            checkCancellation()
+            parseClassItems(project.classes[name])
+        }        
     }
 
     function buildAsts() {        
@@ -181,6 +229,10 @@ function createDrakonTechGenerator(options) {
         for (var name in project.functions) {
             checkCancellation()
             buildAst(project.functions[name])
+        }
+        for (var name in project.classes) {
+            checkCancellation()
+            buildClassAst(project.classes[name])
         }
     }
 
@@ -521,7 +573,7 @@ function createDrakonTechGenerator(options) {
         try {
             var drakonJson = JSON.stringify(fun, null, 4)
             var treeStr = options.toTree(drakonJson, fun.name, fun.path, options.language)
-            var tree = JSON.parse(treeStr)
+            var tree = JSON.parse(treeStr)            
             var ast = treeToAst(fun, tree)
             try {
                 options.escodegen.generate(ast)
@@ -537,6 +589,42 @@ function createDrakonTechGenerator(options) {
             console.log(ex)
             reportError(ex.message, fun.path, ex.nodeId)
         }
+    }
+
+    function buildClassAst(cls) {
+        buildAst(cls)       
+        var scope = cls.scope
+        for (var name in scope.functions) {
+            var fun = scope.functions[name]            
+            buildAst(scope.functions[name])
+        }
+        var body = gAsts[cls.path].body.body
+        body.unshift(createDeclaration("self", createObjectExpression([])))
+        var names = Object.keys(scope.functions)        
+        names.sort()
+        var exported = []
+        for (var name of names) {            
+            var fun = scope.functions[name]
+            var ast = gAsts[fun.path]            
+            body.push(ast)
+            if (isExported(fun)) {
+                exported.push(name)
+            }
+        }     
+        for (var name of exported) {
+            body.push(createExpression(createAssignment(
+                createDotMember(
+                    createIdentifier("self"), 
+                    name
+                ),
+                createIdentifier(name)
+            )))
+        }
+        body.push(createReturn(createIdentifier("self")))
+    }
+
+    function isExported(fun) {
+        return fun.keywords && fun.keywords.export
     }
 
     function parseParams(params) {
@@ -913,15 +1001,24 @@ function createDrakonTechGenerator(options) {
         delete item.content
     }
 
-    function parseFunctionItems(fun, parentScope) {
-        if (fun.name in scopes) {
-            reportError("Name is not unique", fun.path, undefined, fun.name)
-        }
-        fun.scope = createScope(fun.name, "function", parentScope)
+    function parseFunctionItems(fun) {
         fun.arguments = []
         var params = parseParams(fun.params)
         params.forEach(param => addArgument(fun, param))
         parseItemsCore(fun, parseNormal)
+    }
+
+    function parseClassItems(cls) {
+        if (cls.keywords && cls.keywords.async) {
+            reportError("A class constructor cannot be async", cls.path)
+        }
+        parseFunctionItems(cls)
+
+        var scope = cls.scope
+        for (var name in scope.functions) {
+            checkCancellation()
+            parseFunctionItems(scope.functions[name])
+        }
     }
 
     function parseItemsCore(fun, parser) {
@@ -1026,14 +1123,14 @@ function createDrakonTechGenerator(options) {
             addRange(root.body, modAst.body.body)
         }
         var names = Object.keys(project.functions)
+        addRange(names, Object.keys(project.classes))
         names.sort()
         var exported = []
         for (var name of names) {            
-            checkCancellation()
-            var fun = project.functions[name]
+            var fun = project.functions[name] || project.classes[name]
             var ast = gAsts[fun.path]
             root.body.push(ast)
-            if (fun.keywords.export) {
+            if (isExported(fun)) {
                 exported.push(name)
             }
         }
@@ -1049,11 +1146,16 @@ function createDrakonTechGenerator(options) {
         if (project.moduleInit) {
             addVariableDeclarations(project, project.moduleInit)
         }
-        for (var name in project.functions) {
-            var fun = project.functions[name]
-            addVariableDeclarations(fun.scope, fun)
-        }
+        scanFunctionsAsts(project.functions);
+        scanFunctionsAsts(project.classes);
     }
+
+    function scanFunctionsAsts(functions) {
+        for (var name in functions) {
+            var fun = functions[name];
+            addVariableDeclarations(fun.scope, fun);
+        }
+    }   
 
     function addVariableDeclarations(scope, fun) {        
         var ast = gAsts[fun.path]  
