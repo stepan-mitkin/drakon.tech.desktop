@@ -503,7 +503,7 @@ async function determineAccess(winInfo, folderPath) {
         await writeAccessFile(folderPath);
         access = 'write';
     } catch (ex) {
-        console.log("determineAccess", ex)
+        console.log("determineAccess", ex.message)
         access = "read"
     }
     winInfo.name = path.parse(folderPath).name
@@ -1035,7 +1035,7 @@ async function readJson(filepath) {
         const content = await fs.readFile(filepath, 'utf-8');
         return JSON.parse(content);
     } catch (ex) {
-        console.log("Error", filepath, ex)
+        console.log("Error", filepath, ex.message)
         return {};
     }
 }
