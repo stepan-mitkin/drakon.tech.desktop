@@ -288,6 +288,7 @@ async function getFolder(winInfo, spaceId, folderId) {
         parent: existing.parent,
         name: getFolderName(winInfo, folderId),
         path: buildFolderPath(winInfo, folderId),
+        language: winInfo.language,
         items: {},
         children: [],
     };
@@ -489,7 +490,12 @@ async function openFolderCore(winInfo, folderPath) {
     await determineAccess(winInfo, folderPath);
     createMemoryStructures(winInfo, folderPath);
     await loadHistory(winInfo, folderPath);
+    await loadProjectSettings(winInfo)
     return winInfo.spaceId
+}
+
+async function loadProjectSettings(winInfo) {
+    winInfo.language = "JS"
 }
 
 async function determineAccess(winInfo, folderPath) {

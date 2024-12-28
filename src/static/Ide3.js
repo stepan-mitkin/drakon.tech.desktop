@@ -2452,47 +2452,44 @@ function makeFormatList(div, node, widget) {
     updateFormatList()
 }
 
-function makeFunTypeList(div, node, widget) {
-    var _sw53310000_ = 0;
-    var select = make(div, "select")
-    select.id = "fun_type_list"
-    _sw53310000_ = node.language;
-    if (_sw53310000_ === "LANG_S42") {
-        addOption(select, "MES_FUNCTION", translate("MES_FUNCTION"))
-        addOption(select, "MES_ASYNC_FUNCTION", translate("MES_ASYNC_FUNCTION"))
-        addOption(select, "MES_ALGOPROP", translate("MES_ALGOPROP"))
-        if (node.algoprop) {
-            select.value = "MES_ALGOPROP"
-        } else {
-            if (node["async"]) {
-                select.value = "MES_ASYNC_FUNCTION"
-            } else {
-                select.value = "MES_FUNCTION"
-            }
-        }
-    } else {
-        if (_sw53310000_ === "LANG_S4") {
-            addOption(select, "MES_FUNCTION", translate("MES_FUNCTION"))
-            addOption(select, "MES_ALGOPROP", translate("MES_ALGOPROP"))
-            if (node.algoprop) {
-                select.value = "MES_ALGOPROP"
-            } else {
-                select.value = "MES_FUNCTION"
-            }
-        } else {
-            addOption(select, "MES_FUNCTION", translate("MES_FUNCTION"))
-            addOption(select, "MES_ASYNC_FUNCTION", translate("MES_ASYNC_FUNCTION"))
-            addOption(select, "MES_SCENARIO", translate("MES_SCENARIO"))
-            if (node.scenario) {
-                select.value = "MES_SCENARIO"
-            } else {
-                if (node["async"]) {
-                    select.value = "MES_ASYNC_FUNCTION"
-                } else {
-                    select.value = "MES_FUNCTION"
-                }
-            }
-        }
+function addRadio(parent, id, group, labelText, checked) {
+    var container = make(parent, "div")
+    var label = make(container, "label")
+    label.for = id    
+    label.style.marginTop = "10px"
+    label.style.display = "block"
+    var input = make(label, "input")
+    input.type = "radio"
+    input.id = id
+    input.checked = checked
+    input.name = group
+    input.value = labelText
+    var tnode = document.createTextNode(translate(labelText))
+    label.appendChild(tnode)       
+}
+
+function addCheckbox(parent, id, labelText, checked) {
+    var label = make(parent, "label")
+    var text = translate(labelText)
+    var checkbox = make(label, "input")
+    checkbox.type = "checkbox"
+    checkbox.name = "checkbox"
+    checkbox.id = id
+    checkbox.style.marginRight = "10px"
+    checkbox.checked = checked
+    var tnode = document.createTextNode(text)
+    label.appendChild(tnode)    
+}
+
+function makeFunTypeList(div, node, widget) {    
+    if (node.language === "JS") {
+        addCheckbox(div, "async_checkbox", "MES_ASYNC", node.async)
+        var space = make(div, "div")
+        space.style.height = "10px"
+        addRadio(div, "function_flags_function", "function_flags", "MES_FUNCTION", !node.algoprop && !node.export)
+        addRadio(div, "function_flags_exported_function", "function_flags", "MES_EXPORTED_FUNCTION", !node.algoprop && node.export)
+        addRadio(div, "function_flags_algoprop", "function_flags", "MES_ALGOPROP", node.algoprop && !node.lazy)
+        addRadio(div, "function_flags_lazy_algoprop", "function_flags", "MES_LAZY_ALGOPROP", node.algoprop && node.lazy)
     }
 }
 
@@ -4157,40 +4154,19 @@ function saveAsSvg() {
     backend.downloadTextFile(filename, image)    
 }
 
+function isChecked(id) {
+    var input = document.getElementById(id)
+    if (!input) {return false}
+    return input.checked
+}
+
 function saveDiaProps() {
     var keywords = {}
-    keywords["export"] = get("export_check").checked
-    var type = get("fun_type_list").value
-    if (type === "MES_FUNCTION") {
-        keywords["function"] = true
-        keywords["scenario"] = false
-        keywords["async"] = false
-        keywords["algoprop"] = false
-    } else {
-        if (type === "MES_ASYNC_FUNCTION") {
-            keywords["function"] = true
-            keywords["scenario"] = false
-            keywords["async"] = true
-            keywords["algoprop"] = false
-        } else {
-            if (type === "MES_SCENARIO") {
-                keywords["function"] = false
-                keywords["scenario"] = true
-                keywords["async"] = false
-                keywords["algoprop"] = false
-            } else {
-                if (type === "MES_ALGOPROP") {
-                    
-                } else {
-                    throw "Unexpected switch value: " + type;
-                }
-                keywords["function"] = false
-                keywords["scenario"] = false
-                keywords["async"] = false
-                keywords["algoprop"] = true
-            }
-        }
-    }
+    keywords["export"] = isChecked("function_flags_exported_function")
+    keywords["function"] = isChecked("function_flags_function") || isChecked("function_flags_exported_function")
+    keywords["async"] = isChecked("async_checkbox")
+    keywords["algoprop"] = isChecked("function_flags_algoprop") || isChecked("function_flags_lazy_algoprop")
+    keywords["lazy"] = isChecked("function_flags_lazy_algoprop")
     var params = get("params_textarea").value.trim()
     var change = {
     	keywords: keywords,
@@ -4907,36 +4883,15 @@ function showChangeDiaProps(machine, name, folder, ro) {
     		fontWeight: "bold"
     	}
     }
-    var exportCheck = {
-    	type: "custom",
-    	id: "export",
-    	builder: buildNormalCheckbox,
-    	text: "export",
-    	value:  !!globs.keywords["export"],
-    	onchange: onExportChange
-    }
-    var asyncCheck = {
-    	type: "custom",
-    	id: "async",
-    	builder: buildNormalCheckbox,
-    	text: "async",
-    	value:  !!globs.keywords["async"],
-    	onchange: onAsyncChange
-    }
-    var typeLabel = {
-    	type: "wlabel",
-    	text: "MES_FUNCTION_TYPE",
-    	textAlign: "left",
-    	style: {
-    	}
-    }
     var funType = {
     	type: "custom",
     	builder: makeFunTypeList,
     	language: folder.language,
+        export: !!globs.keywords["export"],
     	scenario: !!globs.keywords["scenario"],
     	algoprop: !!globs.keywords["algoprop"],
-    	"async": 	!!globs.keywords["async"]
+    	lazy: !!globs.keywords["lazy"],
+    	async: 	!!globs.keywords["async"]
     }
     var params = {
     	type: "custom",
@@ -4981,9 +4936,6 @@ function showChangeDiaProps(machine, name, folder, ro) {
     	titleLabel,
     	nameLabel,
     	space,
-    	exportCheck,
-    	space,
-    	typeLabel,
     	funType,
     	paramsLabel,
     	params,

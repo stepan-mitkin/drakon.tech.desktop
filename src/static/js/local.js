@@ -3,6 +3,7 @@
         return "v2024.12.28"
     }
 
+    var gLanguage = undefined
     var gFolder = ""
     var gSpaceId = ""
     var gFolderName = ""
@@ -161,6 +162,7 @@
             createRoot(spaceId)
             setProjects(projects)
         }
+        gLanguage = "JS"
         gFolder = folder
         gSpaceId = spaceId
         gFolderName = getLastStage(folder)        
@@ -286,6 +288,7 @@
         if (folder.type !== "folder") {
             addToHistory(id)
         }
+        folder.language = gLanguage
         return folder
     }
 

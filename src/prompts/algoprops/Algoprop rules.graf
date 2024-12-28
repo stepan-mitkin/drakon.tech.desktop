@@ -1,0 +1,153 @@
+{
+    "items": {
+        "1": {
+            "type": "idea",
+            "content": "<p>compute()</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "2": {
+            "type": "idea",
+            "content": "<p>Can call compute() from functions on own algoprops</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "3": {
+            "type": "idea",
+            "content": "<p>Cannot call compute() from class on global algoprops</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "5": {
+            "type": "idea",
+            "content": "<p>Can call compute() from algoprops on own <strong>lazy</strong> algoprops</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "6": {
+            "type": "idea",
+            "content": "<p>Cannot call compute() from algoprops on own normal algoprops</p>",
+            "parent": "1",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "7": {
+            "type": "idea",
+            "content": "<p>Reading to algoprop</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "8": {
+            "type": "idea",
+            "content": "<p>Can read own algoprops in functions</p>",
+            "parent": "7",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "9": {
+            "type": "idea",
+            "content": "<p>Can read global algoprops in functions</p>",
+            "parent": "7",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "10": {
+            "type": "idea",
+            "content": "<p>Can read global algoprops in algoprops</p>",
+            "parent": "7",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "11": {
+            "type": "idea",
+            "content": "<p>Can read own algoprops in algoprops</p>",
+            "parent": "7",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "12": {
+            "type": "idea",
+            "content": "<p>Dependencies</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "13": {
+            "type": "idea",
+            "content": "<p>Reading of own normal algoprop adds dependency</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "14": {
+            "type": "idea",
+            "content": "<p>Reading of own lazy algoprop does not add dependency</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "15": {
+            "type": "idea",
+            "content": "<p>Reading of global algoprop does not add dependency</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "16": {
+            "type": "idea",
+            "content": "<p>Circular dependencies are not allowed</p>",
+            "parent": "12",
+            "treeType": "treeview",
+            "ordinal": 3
+        },
+        "17": {
+            "type": "idea",
+            "content": "<p>Writing to algoprop</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 2
+        },
+        "18": {
+            "type": "idea",
+            "content": "<p>Writing to algoprops is not allowed at all</p>",
+            "parent": "17",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "19": {
+            "type": "idea",
+            "content": "<p>Async algoprops</p>",
+            "parent": "root",
+            "treeType": "treeview",
+            "ordinal": 4
+        },
+        "20": {
+            "type": "idea",
+            "content": "<p>Algoprop must be marked as async explicitly</p>",
+            "parent": "19",
+            "treeType": "treeview",
+            "ordinal": 0
+        },
+        "21": {
+            "type": "idea",
+            "content": "<p>Just one async dependency makes compute async</p>",
+            "parent": "19",
+            "treeType": "treeview",
+            "ordinal": 1
+        },
+        "22": {
+            "type": "idea",
+            "content": "<p>Await is added to async computes (if not there)</p>",
+            "parent": "19",
+            "treeType": "treeview",
+            "ordinal": 2
+        }
+    },
+    "type": "graf",
+    "id": "Algoprop rules.graf"
+}
