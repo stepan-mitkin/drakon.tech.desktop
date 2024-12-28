@@ -435,8 +435,8 @@ function Header_draw(render, item) {
             	SmallFont
             )
         } else {
-            if (isAlgoprop()) {
-                scenario = translate("MES_ALGOPROP")
+            if (isLazyAlgoprop()) {
+                scenario = translate("MES_LAZY_ALGOPROP")
                 render.setDefaultFont(SmallFont)
                 sw = render.measureTextWidth(scenario)
                 labelColor = getYesColor()
@@ -448,6 +448,21 @@ function Header_draw(render, item) {
                 	labelColor,
                 	SmallFont
                 )
+            } else {
+                if (isAlgoprop()) {
+                    scenario = translate("MES_ALGOPROP")
+                    render.setDefaultFont(SmallFont)
+                    sw = render.measureTextWidth(scenario)
+                    labelColor = getYesColor()
+                    render.drawText(
+                    	texId,
+                    	scenario,
+                    	item.x - Math.floor(sw / 2),
+                    	item.y - item.h - 3,
+                    	labelColor,
+                    	SmallFont
+                    )
+                }
             }
         }
     }
@@ -8752,6 +8767,10 @@ function isEnd(state) {
 
 function isHuman() {
     return module.language == "LANG_HUMAN"
+}
+
+function isLazyAlgoprop() {
+    return !!module.storage.keywords.algoprop && !!module.storage.keywords.lazy
 }
 
 function isLeftDown(node) {
