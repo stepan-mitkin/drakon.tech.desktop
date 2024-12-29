@@ -2425,7 +2425,7 @@ function init(cfg) {
     		{
     			id: "tt_selection",
     			image: "normal-mode.png",
-    			tooltip: "BUT_SELECTION_MODE",
+    			tooltip: "BUT_NORMAL_MODE",
     			command: toggleSelectionMode
     		}
     	]
