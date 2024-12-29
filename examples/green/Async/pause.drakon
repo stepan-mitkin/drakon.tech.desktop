@@ -1,4 +1,5 @@
 {
+    "type": "drakon",
     "items": {
         "1": {
             "type": "end"
@@ -21,6 +22,5 @@
         "async": false,
         "algoprop": false
     },
-    "params": "milliseconds",
-    "type": "drakon"
+    "params": "milliseconds"
 }

@@ -11,13 +11,18 @@
         },
         "3": {
             "type": "action",
-            "one": "1",
-            "content": "return greeting + \", \" + title + \" \" + name\n+ \"!\""
+            "one": "5",
+            "content": "message = greeting + \", \" + title + \" \" +\nname + \"!\""
         },
         "4": {
             "type": "action",
             "one": "3",
             "content": "log(\"greet\")"
+        },
+        "5": {
+            "type": "action",
+            "one": "1",
+            "content": "return message"
         }
     },
     "keywords": {

@@ -12,7 +12,7 @@
         "3": {
             "type": "action",
             "one": "4",
-            "content": "result = {\n    name: name,\n    color: color,\n    address: self.address\n}"
+            "content": "result = {\n    name: name,\n    color: color,\n    address: self.address,\n    a: a,\n    b: b,\n    x: x,\n    y: y\n}"
         },
         "4": {
             "type": "action",
@@ -21,8 +21,13 @@
         },
         "5": {
             "type": "action",
-            "one": "3",
+            "one": "6",
             "content": "log(\"getFullInfo\")"
+        },
+        "6": {
+            "type": "action",
+            "one": "3",
+            "content": "a = 1000"
         }
     },
     "keywords": {

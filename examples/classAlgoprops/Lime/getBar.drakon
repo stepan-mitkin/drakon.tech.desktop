@@ -11,26 +11,21 @@
         },
         "3": {
             "type": "action",
-            "one": "5",
-            "content": "console.log(\"slow\", \"start\")"
+            "one": "4",
+            "content": "compute(bar)"
         },
         "4": {
             "type": "action",
             "one": "1",
-            "content": "console.log(\"slow\", \"end\")"
-        },
-        "5": {
-            "type": "action",
-            "one": "4",
-            "content": "await pause(1000)"
+            "content": "return bar"
         }
     },
     "keywords": {
         "export": true,
         "function": true,
-        "scenario": false,
         "async": true,
-        "algoprop": false
+        "algoprop": false,
+        "lazy": false
     },
     "params": ""
 }

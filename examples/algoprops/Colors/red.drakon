@@ -1,4 +1,5 @@
 {
+    "type": "drakon",
     "items": {
         "1": {
             "type": "end"
@@ -11,16 +12,15 @@
         "3": {
             "type": "action",
             "one": "1",
-            "content": "console.log(\"Hello, world\")"
+            "content": "return [255, 10, 0]"
         }
     },
-    "type": "drakon",
     "keywords": {
-        "export": true,
-        "function": true,
-        "scenario": false,
+        "export": false,
+        "function": false,
         "async": false,
-        "algoprop": false
+        "algoprop": true,
+        "lazy": false
     },
     "params": ""
 }

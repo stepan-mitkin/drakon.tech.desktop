@@ -60,6 +60,7 @@
             "content": "result += 10"
         }
     },
+    "type": "drakon",
     "keywords": {
         "export": true,
         "function": true,
@@ -67,6 +68,5 @@
         "async": false,
         "algoprop": false
     },
-    "params": "left  \n\n right",
-    "type": "drakon"
+    "params": "left  \n\n right"
 }

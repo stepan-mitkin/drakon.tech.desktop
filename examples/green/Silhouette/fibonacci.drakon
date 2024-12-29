@@ -78,6 +78,7 @@
             "content": "i_2 = i_1\ni_1 = result"
         }
     },
+    "type": "drakon",
     "keywords": {
         "export": true,
         "function": true,
@@ -85,6 +86,5 @@
         "async": false,
         "algoprop": false
     },
-    "params": "ordinal",
-    "type": "drakon"
+    "params": "ordinal"
 }

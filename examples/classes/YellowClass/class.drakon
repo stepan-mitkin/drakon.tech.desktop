@@ -16,16 +16,21 @@
         },
         "4": {
             "type": "action",
-            "one": "1",
+            "one": "5",
             "content": "const greeting = \"Hello\""
+        },
+        "5": {
+            "type": "action",
+            "one": "1",
+            "content": "const {\n    x,\n    y\n} = arg1\nvar [a, b] = arg2"
         }
     },
     "keywords": {
         "export": true,
         "function": true,
-        "scenario": false,
         "async": false,
-        "algoprop": false
+        "algoprop": false,
+        "lazy": false
     },
-    "params": "name\ncolor"
+    "params": "name\ncolor\narg1\narg2"
 }
