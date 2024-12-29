@@ -1920,7 +1920,7 @@ var gWheel
 var gTouch
 var gScroll
 
-var gSelectMode = false
+var gSelectMode = true
 
 resetMachines()
 

@@ -2424,7 +2424,7 @@ function init(cfg) {
     
     		{
     			id: "tt_selection",
-    			image: "select-mode.png",
+    			image: "normal-mode.png",
     			tooltip: "BUT_SELECTION_MODE",
     			command: toggleSelectionMode
     		}
@@ -3152,7 +3152,7 @@ function makeRowUi(tr, row) {
         img.onclick = makeButtonOnClick(cell)
         img.ondragstart = function(evt) { return false; }
         cell.img = img
-        cell.on = false
+        cell.on = true
         var ttext = globals.translate(cell.tooltip)
         if (cell.shortcut) {
             var key = globals.translate("MES_KEY")
