@@ -8,6 +8,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+out
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -26,7 +27,7 @@ coverage
 *.lcov
 
 # nyc test coverage
-.nyc_output
+.nyc_rootFolderput
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
@@ -68,7 +69,7 @@ web_modules/
 # Optional REPL history
 .node_repl_history
 
-# Output of 'npm pack'
+# rootFolderput of 'npm pack'
 *.tgz
 
 # Yarn Integrity file
@@ -85,11 +86,11 @@ web_modules/
 .cache
 .parcel-cache
 
-# Next.js build output
+# Next.js build rootFolderput
 .next
-out
+rootFolder
 
-# Nuxt.js build / generate output
+# Nuxt.js build / generate rootFolderput
 .nuxt
 dist
 
@@ -99,7 +100,7 @@ dist
 # https://nextjs.org/blog/next-9-1#public-directory-support
 # public
 
-# vuepress build output
+# vuepress build rootFolderput
 .vuepress/dist
 
 # vuepress v2.x temp and cache directory
