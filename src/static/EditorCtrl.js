@@ -4750,23 +4750,23 @@ function showStyleItems(data) {
 function showThemeMenu() {
     var rows = []
     var row1 = [
-    	buildThemeMenuItem("default"),
-    	buildThemeMenuItem("parrot"),
+    	buildThemeMenuItem("dark1"),
+    	buildThemeMenuItem("night"),
+    	buildThemeMenuItem("dark3"),
     	buildThemeMenuItem("strict"),
-    	buildThemeMenuItem("cloud")
     ]
     rows.push(row1)
     var row2 = [
+    	buildThemeMenuItem("default"),
+    	buildThemeMenuItem("parrot"),        
     	buildThemeMenuItem("white1"),
     	buildThemeMenuItem("white2"),
-    	buildThemeMenuItem("dark1"),
-    	buildThemeMenuItem("night")
     ]
     rows.push(row2)
     var row3 = [
+    	buildThemeMenuItem("cloud"),
     	buildThemeMenuItem("red"),
     	buildThemeMenuItem("black"),
-    	buildThemeMenuItem("dark3"),
     	buildThemeMenuItem("night2")
     ]
     rows.push(row3)
