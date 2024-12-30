@@ -31,6 +31,7 @@ contextBridge.exposeInMainWorld('backend', {
     getProjectName: () => ipcRenderer.invoke("getProjectName"),
     getAppVersion: () => ipcRenderer.invoke("getAppVersion"),
     getRootHandle: () => ipcRenderer.invoke("getRootHandle"),
+    downloadExample: () => ipcRenderer.invoke("downloadExample"),
     saveGeneratedFile: (content) => ipcRenderer.invoke("saveGeneratedFile", content),
     showGeneratedFile: (content) => ipcRenderer.invoke("showGeneratedFile", content),
     getObjectByHandle: (handle) => ipcRenderer.invoke("getObjectByHandle", handle),

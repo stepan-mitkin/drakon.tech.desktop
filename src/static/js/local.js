@@ -1,4 +1,4 @@
-(function() {
+(function () {
     async function getAppVersion() {
         return "v2024.12.29"
     }
@@ -17,13 +17,40 @@
             callback(key, value, target)
         }
     }
-    
-    
+
+
     function forEach(array, callback, target) {
         var length = array.length
         for (var i = 0; i < length; i++) {
             var value = array[i]
             callback(value, target, i)
+        }
+    }
+
+    function sendRequest(method, url, body, headers) {
+        return new Promise(resolve => {
+            var request = new XMLHttpRequest()
+            request.onreadystatechange = function () {
+                onDataWhenReady(resolve, request)
+            }
+            request.open(method, url, true)
+            if (headers) {
+                for (var header in headers) {
+                    var value = headers[header]
+                    request.setRequestHeader(header, value)
+                }
+            }
+            request.send(body)
+        })
+    }
+
+    function onDataWhenReady(onData, request) {
+        if (request.readyState === 4) {
+            var result = {
+                responseText: request.responseText,
+                status: request.status
+            }
+            onData(result)
         }
     }
 
@@ -38,7 +65,7 @@
             for (var path in projects) {
                 var spaceId = projects[path]
                 clearProjectCore(spaceId)
-            }            
+            }
             localStorage.removeItem("projects")
             localStorage.removeItem("recent")
         } else {
@@ -60,15 +87,15 @@
             localStorage.removeItem(id)
         }
         localStorage.removeItem(spaceId + "-folders")
-        localStorage.removeItem(spaceId + "-history")        
-    }    
-    
+        localStorage.removeItem(spaceId + "-history")
+    }
+
 
     function getSettingsCore() {
         var settingStr = localStorage.getItem("settings") || "{}"
         return JSON.parse(settingStr)
     }
-    async function getSettings() {        
+    async function getSettings() {
         var settings = getSettingsCore()
         if (!settings.language) {
             settings.language = "en"
@@ -84,7 +111,7 @@
     }
 
     async function chooseFolder() {
-        return prompt("Enter full folder path")
+        return prompt("Enter a name for the new project")
     }
 
     function openUrl(url) {
@@ -107,7 +134,7 @@
 
     function randomNumber(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
-    }    
+    }
 
     function generateId(used, prefix) {
         var id = prefix + randomNumber(1000, 9999)
@@ -129,11 +156,11 @@
     }
 
     function createFolderWithId(spaceId, folderId, body) {
-        var id = buildId(spaceId, folderId)                
+        var id = buildId(spaceId, folderId)
         var all = getAllFolders(spaceId)
         all[id] = true
         setAllFolders(spaceId, all)
-        setFolderBody(id, body)        
+        setFolderBody(id, body)
     }
 
     function replace(str, from, to) {
@@ -144,12 +171,12 @@
         var normalized = replace(path, "\\", "/")
         var parts = normalized
             .split("/")
-            .filter(part => {return part.trim() !== ""})
+            .filter(part => { return part.trim() !== "" })
         return parts[parts.length - 1]
-    }    
+    }
 
     function createRoot(spaceId) {
-        var body = {type:"folder"}        
+        var body = { type: "folder" }
         createFolderWithId(spaceId, "1", body)
     }
 
@@ -165,7 +192,7 @@
         gLanguage = "JS"
         gFolder = folder
         gSpaceId = spaceId
-        gFolderName = getLastStage(folder)        
+        gFolderName = getLastStage(folder)
         return spaceId
     }
 
@@ -185,7 +212,7 @@
 
     async function getHistory() {
         console.log("getHistory")
-        await pause(10)        
+        await pause(10)
         var history = getHistoryItems()
         return {
             recent: history.map(getHistoryItem)
@@ -198,7 +225,7 @@
 
     function getHistoryItems() {
         var historyStr = localStorage.getItem(gSpaceId + "-history") || "[]"
-        return JSON.parse(historyStr)        
+        return JSON.parse(historyStr)
     }
 
     function saveHistoryItems(history) {
@@ -206,13 +233,13 @@
         localStorage.setItem(gSpaceId + "-history", historyStr)
     }
 
-    function addToHistory(id) {        
+    function addToHistory(id) {
         var histItem = {
             whenOpened: getUtc(),
             id: id
         }
         var history = getHistoryItems()
-        deleteFromHistoryCore(history, [id])        
+        deleteFromHistoryCore(history, [id])
         history.unshift(histItem)
         while (history.length > 30) {
             history.pop()
@@ -226,7 +253,7 @@
                 array.splice(i, 1);
             }
         }
-    }    
+    }
 
     function deleteFromHistory(ids) {
         var history = getHistoryItems()
@@ -237,7 +264,7 @@
     function deleteFromHistoryCore(history, ids) {
         for (var id of ids) {
             deleteFromArray(history, element => element.id === id)
-        }        
+        }
     }
 
     function getHistoryItem(histItem) {
@@ -256,25 +283,25 @@
     async function createFolder(spaceId, body) {
         console.log("createFolder", spaceId, body)
         await pause(10)
-        body.parent = buildId(spaceId, body.parent)        
+        body.parent = buildId(spaceId, body.parent)
         var folderId = createFolderCore(spaceId, body)
-        return {folder_id: folderId}
+        return { folder_id: folderId }
     }
 
-    function createFolderCore(spaceId, body) {         
+    function createFolderCore(spaceId, body) {
         var folderId = generateFolderId(spaceId)
         createFolderWithId(spaceId, folderId, body)
         return folderId
-    }    
+    }
 
     function generateFolderId(spaceId) {
-        var all = getAllFolders(spaceId)        
+        var all = getAllFolders(spaceId)
         var folderId = generateId(all, "f")
         return folderId
     }
 
-    async function getFolder(spaceId, folderId) {                
-        console.log("getFolder", spaceId, folderId)        
+    async function getFolder(spaceId, folderId) {
+        console.log("getFolder", spaceId, folderId)
         await pause(10)
         var folder = getFolderWithChildren(spaceId, folderId)
         folder.path = buildFolderPath(folder.fullId)
@@ -301,7 +328,7 @@
         objFor(all, findChildren, folder)
         folder.id = folderId
         folder.space_id = spaceId
-        fixFolderName(folder)        
+        fixFolderName(folder)
         return folder
     }
 
@@ -318,7 +345,7 @@
 
     async function changeMany(body) {
         console.log("changeMany", body)
-        await pause(10)        
+        await pause(10)
         var deleted = []
         try {
             if (body.operation === "delete") {
@@ -333,11 +360,11 @@
                 }
             }
         } catch (ex) {
-            return {ok:false, error:ex.message}
+            return { ok: false, error: ex.message }
         }
 
         deleteFromHistory(deleted)
-        return {ok:true, deleted: deleted}
+        return { ok: true, deleted: deleted }
     }
 
     function moveAcrossProjects(body) {
@@ -364,8 +391,8 @@
         }
         if (change.added) {
             forEach(change.added, addItem, folder)
-        }        
-        setFolderBody(id, folder)        
+        }
+        setFolderBody(id, folder)
     }
 
     function setProperty(target, source, name) {
@@ -387,8 +414,8 @@
         }
         fixContentField(copy)
         folder.items[change.id] = copy
-    }  
-    
+    }
+
     function updateItem(change, folder) {
         var existing = folder.items[change.id]
         var copy = {}
@@ -397,7 +424,7 @@
         delete copy["id"]
         fixContentField(copy)
         folder.items[change.id] = copy
-    }      
+    }
 
     function fixContentField(copy) {
         if ("text" in copy) {
@@ -425,22 +452,22 @@
         var name = folder.name
         while (!isUnique(targetFolder.children, name)) {
             name += "-x2"
-        }        
+        }
         copyFolderRecursive(id, name, targetId)
     }
 
     function moveOneFolder(item, target) {
         var id = buildId(item.space_id, item.id)
-        var folder = getFolderBody(id)        
+        var folder = getFolderBody(id)
         var targetId = buildId(target.space_id, target.folder_id)
-        checkForCycles(id, targetId)        
+        checkForCycles(id, targetId)
         var targetFolder = getFolderWithChildren(target.space_id, target.folder_id)
         var name = folder.name
         while (!isUnique(targetFolder.children, name)) {
             name += "-x2"
-        }        
+        }
         folder.parent = targetId
-        setFolderBody(id, folder)        
+        setFolderBody(id, folder)
     }
 
     function isUnique(folders, name) {
@@ -469,7 +496,7 @@
             var childId = buildId(child.space_id, child.id)
             copyFolderRecursive(childId, undefined, newId)
         }
-        createFolderWithId(tparsed.spaceId, newFolderId, folder)        
+        createFolderWithId(tparsed.spaceId, newFolderId, folder)
     }
 
 
@@ -502,11 +529,11 @@
     }
 
     function getFolderBody(id) {
-        return JSON.parse(localStorage.getItem(id))        
+        return JSON.parse(localStorage.getItem(id))
     }
 
     function setFolderBody(id, body) {
-        localStorage.setItem(id, JSON.stringify(body))        
+        localStorage.setItem(id, JSON.stringify(body))
     }
 
     function findChildren(id, _, output) {
@@ -526,17 +553,17 @@
 
     async function searchFolders(body) {
         console.log("searchFolders", body)
-        await pause(10)  
+        await pause(10)
         var spaceId = body.spaces[0]
         return searchFolderCore(spaceId, [body.needle], 10)
     }
 
     async function searchDefinitions(body) {
         console.log("searchDefinitions", body)
-        await pause(10)  
+        await pause(10)
         var spaceId = body.space_id
         return searchFolderCore(spaceId, body.tokens, 1)
-    }    
+    }
 
     function getMatchRank(name, needles) {
         var rank = 10000
@@ -556,12 +583,12 @@
 
     function searchFolderCore(spaceId, needles, maxRank) {
         var all = getAllFolders(spaceId)
-        var needlesChecked = prepareNeedles(needles)        
+        var needlesChecked = prepareNeedles(needles)
 
         var results = []
         for (var id in all) {
             var folder = getFolderBody(id)
-            if (!folder.name) {continue}
+            if (!folder.name) { continue }
             var name = folder.name.toLowerCase()
             var rank = getMatchRank(name, needlesChecked)
             if (rank <= maxRank) {
@@ -576,7 +603,7 @@
         results.sort(sortByRankThenName)
         return {
             folders: results.map(transformSearchResultFolder)
-        }        
+        }
     }
 
     function prepareNeedle(text) {
@@ -586,10 +613,10 @@
     }
 
     function sortByRankThenName(left, right) {
-        if (left.rank < right.rank) {return -1}
-        if (left.rank > right.rank) {return 1}
-        if (left.name < right.name) {return -1}
-        if (left.name > right.name) {return 1}  
+        if (left.rank < right.rank) { return -1 }
+        if (left.rank > right.rank) { return 1 }
+        if (left.name < right.name) { return -1 }
+        if (left.name > right.name) { return 1 }
         return 0
     }
 
@@ -612,7 +639,7 @@
         var found = []
         var completed = false
         async function start() {
-            if (completed) {throw new Error("Search has completed")}
+            if (completed) { throw new Error("Search has completed") }
             for (var id in all) {
                 searchDiagram(id)
                 await pause(1)
@@ -644,7 +671,7 @@
                         found.push(createFoundItem(id, itemId, folder, part))
                     }
                 }
-            }  
+            }
         }
 
         function createFoundItem(id, itemId, folder, text) {
@@ -677,20 +704,20 @@
 
     async function searchItems(body) {
         console.log("searchItems", body)
-        await pause(10)  
+        await pause(10)
         var spaceId = body.spaces[0]
         startItemsSearch(spaceId, [body.needle])
         return {}
-    }    
+    }
 
     function prepareNeedles(needles) {
         return needles
             .map(prepareNeedle)
-            .filter(nee => !!nee)          
+            .filter(nee => !!nee)
     }
 
     function startItemsSearch(spaceId, needles) {
-        var needlesChecked = prepareNeedles(needles)        
+        var needlesChecked = prepareNeedles(needles)
         if (gSearch) {
             gSearch = undefined
         }
@@ -699,12 +726,12 @@
         }
         var all = getAllFolders(spaceId)
         gSearch = createItemSearch(all, needlesChecked)
-        gSearch.start()        
+        gSearch.start()
     }
 
     async function pollSearch() {
         console.log("pollSearch")
-        await pause(10)  
+        await pause(10)
         var result = {
             completed: true,
             items: []
@@ -735,7 +762,7 @@
         localStorage.setItem("clipboard-content", content)
     }
 
-    window.onstorage = function(evt) {
+    window.onstorage = function (evt) {
         if (evt.key === "clipboard-content") {
             var type = localStorage.getItem("clipboard-type")
             var content = localStorage.getItem("clipboard-content")
@@ -762,22 +789,22 @@
     function downloadTextFile(filename, content) {
         // Create a new Blob object using the content and specifying UTF-8 encoding
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    
+
         // Create a temporary anchor (<a>) element
         const link = document.createElement('a');
-    
+
         // Generate a URL for the Blob and set it as the href attribute
         link.href = URL.createObjectURL(blob);
-    
+
         // Set the download attribute with the desired filename
         link.download = filename;
-    
+
         // Append the link to the document body (required for Firefox)
         document.body.appendChild(link);
-    
+
         // Programmatically click the link to trigger the download
         link.click();
-    
+
         // Clean up by removing the link and revoking the object URL
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
@@ -809,19 +836,19 @@
                 context.nextId++
                 folder.id = newId
                 var str = JSON.stringify(folder)
-                context.result.push(str)                
+                context.result.push(str)
                 exportFolders(context, id, newId)
             }
         }
     }
-    
+
     function exportProject() {
         console.log("exportProject!")
         var folders = getExportFolders()
         var filename = gFolderName + ".jsonl"
         var content = folders.join("\n")
         downloadTextFile(filename, content)
-    }  
+    }
 
     async function closeFolder() {
         console.log("closeFolder")
@@ -839,11 +866,11 @@
         if (queryString.startsWith('?')) {
             queryString = queryString.slice(1);
         }
-    
+
         // Split the query string into key-value pairs
         const pairs = queryString.split('&');
         const params = {};
-    
+
         // Iterate through each key-value pair
         pairs.forEach(pair => {
             const [key, value] = pair.split('=');
@@ -851,7 +878,7 @@
                 // Decode key and value to handle URL encoding
                 const decodedKey = decodeURIComponent(key);
                 const decodedValue = value ? decodeURIComponent(value) : undefined;
-    
+
                 // Handle duplicate keys by storing values in an array
                 if (params[decodedKey]) {
                     if (Array.isArray(params[decodedKey])) {
@@ -864,20 +891,20 @@
                 }
             }
         });
-    
+
         return params;
     }
 
-    
+
     async function getProjectName() {
         console.log("getProjectName")
-        await pause(10)  
+        await pause(10)
         return gFolderName
     }
 
     async function getMyFolder() {
         console.log("getMyFolder")
-        await pause(10)  
+        await pause(10)
         if (gFolder) {
             return gFolder
         }
@@ -886,26 +913,50 @@
         return query.folder
     }
 
+    async function downloadExample(folder) {
+        console.log("downloadExample", folder)
+        await pause(10)
+        try {
+            var projects = getProjects()
+            var spaceId = projects[folder]
+            if (spaceId) {
+                console.log("Found existing project in local storage")
+                return
+            }
+            var url = "/drakon.tech.desktop/examples/" + folder + ".jsonl"
+            var response = await sendRequest("GET", url)
+            if (response.status !== 200) {
+                console.log("Response status: " + response.status)
+                return
+            }
+            spaceId = await openFolder(folder)
+            var project = dtAppInjector.parseJsonlProject(response.responseText)
+            await dtAppInjector.loadProject(spaceId, project)
+        } catch (ex) {
+            console.error("downloadExample", ex)
+        }
+    }
+
     function newWindow() {
         window.open(window.location.href, '_blank');
-    }    
+    }
 
     async function getRootHandle() {
         console.log("getRootHandle")
-        await pause(10)        
+        await pause(10)
         return getRootId()
     }
-    
+
     async function saveGeneratedFile(content) {
         console.log("saveGeneratedFile", content.length)
         await pause(10)
         gGenerated = content
     }
 
-    
+
     async function getObjectByHandle(id) {
         console.log("getObjectByHandle", id)
-        await pause(10)        
+        await pause(10)
 
         var spaceId = gSpaceId
         var all = getAllFolders(spaceId)
@@ -918,10 +969,10 @@
                 folder.children.push(objId)
             }
         }
-        fixFolderName(folder)        
+        fixFolderName(folder)
         return folder
     }
-    
+
     async function getFolderInfoByHandle(filepath) {
         var name = path.parse(filepath).name
         var id = await loadRecordFromDiscToCache(winInfo, filepath)
@@ -930,23 +981,23 @@
             name: name
         }
     }
-    
+
     async function showGeneratedFile() {
         console.log("showGeneratedFile", gFolderName)
         const blob = new Blob([gGenerated], { type: 'text/javascript' });
 
         // Create an object URL from the Blob
         const url = URL.createObjectURL(blob);
-        
+
         // Open a new tab with the URL
         window.open(url, '_blank');
-        
+
         // Optionally, release the object URL when you're done
         setTimeout(() => {
             URL.revokeObjectURL(url);
-        }, 10000);         
+        }, 10000);
     }
-    
+
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -980,8 +1031,9 @@
         getObjectByHandle: getObjectByHandle,
         saveGeneratedFile: saveGeneratedFile,
         getFolderInfoByHandle: getFolderInfoByHandle,
-        showGeneratedFile: showGeneratedFile
+        showGeneratedFile: showGeneratedFile,
+        downloadExample: downloadExample
     }
 
-    
+
 })();

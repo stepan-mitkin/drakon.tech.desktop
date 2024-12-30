@@ -252,6 +252,10 @@ async function exportProject(winInfo) {
     await downloadTextFile(winInfo, filename, content)
 }
 
+async function downloadExample() {
+}
+
+
 function registerMainCallbacks() {
     registerHandler(getRecent)
     registerHandler(setRecent)
@@ -288,6 +292,7 @@ function registerMainCallbacks() {
     registerHandler(getObjectByHandle)
     registerHandler(getFolderInfoByHandle)
     registerHandler(showGeneratedFile)
+    registerHandler(downloadExample)
 }
 
 function registerHandler(fun) {

@@ -549,6 +549,7 @@
         window.addEventListener('unhandledrejection', onRejection);      
         var folder = await backend.getMyFolder()
         if (folder) {
+            await backend.downloadExample(folder)
             await tryOpenFolder(folder)
         } else {
             await showStartPage()
