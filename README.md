@@ -10,5 +10,7 @@ DrakonTech is available for __Windows__, __macOS__, and __Linux__, and provides 
 
 This tool is designed to make visual programming intuitive and efficient, with a focus on making algorithms easy to understand.
 
-[Run DrakonTech in the browser](https://stepan-mitkin.github.io/drakon.tech.desktop/run)
-[Download DrakonTech from GitHub releases](https://github.com/stepan-mitkin/drakon.tech.desktop/releases/)
+## Get DrakonTech
+
+- [Run DrakonTech in the browser](https://stepan-mitkin.github.io/drakon.tech.desktop/run)
+- [Download DrakonTech from GitHub releases](https://github.com/stepan-mitkin/drakon.tech.desktop/releases/)
