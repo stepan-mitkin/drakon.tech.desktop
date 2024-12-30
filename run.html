@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'unsafe-inline' 'self'; img-src 'self' data:">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" type="image/png" href="/drakon.tech.desktop/src/drakosha.png">
+  <link rel="stylesheet" href="/drakon.tech.desktop/assets/reset.css">
+  <title>Run DrakonTech in the browser</title>
+  <meta name="description" content="Run DrakonTech JavaScript IDE directly in the browser without installation">
+  <style>
+    *, *:before, *:after {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 17px;
+      background: black;
+      color: #ffffd0;
+    }
+
+    p {
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+
+    a:link, a:visited {
+      color: yellow;
+    }
+    #main-container {
+      width: 700px;
+      max-width: 100%;
+      margin: auto;
+      padding: 20px;
+    }
+    .logo-header img {
+      display: inline-block;
+      vertical-align: middle;
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+    .logo-header {
+      color: #ffffd0;
+      font-weight: bold;
+      font-size: 36px;
+    }
+    h2 {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 20px;      
+    }
+    h1 {
+      font-weight: bold;
+      font-size: 24px;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    strong {
+      font-weight: bold;
+    }
+    .button-div {
+      margin-bottom: 20px;
+    }
+    .button-div a {
+      display: inline-block;
+      width: 200px;
+      padding: 20px;
+      border-radius: 4px;
+      color: white;
+      background: #007820;      
+      cursor: pointer;
+      user-select: none;
+    }    
+    .button-div a:link, .button-div a:visited{
+      color: white;
+      text-decoration: none;
+    }        
+
+    .button-div a:hover {
+      background: #015216;
+    }
+
+    .button-div a:active {
+      background: #003b0f;
+    }    
+
+    .illu {
+      max-width: 100%;
+    }
+    .example-link {
+        display: block;
+        margin-top: 40px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .example-link:link, .example-link:visited {
+        color: white;
+    }    
+  </style>
+</head>
+
+<body>
+  <div id="main-container">
+    <div class="logo-header"><img src="/drakon.tech.desktop/src/drakosha.png" alt="DrakonTech logo">DrakonTech</div>
+    <h1>Run DrakonTech in the browser</h1>
+    <p>Experience DrakonTech directly in your browser-no registration or installation required.</p>
+    <p>Your data stays safe, stored locally in your browser, ensuring it never leaves your computer.
+    Save your project on your computer to continue editing with the <a href="https://github.com/stepan-mitkin/drakon.tech.desktop">desktop version of DrakonTech</a>.</p>
+    <p><strong>Choose an example project:</strong></p>
+    <a class="example-link" href="/drakon.tech.desktop/src/drakontech">Empty</a>
+    <p>Open DrakonTech with a blank workspace, ready for your ideas</p>
+    <a class="example-link" href="/drakon.tech.desktop/src/drakontech?folder=functions">Functions</a>
+    <p>A complete list of DRAKON's algorithmic constructs, including the silhouette.
+    Importing and exporting functions. Module-level variables, async and await.
+    Basic algorithms, including Hello world, Fibonacci, and FizzBuzz.</p>
+    <a class="example-link" href="/drakon.tech.desktop/src/drakontech?folder=classes">Classes</a>
+    <p>Object-oriented programming with light-weight classes that do not use the keywords &ldquo;class&rdquo;, &ldquo;new&rdquo;, and &ldquo;this.&rdquo;</p>
+    <a class="example-link" href="/drakon.tech.desktop/src/drakontech?folder=algoprops">Algo-props</a>
+    <p>Backward chaining implemented with algorithmic properties, or algo-props.
+    Algo-props make your programs shorter and simpler by reducing binding. With backward chaining, one does not call functions explicitly but simply uses data when needed.</p>
+    <a class="example-link" href="/drakon.tech.desktop/src/drakontech?folder=classAlgoprops">Class algo-props</a>
+    <p>Algo-props that are defined at the class level.</p>
+  </div>
+</body>
+
+</html>
+
