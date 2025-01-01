@@ -4945,11 +4945,9 @@ function idToServerFolder(id) {
 
 function init() {
     var target
-    if (browser.getWidth() >= 700) {
-        globs.wide = true
-    } else {
-        globs.wide = false
-    }
+
+    globs.wide = true
+
     Nav.onStateChange = onStateChange
 
     globs.isDev = false
