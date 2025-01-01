@@ -140,7 +140,13 @@ function createDrakonTechGenerator(options) {
     }
 
     function isFunction(folder) {
-        return folder.type === "drakon" && folder.keywords && folder.keywords.function
+        if (folder.type === "drakon") {
+            if (folder.keywords) {
+                return !!folder.keywords.function
+            }
+            return true
+        }
+        return false
     }
 
     function isAlgoprop(folder) {
@@ -159,18 +165,27 @@ function createDrakonTechGenerator(options) {
     }
 
     function addFunction(scope, folder, scopeName, parentScope) {
+        if (verbose) {
+            console.log("addFunction", scope.name, folder.name, folder.path)
+        }
         var name = folder.name
         createFunctionScope(folder, "function", scopeName, parentScope)
         scope.functions[name] = folder
     }
 
     function addAlgoprop(scope, folder, scopeName, parentScope) {
+        if (verbose) {
+            console.log("addAlgoprop", scope.name, folder.name, folder.path)
+        }        
         var name = folder.name
         createFunctionScope(folder, "algoprop", scopeName, parentScope)
         scope.algoprops[name] = folder
     }
 
     function addClass(folder, ctr) {
+        if (verbose) {
+            console.log("addClass", folder.name, folder.path)
+        }
         var name = folder.name
         createFunctionScope(ctr, "class", name, project.name)
         ctr.scope.allowDeclare = true
@@ -203,6 +218,7 @@ function createDrakonTechGenerator(options) {
         }
     }
     async function traverseModuleItem(folder) {
+        if (verbose) {console.log("traverseModuleItem", folder.path)}
         checkCancellation()
         if (folder.type === "folder") {
             var children = await readChildren(folder)
@@ -227,6 +243,7 @@ function createDrakonTechGenerator(options) {
     }
 
     async function traverseClassItem(cls, folder, classAllowed) {
+        if (verbose) {console.log("traverseClassItem", folder.path)}
         checkCancellation()
         var scope = cls.scope
         if (folder.type === "folder") {
@@ -251,7 +268,7 @@ function createDrakonTechGenerator(options) {
 
     async function jsPreprocess() {
         var rootFolder = await options.getObjectByHandle(options.root)
-        for (var childPath of rootFolder.children) {
+        for (var childPath of rootFolder.children) {            
             var child = await options.getObjectByHandle(childPath)
             if (!child) { continue }
             if (isClass(child)) {
