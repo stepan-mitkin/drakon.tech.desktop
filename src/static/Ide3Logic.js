@@ -1088,7 +1088,7 @@ function FolderCutterDeleter_Reloading_onError(self, data) {
 
 function FolderCutterDeleter_RunningOperation_onData(self, data) {
     if (!self.cut) {
-        data.deleted.forEach(Nav.onDeleteFolder)
+        data.deleted.forEach(deleteFolderInNav)
     }
     startMachine(
         new RecentGetter(),
@@ -1096,6 +1096,11 @@ function FolderCutterDeleter_RunningOperation_onData(self, data) {
         self
     )
     self.state = "GettingHistory";
+}
+
+function deleteFolderInNav(folderId) {
+    var id = makeId(gSpaceId, folderId)
+    Nav.onDeleteFolder(id)
 }
 
 function FolderCutterDeleter_RunningOperation_onError(self, data) {

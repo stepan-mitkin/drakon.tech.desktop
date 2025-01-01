@@ -336,7 +336,7 @@
         var folder = getFolderWithChildren(item.space_id, item.id)
         forEach(folder.children, deleteOneFolder, deleted)
         var id = buildId(item.space_id, item.id)
-        deleted.push(id)
+        deleted.push(item.id)
         var all = getAllFolders(item.space_id)
         delete all[id]
         setAllFolders(item.space_id, all)

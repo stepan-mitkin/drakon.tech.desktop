@@ -58,17 +58,24 @@ function fireCallback() {
   self.onStateChange(state.data)    
 }
 
-function onDeleteFolder(id) {
+function onDeleteFolderCore(id) {
   for (var i = 0; i < gStates.length; i++) {
     var state = gStates[i]
     if (state.data.id === id) {
       gStates.splice(i, 1)
       if (i <= gCurrent) {
         gCurrent--
-      }
-      onDeleteFolder(id)
-      return
+      }      
+      return true
     }
+  }
+  return false
+}
+
+
+function onDeleteFolder(id) {
+  while (onDeleteFolderCore(id)) {
+
   }
   printState()
 }
