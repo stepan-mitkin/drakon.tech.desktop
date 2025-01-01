@@ -2483,11 +2483,13 @@ function addCheckbox(parent, id, labelText, checked) {
 
 function makeFunTypeList(div, node, widget) {    
     if (node.language === "JS") {
+        addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export)
+        var s2 = make(div, "div")
+        s2.style.height = "10px"
         addCheckbox(div, "async_checkbox", "MES_ASYNC", node.async)
         var space = make(div, "div")
         space.style.height = "10px"
-        addRadio(div, "function_flags_function", "function_flags", "MES_FUNCTION", !node.algoprop && !node.export)
-        addRadio(div, "function_flags_exported_function", "function_flags", "MES_EXPORTED_FUNCTION", !node.algoprop && node.export)
+        addRadio(div, "function_flags_function", "function_flags", "MES_FUNCTION", !node.algoprop)
         addRadio(div, "function_flags_algoprop", "function_flags", "MES_ALGOPROP", node.algoprop && !node.lazy)
         addRadio(div, "function_flags_lazy_algoprop", "function_flags", "MES_LAZY_ALGOPROP", node.algoprop && node.lazy)
     }
@@ -4161,10 +4163,10 @@ function isChecked(id) {
 }
 
 function saveDiaProps() {
-    var keywords = {}
-    keywords["export"] = isChecked("function_flags_exported_function")
-    keywords["function"] = isChecked("function_flags_function") || isChecked("function_flags_exported_function")
+    var keywords = {}    
+    keywords["function"] = isChecked("function_flags_function")
     keywords["async"] = isChecked("async_checkbox")
+    keywords["export"] = isChecked("export_checkbox")    
     keywords["algoprop"] = isChecked("function_flags_algoprop") || isChecked("function_flags_lazy_algoprop")
     keywords["lazy"] = isChecked("function_flags_lazy_algoprop")
     var params = get("params_textarea").value.trim()
