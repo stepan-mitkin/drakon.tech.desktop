@@ -1,6 +1,6 @@
 (function () {
     async function getAppVersion() {
-        return "v2025.01.02"
+        return "v2025.01.04"
     }
 
     var gLanguage = undefined
@@ -215,7 +215,7 @@
         await pause(10)
         var history = getHistoryItems()
         return {
-            recent: history.map(getHistoryItem)
+            recent: history.map(getHistoryItem).filter(item => !!item)
         }
     }
 
@@ -271,6 +271,7 @@
         var id = histItem.id
         var parsed = parseId(id)
         var folder = getFolderBody(id)
+        if (!folder) { return undefined }
         return {
             folder_id: parsed.folderId,
             space_id: parsed.spaceId,
@@ -973,12 +974,11 @@
         return folder
     }
 
-    async function getFolderInfoByHandle(filepath) {
-        var name = path.parse(filepath).name
-        var id = await loadRecordFromDiscToCache(winInfo, filepath)
+    async function getFolderInfoByHandle(id) {
+        var obj = getFolderBody(id)
         return {
-            id: winInfo.spaceId + " " + id,
-            name: name
+            id: id,
+            name: obj.name
         }
     }
 
