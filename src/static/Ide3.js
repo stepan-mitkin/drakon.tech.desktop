@@ -4171,6 +4171,12 @@ function saveDiaProps() {
     keywords["export"] = isChecked("export_checkbox")    
     keywords["algoprop"] = isChecked("function_flags_algoprop") || isChecked("function_flags_lazy_algoprop")
     keywords["lazy"] = isChecked("function_flags_lazy_algoprop")
+    if (keywords.machine) {
+        keywords.async = false
+    }
+    if (keywords.algoprop) {
+        keywords.export = false
+    }
     var params = get("params_textarea").value.trim()
     var change = {
     	keywords: keywords,

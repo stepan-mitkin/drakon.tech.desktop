@@ -462,6 +462,21 @@ function Header_draw(render, item) {
                     	labelColor,
                     	SmallFont
                     )
+                } else {
+                    if (isMachine()) {
+                        scenario = translate("MES_STATE_MACHINE")
+                        render.setDefaultFont(SmallFont)
+                        sw = render.measureTextWidth(scenario)
+                        labelColor = getYesColor()
+                        render.drawText(
+                        	texId,
+                        	scenario,
+                        	item.x - Math.floor(sw / 2),
+                        	item.y - item.h - 3,
+                        	labelColor,
+                        	SmallFont
+                        )
+                    }
                 }
             }
         }
@@ -8795,6 +8810,10 @@ function isLower(record, source) {
     } else {
         return record.element.tail.y > source.tail.y
     }
+}
+
+function isMachine() {
+    return !!module.storage.keywords.machine
 }
 
 function isNewStart(prev, item) {
