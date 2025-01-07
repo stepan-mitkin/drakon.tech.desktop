@@ -67,7 +67,7 @@ window.drakontechgen = {
     }
 }
 },{"./drakontechgen":3}],3:[function(require,module,exports){
-const { findFirst, addRange } = require("./tools")
+const { sortBy, findFirst, addRange } = require("./tools")
 const { traverseAst } = require("./astScanner")
 const { topologicaSort } = require("./sort")
 
@@ -142,9 +142,18 @@ function createDrakonTechGenerator(options) {
     function isFunction(folder) {
         if (folder.type === "drakon") {
             if (folder.keywords) {
-                return !!folder.keywords.function
+                return folder.keywords.function
             }
             return true
+        }
+        return false
+    }
+
+    function isMachine(folder) {
+        if (folder.type === "drakon") {
+            if (folder.keywords) {
+                return folder.keywords.machine
+            }
         }
         return false
     }
@@ -176,22 +185,217 @@ function createDrakonTechGenerator(options) {
     function addAlgoprop(scope, folder, scopeName, parentScope) {
         if (verbose) {
             console.log("addAlgoprop", scope.name, folder.name, folder.path)
-        }        
+        }
         var name = folder.name
         createFunctionScope(folder, "algoprop", scopeName, parentScope)
         scope.algoprops[name] = folder
     }
 
-    function addClass(folder, ctr) {
+    function addClass(name, path, ctr) {
         if (verbose) {
-            console.log("addClass", folder.name, folder.path)
+            console.log("addClass", name, path)
         }
-        var name = folder.name
         createFunctionScope(ctr, "class", name, project.name)
         ctr.scope.allowDeclare = true
         ctr.isCtr = true
         ctr.name = name
         project.classes[name] = ctr
+    }
+
+    function addMachine(folder) {
+        if (verbose) {
+            console.log("addMachine", folder.name, folder.path)
+        }
+        buildMachine(folder)
+    }
+
+    function buildMachine(folder) {
+        if (!folder.items) {
+            folder.items = {}
+        }
+        var ctr = createFunctionObject(folder.name, folder.params, folder.keywords, folder.path)
+        var inputs = {}
+        ctr.keywords.function = true
+        ctr.keywords.machine = false
+        addClass(folder.name, folder.path, ctr)
+        var firstItemId = collectInputs(folder, inputs)
+        if (!firstItemId) {return}
+        cutOutSubprogram(folder, firstItemId, ctr)
+        for (var name in inputs) {
+            var input = inputs[name]
+            createHandler(ctr.scope, input, folder)
+        }
+        ctr.machine = {
+            inputs: inputs
+        }
+    }
+
+    function createHandler(scope, input, folder) {
+        for (var obj of input.items) {
+            var name = input.name + "_" + obj.from
+            var fun = createFunctionObject(name, input.params, { function: true }, folder.path)
+            cutOutSubprogram(folder, obj.to, fun)
+            var scopeName = folder.name + "." + name
+            addFunction(scope, fun, scopeName, scope.name)
+        }
+    }
+
+    function collectInputs(folder, inputs) {
+        var branches = []
+        for (var id in folder.items) {
+            var item = folder.items[id]
+            item.id = id
+            if (isReceive(item)) {
+                collectInputsFromReceive(folder, inputs, item)
+            } else if (item.type === "sinput") {
+                collectInputsFromSInput(folder, inputs, item, item.id)
+            } else if (item.type === "branch") {
+                branches.push(item)
+            }
+        }
+        sortBy(branches, "branchId")
+        return branches[0].one
+    }
+
+    function isReceive(item) {
+        return item.type === "select" && item.content === "receive"
+    }
+
+    function cutOutSubprogram(folder, firstItemId, targetFun) {
+        var startBranch = {
+            type: "branch",
+            content: "_start_",
+            id: generateId("mi"),
+            branchId: 0,
+            one: firstItemId
+        }
+        targetFun.items[startBranch.id] = startBranch
+        var visited = {}
+        visited[startBranch.id] = true
+        copyNode(folder, firstItemId, visited, targetFun)
+    }
+
+    function copyNode(folder, itemId, visited, targetFun) {
+        if (!itemId) {
+            return
+        }
+        if (itemId in visited) {
+            return
+        }
+        visited[itemId] = true
+        var item = folder.items[itemId]
+        if (item.type === "sinput" || isReceive(item)) {
+            var stopItem = {
+                id: itemId,
+                type: "action",
+                content: "self.state = \"" + itemId + "\""
+            }
+            targetFun.items[itemId] = stopItem
+            return
+        }
+        targetFun.items[itemId] = item
+        if (item.type === "end") {
+            item.type = "action"
+            item.content = "self.state = undefined"
+        }
+        copyNode(folder, item.one, visited, targetFun)
+        copyNode(folder, item.two, visited, targetFun)
+    }
+
+    function collectInputsFromReceive(folder, inputs, item) {
+        var id = item.one
+        while (id) {
+            var caseItem = folder.items[id]
+            collectInputsFromSInput(folder, inputs, caseItem, item.id)
+            id = caseItem.two
+        }
+    }
+
+    function extractInput(folder, item, fromId) {
+        if (!item.content) {
+            reportError("An input signature is expected here", folder.path, item.id)
+            return undefined
+        }
+
+        var ast
+        try {
+            ast = options.esprima.parseScript(item.content)
+        } catch (ex) {
+            reportError(ex.message, folder.path, item.id)
+            return undefined
+        }
+        var result = getCall(ast.body[0])
+        if (!result) {
+            reportError("A call expression expected here", folder.path, item.id)
+            return undefined
+        }
+        result.items.push({
+            from: fromId,
+            to: item.one
+        })
+        return result
+    }
+
+    function getCall(ast) {
+        if (ast.type === "ExpressionStatement") {
+            var expr = ast.expression
+            if (expr.type === "CallExpression") {
+                if (expr.callee.type === "Identifier") {
+                    var name = expr.callee.name
+                    var result = {
+                        name: name,
+                        arguments: [],
+                        signature: "",
+                        items: []
+                    }
+                    for (var arg of expr.arguments) {
+                        if (arg.type === "Identifier") {
+                            result.arguments.push(arg.name)
+                        } else {
+                            return undefined
+                        }
+                    }
+                    result.signature = name + "(" + result.arguments.join(",") + ")"
+                    result.params = result.arguments.join("\n")
+                    return result
+                }
+            }
+        }
+        return undefined
+    }
+
+    function collectInputsFromSInput(folder, inputs, item, fromId) {
+        var input = extractInput(folder, item, fromId)
+        if (input) {
+            var existing = inputs[input.name]
+            if (existing) {
+                if (existing.signature === input.signature) {
+                    existing.items.push({
+                        from: fromId,
+                        to: item.one
+                    })
+                } else {
+                    reportError("Incompatible input signatures", folder.path, item.id)
+                }
+            } else {
+                inputs[input.name] = input
+            }
+        }
+    }
+
+    function createFunctionObject(name, params, keywords, path) {
+        var result = {
+            name: name,
+            type: "drakon",
+            params: params,
+            keywords: {},
+            items: {},
+            path: path
+        }
+        if (keywords) {
+            Object.assign(result.keywords, keywords)
+        }
+        return result
     }
 
     function addDeclaration(scope, name) {
@@ -218,13 +422,13 @@ function createDrakonTechGenerator(options) {
         }
     }
     async function traverseModuleItem(folder) {
-        if (verbose) {console.log("traverseModuleItem", folder.path)}
+        if (verbose) { console.log("traverseModuleItem", folder.path) }
         checkCancellation()
         if (folder.type === "folder") {
             var children = await readChildren(folder)
             var ctr = findFirst(children, isClass)
             if (ctr) {
-                addClass(folder, ctr)
+                addClass(folder.name, folder.path, ctr)
                 for (var child of children) {
                     await traverseClassItem(ctr, child, true)
                 }
@@ -239,17 +443,19 @@ function createDrakonTechGenerator(options) {
             addFunction(project, folder, folder.name, project.name)
         } else if (isAlgoprop(folder)) {
             addAlgoprop(project, folder, folder.name, project.name)
+        } else if (isMachine(folder)) {
+            addMachine(folder)
         }
     }
 
-    async function traverseClassItem(cls, folder, classAllowed) {
-        if (verbose) {console.log("traverseClassItem", folder.path)}
+    async function traverseClassItem(ctr, folder, classAllowed) {
+        if (verbose) { console.log("traverseClassItem", folder.path) }
         checkCancellation()
-        var scope = cls.scope
+        var scope = ctr.scope
         if (folder.type === "folder") {
             var children = await readChildren(folder)
             for (var child of children) {
-                await traverseClassItem(cls, child, false)
+                await traverseClassItem(ctr, child, false)
             }
         } else if (isClass(folder)) {
             if (!classAllowed) {
@@ -258,17 +464,19 @@ function createDrakonTechGenerator(options) {
         } else if (isModule(folder)) {
             reportError("module not expected here", folder.path)
         } else if (isFunction(folder)) {
-            var scopeName = cls.name + "." + folder.name
-            addFunction(scope, folder, scopeName, cls.name)
+            var scopeName = ctr.name + "." + folder.name
+            addFunction(scope, folder, scopeName, ctr.name)
         } else if (isAlgoprop(folder)) {
-            var scopeName = cls.name + "." + folder.name
-            addAlgoprop(scope, folder, scopeName, cls.name)
+            var scopeName = ctr.name + "." + folder.name
+            addAlgoprop(scope, folder, scopeName, ctr.name)
+        } else if (isMachine(folder)) {
+            reportError("state machines are not allowed in classes", folder.path)
         }
     }
 
     async function jsPreprocess() {
         var rootFolder = await options.getObjectByHandle(options.root)
-        for (var childPath of rootFolder.children) {            
+        for (var childPath of rootFolder.children) {
             var child = await options.getObjectByHandle(childPath)
             if (!child) { continue }
             if (isClass(child)) {
@@ -530,11 +738,11 @@ function createDrakonTechGenerator(options) {
             gBranches = {}
             for (var branch of tree.branches) {
                 if (!branch.name) {
-                    onError("Branch name cannot be empty", fun.path, branch.id)
+                    reportError("Branch name cannot be empty", fun.path, branch.id)
                     return funAst
                 }
                 if (branch.name in gBranches) {
-                    onError("Non-unique branch name", fun.path, branch.id)
+                    reportError("Non-unique branch name", fun.path, branch.id)
                     return funAst
                 }
                 gBranches[branch.name] = branch
@@ -635,6 +843,23 @@ function createDrakonTechGenerator(options) {
         return false
     }
 
+    function putAst(fun, ast) {
+        var key = getAstId(fun)
+        gAsts[key] = ast
+    }
+
+    function getAstId(fun) {
+        if (fun.scope) {
+            return fun.scope.name
+        }
+        return "module"
+    }
+
+    function getAst(fun) {
+        var key = getAstId(fun)
+        return gAsts[key]
+    }
+
     function buildAst(fun) {
         var ast
         try {
@@ -653,7 +878,7 @@ function createDrakonTechGenerator(options) {
                     ast = createIdentifier("error")
                 }
             }
-            gAsts[fun.path] = ast
+            putAst(fun, ast)
         } catch (ex) {
             console.log(ex)
             reportError(ex.message, fun.path, ex.nodeId)
@@ -757,7 +982,7 @@ function createDrakonTechGenerator(options) {
     }
 
     function isDeclaration(parentNode, property) {
-        if (property === "dec") { return true}
+        if (property === "dec") { return true }
         if (parentNode.type === "VariableDeclarator" && property === "id") {
             return true
         }
@@ -765,7 +990,7 @@ function createDrakonTechGenerator(options) {
     }
 
     function isNeutral(parentNode, property) {
-        if (property === "params") {return true}
+        if (property === "params") { return true }
         if (property === "left" && parentNode.type === "ForInStatement") { return true }
         if (property === "left" && parentNode.type === "ForOfStatement") { return true }
         return false
@@ -793,11 +1018,11 @@ function createDrakonTechGenerator(options) {
         }
         if (name in scope.algoprops) {
             return "algoprop"
-        }          
+        }
         if (name in scope.loop) {
             return "loop"
-        }            
-        
+        }
+
         return undefined
     }
 
@@ -811,7 +1036,7 @@ function createDrakonTechGenerator(options) {
             reportError("Cannot write to algo-prop definition", context.fun.path, itemId)
         } else if (type === "loop") {
             if (!parentNode.loopInternal) {
-                reportError("Cannot write to a loop variable", context.fun.path, itemId)                          
+                reportError("Cannot write to a loop variable", context.fun.path, itemId)
             }
         }
     }
@@ -898,9 +1123,9 @@ function createDrakonTechGenerator(options) {
                 if (isNeutral(parentNode, property)) {
                     return self
                 }
-                if (isAlgoprop(fun) && isOwnEagerProperty(context, node.name)) {                    
+                if (isAlgoprop(fun) && isOwnEagerProperty(context, node.name)) {
                     fun.dependencies[node.name] = true
-                }                
+                }
                 if (parentNode.type === "UpdateExpression") {
                     checkCanWriteTo(context, node.name, itemId, parentNode)
                 } else if (parentNode.type === "AssignmentExpression" && property === "left") {
@@ -953,6 +1178,14 @@ function createDrakonTechGenerator(options) {
 
 
     function parseActionContent(fun, item, parser) {
+        parseItemContent(fun, item, parser)
+    }
+
+    function parseSOutputContent(fun, item, parser) {
+        if (item.content) {
+            item.content = "setTimeout(() => {" + item.content + "}, 0);"
+        }
+        item.type = "action"
         parseItemContent(fun, item, parser)
     }
 
@@ -1215,7 +1448,7 @@ function createDrakonTechGenerator(options) {
     }
 
     function parseItemsCore(fun, parser) {
-        fun.dependencies = {}        
+        fun.dependencies = {}
         fun.items = fun.items || {}
         for (var itemId in fun.items) {
             var item = fun.items[itemId]
@@ -1224,6 +1457,9 @@ function createDrakonTechGenerator(options) {
                 case "action":
                     parseActionContent(fun, item, parser)
                     break;
+                case "soutput":
+                    parseSOutputContent(fun, item, parser)
+                    break;                    
                 case "loopbegin":
                     parseLoopContent(fun, item, parser)
                     break;
@@ -1326,7 +1562,7 @@ function createDrakonTechGenerator(options) {
         for (var name of names) {
             var algo = scope.algoprops[name]
             var algoName = buildCalcName(name)
-            var ast = gAsts[algo.path]
+            var ast = getAst(algo)
             ast.id.name = algoName
             body.push(ast)
         }
@@ -1336,7 +1572,7 @@ function createDrakonTechGenerator(options) {
     function generateSourceCode() {
         var root = createRootNode()
         if (project.moduleInit) {
-            var modAst = gAsts[project.moduleInit.path]
+            var modAst = getAst(project.moduleInit)
             addRange(root.body, modAst.body.body)
         }
         addAlgopropCode(project, root.body)
@@ -1346,7 +1582,7 @@ function createDrakonTechGenerator(options) {
         var exported = []
         for (var name of names) {
             var fun = project.functions[name] || project.classes[name]
-            var ast = gAsts[fun.path]
+            var ast = getAst(fun)
             if (isClass(fun)) {
                 addMembersToClass(fun, ast)
             }
@@ -1381,24 +1617,63 @@ function createDrakonTechGenerator(options) {
         names.sort()
         var exported = []
         for (var name of names) {
-            var fun = scope.functions[name]
-            var ast = gAsts[fun.path]
+            var method = scope.functions[name]
+            var ast = getAst(method)
             body.push(ast)
-            if (isExported(fun)) {
+            if (isExported(method)) {
                 exported.push(name)
             }
-        }        
+        }
         addComputes(scope, body)
         for (var name of exported) {
-            body.push(createExpression(createAssignment(
-                createDotMember(
-                    createIdentifier("self"),
-                    name
-                ),
-                createIdentifier(name)
-            )))
+            addMethodExport(name, body)
         }
+        addMachineMethods(fun, body)
         body.push(createReturn(createIdentifier("self")))
+    }
+
+    function addMethodExport(name, body) {
+        body.push(createExpression(createAssignment(
+            createDotMember(
+                createIdentifier("self"),
+                name
+            ),
+            createIdentifier(name)
+        )))        
+    }
+
+    function addMachineMethods(fun, body) {
+        if (fun.machine) {
+            var inputs = Object.keys(fun.machine.inputs)
+            inputs.sort()
+            for (var name of inputs) {
+                var input = fun.machine.inputs[name]
+                addMachineMethod(input, body)
+            }
+            for (var name of inputs) {
+                addMethodExport(name, body)
+            }            
+        }
+    }
+
+    function addMachineMethod(input, body) {
+        var ast = createFunction(input.name, input.arguments)
+        var output = ast.body.body
+        var stateSwitch = createSwitch(createDotMember(createIdentifier("self"), "state"))
+        output.push(stateSwitch)
+        for (var obj of input.items) {
+            var cas = createCase(createStringLiteral(obj.from))
+            stateSwitch.cases.push(cas)
+            var call = createCall(
+                createIdentifier(input.name + "_" + obj.from),
+                input.arguments.map(createIdentifier)
+            )
+            cas.consequent.push(createReturn(call))
+        }
+        var def = createCase(null)
+        def.consequent.push(createReturn(createIdentifier("undefined")))
+        stateSwitch.cases.push(def)
+        body.push(ast)
     }
 
     function scanAsts() {
@@ -1439,13 +1714,13 @@ function createDrakonTechGenerator(options) {
         for (var name in scope.algoprops) {
             var algo = scope.algoprops[name]
             var deps = getAllDeps(scope, algo)
-            algo.sortedDeps = deps            
+            algo.sortedDeps = deps
         }
 
         scope.computeFunctions = {}
         var names = Object.keys(scope.computes)
         names.sort()
-        for (var name of names) {            
+        for (var name of names) {
             var ast = buildComputeAst(scope, name)
             scope.computeFunctions[name] = ast
         }
@@ -1466,7 +1741,7 @@ function createDrakonTechGenerator(options) {
             argument: argument
         }
     }
-    
+
 
     function buildComputeAst(scope, name) {
         var fname = buildComputeName(name)
@@ -1480,7 +1755,7 @@ function createDrakonTechGenerator(options) {
                 call = createAwait(call)
                 as = true
             }
-            var calcLine = createExpression(createAssignment(createIdentifier(dep), call))            
+            var calcLine = createExpression(createAssignment(createIdentifier(dep), call))
             ast.body.body.push(calcLine)
         }
         if (as) {
@@ -1490,8 +1765,8 @@ function createDrakonTechGenerator(options) {
         return ast
     }
 
-    function secondScanAst(scope, fun) {        
-        var ast = gAsts[fun.path]
+    function secondScanAst(scope, fun) {
+        var ast = getAst(fun)
         var context = secondPass(fun, scope)
         traverseAst(context, ast, undefined, {}, undefined)
     }
@@ -1524,7 +1799,7 @@ function createDrakonTechGenerator(options) {
     }
 
     function addVariableDeclarations(scope, fun) {
-        var ast = gAsts[fun.path]
+        var ast = getAst(fun)
         var context = firstPass(fun, scope)
         traverseAst(context, ast.body.body, undefined, {}, undefined)
     }
@@ -1532,7 +1807,7 @@ function createDrakonTechGenerator(options) {
     function isDeclared(scope, name) {
         if (name in scope.declared) {
             return true
-        }       
+        }
 
         if (scope.parent) {
             var parent = scopes[scope.parent]
@@ -1587,7 +1862,7 @@ function createDrakonTechGenerator(options) {
             await pause(1)
             if (failed) {
                 return
-            }            
+            }
             checkCancellation()
             var src = generateSourceCode()
             await options.onData(src)
@@ -1663,7 +1938,24 @@ function addRange(target, source) {
     source.forEach(item => target.push(item))
 }
 
+function sortBy(array, property) {
+    array.sort((left, right) => compareBy(left, right, property))
+}
+
+function compareBy(leftObj, rightObj, property) {
+    var left = leftObj[property]
+    var right = rightObj[property]
+    if (left < right) {
+        return -1
+    }
+    if (left > right) {
+        return 1
+    }
+    return 0
+}
+
 module.exports = {
+    sortBy,
     findFirst,
     addRange
 }
