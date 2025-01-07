@@ -529,7 +529,8 @@ var gStringsEn = {
 	"Export/Import": "Export/Import",
 	"Export project": "Export project",
 	"Import project": "Import project",
-	"Cannot build a read-only project": "Cannot build a read-only project"
+	"Cannot build a read-only project": "Cannot build a read-only project",
+	"MES_STATE_MACHINE": "State machine"
 }
 
 var gStringsRu = {
@@ -1064,7 +1065,8 @@ var gStringsRu = {
 	"Export/Import": "Экспорт/импорт",
 	"Export project": "Экспортировать проект",
 	"Import project": "Импортировать проект",
-	"Cannot build a read-only project": "Невозможно генерировать код для проекта в режиме только для чтения"
+	"Cannot build a read-only project": "Невозможно генерировать код для проекта в режиме только для чтения",
+	"MES_STATE_MACHINE": "Конечный автомат"
 }
 
 function translate(text) {

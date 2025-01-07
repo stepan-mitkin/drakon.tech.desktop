@@ -2489,7 +2489,8 @@ function makeFunTypeList(div, node, widget) {
         addCheckbox(div, "async_checkbox", "MES_ASYNC", node.async)
         var space = make(div, "div")
         space.style.height = "10px"
-        addRadio(div, "function_flags_function", "function_flags", "MES_FUNCTION", !node.algoprop)
+        addRadio(div, "function_flags_function", "function_flags", "MES_FUNCTION", node.function)
+        addRadio(div, "function_flags_machine", "function_flags", "MES_STATE_MACHINE", node.machine)
         addRadio(div, "function_flags_algoprop", "function_flags", "MES_ALGOPROP", node.algoprop && !node.lazy)
         addRadio(div, "function_flags_lazy_algoprop", "function_flags", "MES_LAZY_ALGOPROP", node.algoprop && node.lazy)
     }
@@ -4165,6 +4166,7 @@ function isChecked(id) {
 function saveDiaProps() {
     var keywords = {}    
     keywords["function"] = isChecked("function_flags_function")
+    keywords["machine"] = isChecked("function_flags_machine")
     keywords["async"] = isChecked("async_checkbox")
     keywords["export"] = isChecked("export_checkbox")    
     keywords["algoprop"] = isChecked("function_flags_algoprop") || isChecked("function_flags_lazy_algoprop")
@@ -4889,8 +4891,9 @@ function showChangeDiaProps(machine, name, folder, ro) {
     	type: "custom",
     	builder: makeFunTypeList,
     	language: folder.language,
+        function: globs.keywords["function"] || (!globs.keywords["algoprop"] && !globs.keywords["machine"]),
+        machine: !!globs.keywords["machine"],
         export: !!globs.keywords["export"],
-    	scenario: !!globs.keywords["scenario"],
     	algoprop: !!globs.keywords["algoprop"],
     	lazy: !!globs.keywords["lazy"],
     	async: 	!!globs.keywords["async"]
