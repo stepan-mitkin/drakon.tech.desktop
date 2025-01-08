@@ -67,7 +67,7 @@ window.drakontechgen = {
     }
 }
 },{"./drakontechgen":3}],3:[function(require,module,exports){
-const { sortBy, findFirst, addRange, clone } = require("./tools")
+const { sortBy, findFirst, addRange, clone, replace } = require("./tools")
 const { traverseAst } = require("./astScanner")
 const { topologicaSort } = require("./sort")
 
@@ -220,21 +220,52 @@ function createDrakonTechGenerator(options) {
         addClass(folder.name, folder.path, ctr)
         var firstItemId = collectInputs(folder, inputs)
         if (!firstItemId) {return}
-        cutOutSubprogram(folder, firstItemId, ctr)
+        var visited = {}
+        setBranchName(folder.items, firstItemId, visited, "")
+        var br = folder.items[firstItemId]
+        cutOutSubprogram(folder, br.one, ctr)
         for (var name in inputs) {
             var input = inputs[name]
-            createHandler(ctr.scope, input, folder)
+            enrichInput(input, folder)
+            createHandler(ctr.scope, input, folder)            
         }
         ctr.machine = {
             inputs: inputs
         }
     }
 
+    function setBranchName(items, id, visited, branchName) {
+        if (!id) {
+            return
+        }
+        if (id in visited) {
+            return
+        }
+        visited[id] = true
+        var item = items[id]
+        if (item.type === "branch") {
+            var fallback = ""
+            if (item.branchId === 0) {
+                fallback = "_start_"
+            }
+            branchName = extractGoodSymbols(item.content, fallback)
+        }
+        item.branchName = branchName
+        setBranchName(items, item.one, visited, branchName)
+        setBranchName(items, item.two, visited, branchName)
+    }
+
+    function createHandlerName(input, obj) {
+        var name = input.name + "_" + obj.branchName + "_" + obj.from
+        return replace(name, "__", "_")
+    }
+
     function createHandler(scope, input, folder) {
         for (var obj of input.items) {
-            var name = input.name + "_" + obj.from
+            var name = createHandlerName(input, obj)
             var fun = createFunctionObject(name, input.params, { function: true }, folder.path)
-            cutOutSubprogram(folder, obj.to, fun)
+            var startItem = folder.items[obj.to]
+            cutOutSubprogram(folder, startItem.one, fun)
             var scopeName = folder.name + "." + name
             addFunction(scope, fun, scopeName, scope.name)
         }
@@ -245,6 +276,9 @@ function createDrakonTechGenerator(options) {
         for (var id in folder.items) {
             var item = folder.items[id]
             item.id = id
+        }
+        for (var id in folder.items) {
+            var item = folder.items[id]        
             if (isReceive(item)) {
                 collectInputsFromReceive(folder, inputs, item)
             } else if (item.type === "sinput") {
@@ -254,7 +288,7 @@ function createDrakonTechGenerator(options) {
             }
         }
         sortBy(branches, "branchId")
-        return branches[0].one
+        return branches[0].id
     }
 
     function isReceive(item) {
@@ -283,7 +317,7 @@ function createDrakonTechGenerator(options) {
             return
         }
         visited[itemId] = true
-        var item = folder.items[itemId]
+        var item = folder.items[itemId]        
         if (item.type === "sinput" || isReceive(item)) {
             var stopItem = {
                 id: itemId,
@@ -293,6 +327,9 @@ function createDrakonTechGenerator(options) {
             targetFun.items[itemId] = stopItem
             return
         }
+        if (item.type === "branch") {
+            branchName = extractGoodSymbols(item.content, "")
+        }        
         var copy = clone(item)
         if (copy.type === "end") {
             copy.type = "action"
@@ -301,6 +338,42 @@ function createDrakonTechGenerator(options) {
         targetFun.items[itemId] = copy        
         copyNode(folder, item.one, visited, targetFun)
         copyNode(folder, item.two, visited, targetFun)
+    }
+
+    function isGoodSymbol(code) {
+        if (code >= 48 && code <= 57) {
+            return true;
+        }
+
+        // Check for uppercase letters (A-Z)
+        if (code >= 65 && code <= 90) {
+            return true;
+        }
+
+        // Check for lowercase letters (a-z)
+        if (code >= 97 && code <= 122) {
+            return true;
+        }
+
+        // Check for underscore (_)
+        if (code === 95) {
+            return true;
+        }        
+        return false
+    }
+
+    function extractGoodSymbols(content, fallback) {
+        content = content || ""
+        var result = ""
+        // Iterate through each character in the string
+        for (let i = 0; i < content.length; i++) {
+            var char = content[i]
+            const code = content.charCodeAt(i);
+            if (isGoodSymbol(code)) {
+                result += char
+            }
+        }        
+        return result || fallback
     }
 
     function collectInputsFromReceive(folder, inputs, item) {
@@ -329,12 +402,16 @@ function createDrakonTechGenerator(options) {
         if (!result) {
             reportError("A call expression expected here", folder.path, item.id)
             return undefined
-        }
-        result.items.push({
-            from: fromId,
-            to: item.one
-        })
+        }        
+        addInputItem(result, fromId, item)
         return result
+    }
+
+    function addInputItem(result, fromId, item) {
+        result.items.push({
+            from: fromId,            
+            to: item.id
+        })
     }
 
     function getCall(ast) {
@@ -370,11 +447,8 @@ function createDrakonTechGenerator(options) {
         if (input) {
             var existing = inputs[input.name]
             if (existing) {
-                if (existing.signature === input.signature) {
-                    existing.items.push({
-                        from: fromId,
-                        to: item.one
-                    })
+                if (existing.signature === input.signature) {                    
+                    addInputItem(existing, fromId, item)
                 } else {
                     reportError("Incompatible input signatures", folder.path, item.id)
                 }
@@ -1629,7 +1703,7 @@ function createDrakonTechGenerator(options) {
         for (var name of exported) {
             addMethodExport(name, body)
         }
-        addMachineMethods(fun, body)
+        addMachineMethods(fun, body)        
         body.push(createReturn(createIdentifier("self")))
     }
 
@@ -1647,13 +1721,20 @@ function createDrakonTechGenerator(options) {
         if (fun.machine) {
             var inputs = Object.keys(fun.machine.inputs)
             inputs.sort()
-            for (var name of inputs) {
+            for (var name of inputs) {                
                 var input = fun.machine.inputs[name]
                 addMachineMethod(input, body)
             }
             for (var name of inputs) {
                 addMethodExport(name, body)
             }            
+        }
+    }
+
+    function enrichInput(input, fun) {
+        for (var obj of input.items) {
+            var item = fun.items[obj.to]
+            obj.branchName = item.branchName
         }
     }
 
@@ -1665,8 +1746,9 @@ function createDrakonTechGenerator(options) {
         for (var obj of input.items) {
             var cas = createCase(createStringLiteral(obj.from))
             stateSwitch.cases.push(cas)
+            var name = createHandlerName(input, obj)
             var call = createCall(
-                createIdentifier(input.name + "_" + obj.from),
+                createIdentifier(name),
                 input.arguments.map(createIdentifier)
             )
             cas.consequent.push(createReturn(call))
@@ -1963,7 +2045,13 @@ function clone(src) {
     return target
 }
 
+function replace(str, before, after) {
+    var parts = str.split(before)
+    return parts.join(after)
+}
+
 module.exports = {
+    replace,
     clone,
     sortBy,
     findFirst,
