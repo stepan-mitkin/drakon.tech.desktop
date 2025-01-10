@@ -5048,6 +5048,9 @@ function isAnyCurrent(folders) {
                     return false
                 }
                 var folder = _col3327[_ind3327];
+                if (currentId === folder) {
+                    return true
+                }
                 if (tree.hasItem(folder)) {
                     item = tree.getItem(folder)
                     if (isUnderFolder(currentId, item)) {

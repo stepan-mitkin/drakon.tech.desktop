@@ -727,8 +727,8 @@ async function changeManyCore(winInfo, body) {
                 for (var item of body.items) {
                     await copyOneFolder(winInfo, item, body.target)
                 }
-            } else {
-                for (var item of body.items) {
+            } else {                
+                for (var item of body.items) {                    
                     await moveOneFolder(winInfo, item, body.target)
                 }
                 await rewriteHistory(winInfo)
@@ -971,6 +971,7 @@ async function moveOneFolder(winInfo, item, target) {
     var filename = path.parse(item.filepath).base
     var targetPath = await buildUniqueFilename(targetFolder, filename)
     await fs.rename(item.filepath, targetPath)
+    record.parent = target.folder_id
     replaceFilePathInChildren(winInfo, targetPath, item.id)
 }
 
