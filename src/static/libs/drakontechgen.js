@@ -241,10 +241,7 @@ function createDrakonTechGenerator(options) {
         visited[id] = true
         var item = items[id]
         if (item.type === "branch") {
-            var fallback = ""
-            if (item.branchId === 0) {
-                fallback = "_start_"
-            }
+            var fallback = "branch_" + item.branchId
             branchName = extractGoodSymbols(item.content, fallback)
         }
         item.branchName = branchName
@@ -253,13 +250,12 @@ function createDrakonTechGenerator(options) {
     }
 
     function createHandlerName(input, obj) {
-        var name = input.name + "_" + obj.branchName + "_" + obj.from
+        var name = obj.branchName + "_" + input.name
         return replace(name, "__", "_")
     }
 
     function createStateName(branchName, id) {
-        var name = branchName + "_" + id
-        return replace(name, "__", "_")        
+        return branchName        
     }
 
 
@@ -289,16 +285,28 @@ function createDrakonTechGenerator(options) {
         sortBy(branches, "branchId")
         var firstItemId = branches[0].id
         var visited = {}
+        var branchesVisited = {}
         setBranchName(folder.items, firstItemId, visited, "")
         for (var id in folder.items) {
             var item = folder.items[id]        
             if (isReceive(item)) {
+                if (!checkOneInputPerBranch(folder, item, branchesVisited)) {return undefined}
                 collectInputsFromReceive(folder, inputs, item)
             } else if (item.type === "sinput") {
+                if (!checkOneInputPerBranch(folder, item, branchesVisited)) {return undefined}
                 collectInputsFromSInput(folder, inputs, item, item.id)
             }
         }
         return firstItemId
+    }
+
+    function checkOneInputPerBranch(folder, item, branchesVisited) {
+        if (item.branchName in branchesVisited) {
+            reportError("Only one input or receive is allowed on one silhouette branch", folder.path, item.id)
+            return false
+        }
+        branchesVisited[item.branchName] = true
+        return true
     }
 
     function isReceive(item) {
