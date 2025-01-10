@@ -321,6 +321,18 @@ function ListGrid_setItemText(rowId, cellId, text) {
     HtmlUtils.setText(id, text)
 }
 
+function ListGrid_setItemColor(rowId, cellId, color) {
+    var id
+    id = makeCellId(
+        makeItemId(this.id, rowId),
+        cellId
+    )
+    var element = document.getElementById(id)
+    if (element) {
+        setDivColor(element, color)    
+    }
+}
+
 function ListGrid_setItems(items, buttons) {
     var list, listId
     this.items = []
@@ -859,6 +871,9 @@ function addListGridCell(column, row, cell, widgetId, rowId, cellId) {
         style.padding = "6px"
         style.lineHeight = "120%"
         HtmlUtils.setDivText(td, cell.text)
+        if (cell.color) {
+            setDivColor(td, cell.color)
+        }        
         td.id = id
     } else {
         if (_sw28160000_ === "image") {
@@ -1305,7 +1320,7 @@ function createList(div, node, widget) {
     widget.setRect = default_setRect
     widget.setItems = List_setItems
     widget.remove = List_remove
-    widget.setItemText = List_setItemText
+    widget.setItemText = List_setItemText    
 }
 
 function createListGrid(div, node, widget) {
@@ -1355,6 +1370,7 @@ function createListGrid(div, node, widget) {
     widget.mark = ListGrid_mark
     widget.getItem = ListGrid_getItem
     widget.measureHeight = ListGrid_measureHeight
+    widget.setItemColor = ListGrid_setItemColor
     if (node.rows) {
         widget.setItems(node.rows)
     }
@@ -1901,10 +1917,17 @@ function createTreeNode(widget, parentDiv, item) {
     textPart.style.padding = "8px"
     item.textDiv = textPart
     HtmlUtils.setDivText(textPart, item.text)
+    if (item.color) {
+        setDivColor(textPart, item.color)
+    }
     left = (item.depth + 2) * TreeIconWidth
 }
 
-function createTreeNodeItem(widget, parent, id, isFolder, icon, text, rank) {
+function setDivColor(element, color) {
+    element.style.color = color
+}
+
+function createTreeNodeItem(widget, parent, id, isFolder, icon, text, rank, color) {
     var depth, item, parentItem
     depth = 0
     if (parent) {
@@ -1917,7 +1940,8 @@ function createTreeNodeItem(widget, parent, id, isFolder, icon, text, rank) {
         icon : icon,
         text : text,
         rank : rank,
-        depth : depth
+        depth : depth,
+        color: color
     }
     widget.items.insert(
         "items",
@@ -1932,6 +1956,7 @@ function createTreeView(div, node, widget) {
     widget.clear = tree_clear
     widget.setIcon = tree_setIcon
     widget.setText = tree_setText
+    widget.setColor = tree_setColor
     widget.setChildren = tree_setChildren
     widget.removeChildren = tree_removeChildren
     widget.select = tree_select
@@ -1969,7 +1994,8 @@ function createTreeViewRoot(widget) {
         true,
         "none",
         "<root>",
-        0
+        0,
+        undefined
     )
     widget.root = rootItem.id
     rootItem.kidsDiv = widget.div
@@ -3253,7 +3279,8 @@ function tree_setChildren(parentId, kids) {
             kidInfo.isFolder || false,
             kidInfo.icon,
             kidInfo.text,
-            kidInfo.rank
+            kidInfo.rank,
+            kidInfo.color
         )
         _ind3193++;
     }
@@ -3295,6 +3322,16 @@ function tree_setText(id, text) {
         item = items[id]
         div = item.textDiv
         HtmlUtils.setDivText(div, text)
+    }
+}
+
+function tree_setColor(id, color) {
+    var div, item, items
+    items = getTreeItems(this)
+    if (id in items) {
+        item = items[id]
+        div = item.textDiv
+        setDivColor(div, color)        
     }
 }
 

@@ -1,0 +1,171 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "5",
+            "content": "Calculate coords"
+        },
+        "4": {
+            "type": "action",
+            "one": "7",
+            "content": "left = canvasPadding"
+        },
+        "5": {
+            "type": "action",
+            "one": "4",
+            "content": "ctx = globals.ctx"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "doorLeft = left + (\n    floorWidth - doorWidth\n) / 2"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "content": "cabinLeft = doorLeft - cabinThickness"
+        },
+        "9": {
+            "type": "action",
+            "one": "10",
+            "content": "doorTop = cabinFloorY - doorHeight"
+        },
+        "10": {
+            "type": "action",
+            "one": "11",
+            "content": "cabinTop = doorTop - cabinThickness"
+        },
+        "11": {
+            "type": "action",
+            "one": "27",
+            "content": "cabinWidth = doorWidth + cabinThickness *\n2\ncabinHeight = doorHeight + cabinThickness\n* 2"
+        },
+        "14": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 6,
+            "content": "Exit"
+        },
+        "15": {
+            "type": "branch",
+            "one": "20",
+            "branchId": 3,
+            "content": "Left door"
+        },
+        "16": {
+            "type": "branch",
+            "branchId": 5,
+            "one": "22",
+            "content": "Draw cabin"
+        },
+        "17": {
+            "type": "action",
+            "one": "32",
+            "two": "",
+            "content": "fillRect(\n    cabinLeft,\n    cabinTop,\n    cabinWidth,\n    cabinThickness\n)"
+        },
+        "20": {
+            "type": "action",
+            "one": "23",
+            "content": "leftDoorX = doorLeft - doorWidth * 0.45 *\ndoorOpening"
+        },
+        "22": {
+            "type": "action",
+            "one": "17",
+            "content": "ctx.fillStyle = lineColor"
+        },
+        "23": {
+            "type": "action",
+            "one": "24",
+            "two": "",
+            "content": "ctx.fillStyle = normalButton"
+        },
+        "24": {
+            "type": "action",
+            "one": "25",
+            "content": "fillRect(\n    leftDoorX,\n    doorTop,\n    doorWidth / 2,\n    doorHeight\n)"
+        },
+        "25": {
+            "type": "action",
+            "one": "26",
+            "two": "",
+            "content": "ctx.strokeStyle = lineColor"
+        },
+        "26": {
+            "type": "action",
+            "one": "37",
+            "content": "rect(\n    leftDoorX,\n    doorTop,\n    doorWidth / 2,\n    doorHeight\n)"
+        },
+        "27": {
+            "type": "branch",
+            "branchId": 2,
+            "one": "30",
+            "content": "Draw cabin background"
+        },
+        "29": {
+            "type": "action",
+            "one": "15",
+            "two": "",
+            "content": "fillRect(\n    doorLeft,\n    doorTop,\n    doorWidth,\n    doorHeight\n)"
+        },
+        "30": {
+            "type": "action",
+            "one": "29",
+            "two": "",
+            "content": "ctx.fillStyle = openColor"
+        },
+        "32": {
+            "type": "action",
+            "one": "35",
+            "two": "",
+            "content": "fillRect(\n    cabinLeft,\n    doorTop,\n    cabinThickness,\n    doorHeight\n)"
+        },
+        "35": {
+            "type": "action",
+            "one": "36",
+            "two": "",
+            "content": "fillRect(\n    cabinLeft,\n    cabinFloorY,\n    cabinWidth,\n    cabinThickness\n)"
+        },
+        "36": {
+            "type": "action",
+            "one": "14",
+            "two": "",
+            "content": "fillRect(\n    doorLeft + doorWidth,\n    doorTop,\n    cabinThickness,\n    doorHeight\n)"
+        },
+        "37": {
+            "type": "branch",
+            "branchId": 4,
+            "one": "38",
+            "content": "Right door"
+        },
+        "38": {
+            "type": "action",
+            "one": "39",
+            "content": "rightDoorX = doorLeft + doorWidth / 2 + doorWidth\n* 0.45 * doorOpening"
+        },
+        "39": {
+            "type": "action",
+            "one": "40",
+            "content": "fillRect(\n    rightDoorX,\n    doorTop,\n    doorWidth / 2,\n    doorHeight\n)"
+        },
+        "40": {
+            "type": "action",
+            "one": "16",
+            "content": "rect(\n    rightDoorX,\n    doorTop,\n    doorWidth / 2,\n    doorHeight\n)"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "cabinFloorY\ndoorOpening"
+}

@@ -20,6 +20,9 @@ var DarkBackground = "#455A64"
 var AddUserMs = 300
 var BuildCheck = 513
 
+const cutColor = "#909090"
+var gCutFolders = {}
+
 function AccessShower_AccessScreen_addUser(self, data) {
     self.role = data
     var machine = new UserAdder()
@@ -1054,6 +1057,12 @@ function FolderCreator_SetModuleProps_onError(self, data) {
 }
 
 function FolderCutterDeleter_GettingHistory_onData(self, data) {
+    resetCutFolders()
+    if (self.cut) {        
+        self.folders.forEach(onCut)
+    } else {
+        self.folders.forEach(onDelete)
+    }
     var currentDeleted = deleteFoldersFromUi(
         self.folders
     )
@@ -3754,6 +3763,7 @@ function copyFolders() {
 
 function copyFoldersCore(selected) {
     var type
+    resetCutFolders()
     if (selected.length == 0) {
         
     } else {
@@ -4031,8 +4041,7 @@ function deleteFoldersCore(parentId, selected) {
 function deleteFoldersFromUi(folders) {
     var currentDeleted = isAnyCurrent(
         folders
-    )
-    folders.forEach(onDelete)
+    )    
     if (currentDeleted) {
         
     } else {
@@ -5807,6 +5816,30 @@ function onDelete(id) {
     removeFromCache(id)
 }
 
+function onCut(id) {
+    gCutFolders[id] = true
+    var tree = getWidget("tree")
+    tree.setColor(id, cutColor)
+    var grid = getWidget("folder_grid")
+    grid.setItemColor(id, 1, cutColor)
+}
+
+function setNameColor(id, color) {
+    var tree = getWidget("tree")
+    tree.setColor(id, color)
+    var grid = getWidget("folder_grid")
+    grid.setItemColor(id, 1, color)
+}
+
+function resetCutFolders() {
+    for (var id in gCutFolders) {
+        setNameColor(id, "")
+    }
+    gCutFolders = {}
+}
+
+
+
 function onDiagramError(data) {
     var saver = globs.saver
     if (saver) {
@@ -6441,6 +6474,7 @@ function pasteFolders() {
 
 function pasteFoldersCore(parentId) {
     var ctype, data, folders, onDone, operation, target
+    resetCutFolders()
     parentId = getCurrentParent(parentId)
     if (parentId) {
         ctype = globs.clipboard.getClipboardType()
@@ -6466,6 +6500,10 @@ function pasteFoldersCore(parentId) {
             operation : operation,
             parentId : parentId
         }
+        if (operation === "move") {
+            folders.forEach(onDelete)
+        }
+        
         startMachine(
             new Paster(),
             data,
@@ -7312,14 +7350,16 @@ function setTreeChildren(data) {
         }
         var child = _col521[_ind521];
         childId = makeIdFromChild(child)
-        setSubtype(child)
+        setSubtype(child)        
+        var color = gCutFolders[childId] ? cutColor : undefined
         item = {
             id : childId,
             text : child.name,
             icon : getImage(child.subtype),
             rank : getRank(child.subtype),
             isFolder : canContainChildren(child),
-            kids : []
+            kids : [],
+            color: color
         }
         items.push(item)
         deleteFromTree(childId)
@@ -7535,8 +7575,11 @@ function showFolderInGrid(data) {
         var child = _col942[_ind942];
         setSubtype(child)
         imageCell = makeImageCell(child.subtype)
-        textCell = makeTextCell(child.name)
+        textCell = makeTextCell(child.name)        
         id = makeIdFromChild(child)
+        if (id in gCutFolders) {
+            textCell.color = cutColor
+        }
         row = {
             id : id,
             cells : [imageCell, textCell]
