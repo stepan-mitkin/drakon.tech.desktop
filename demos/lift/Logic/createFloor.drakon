@@ -1,0 +1,129 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "7",
+            "content": "Floor button"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "17",
+            "flag1": 1,
+            "content": "up"
+        },
+        "5": {
+            "type": "question",
+            "one": "9",
+            "two": "13",
+            "flag1": 1,
+            "content": "down"
+        },
+        "6": {
+            "type": "action",
+            "one": "8",
+            "content": "centerY = Math.round(\n    bottom + floorHeight / 2\n)"
+        },
+        "7": {
+            "type": "action",
+            "one": "6",
+            "content": "bottom = getFloorBottom(number)"
+        },
+        "8": {
+            "type": "action",
+            "one": "4",
+            "content": "left = canvasPadding + floorWidth + canvasPadding"
+        },
+        "9": {
+            "type": "action",
+            "one": "10",
+            "content": "y1 = centerY - (\n    buttonSize + buttonMargin / 2\n)"
+        },
+        "10": {
+            "type": "action",
+            "one": "11",
+            "content": "y2 = y1 + buttonSize + buttonMargin"
+        },
+        "11": {
+            "type": "action",
+            "one": "12",
+            "content": "floor.up = createButton(\n    \"up\",\n    undefined,\n    left,\n    y1\n)"
+        },
+        "12": {
+            "type": "action",
+            "one": "19",
+            "content": "floor.down = createButton(\n    \"down\",\n    undefined,\n    left,\n    y2\n)"
+        },
+        "13": {
+            "type": "action",
+            "one": "14",
+            "content": "y = centerY - buttonSize / 2"
+        },
+        "14": {
+            "type": "action",
+            "one": "19",
+            "content": "floor.up = createButton(\n    \"up\",\n    undefined,\n    left,\n    y\n)"
+        },
+        "15": {
+            "type": "action",
+            "one": "16",
+            "two": "",
+            "content": "y = centerY - buttonSize / 2"
+        },
+        "16": {
+            "type": "action",
+            "one": "19",
+            "two": "",
+            "content": "floor.down = createButton(\n    \"down\",\n    undefined,\n    left,\n    y\n)"
+        },
+        "17": {
+            "type": "question",
+            "one": "15",
+            "two": "19",
+            "flag1": 1,
+            "content": "down"
+        },
+        "18": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "19": {
+            "type": "branch",
+            "one": "20",
+            "branchId": 2,
+            "content": "Cabin button"
+        },
+        "20": {
+            "type": "action",
+            "one": "21",
+            "content": "nleft = left + buttonSize + canvasPadding"
+        },
+        "21": {
+            "type": "action",
+            "one": "22",
+            "content": "ny = bottom - (number - 1) * (\n    buttonSize + buttonMargin\n)"
+        },
+        "22": {
+            "type": "action",
+            "one": "18",
+            "two": "",
+            "content": "floor.inner = createButton(\n    \"inner\",\n    number,\n    nleft,\n    ny\n)"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "number\nup\ndown"
+}

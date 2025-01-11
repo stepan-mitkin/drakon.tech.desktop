@@ -7,22 +7,17 @@
         "2": {
             "type": "branch",
             "branchId": 0,
-            "one": "3"
+            "one": "4"
         },
         "3": {
             "type": "action",
-            "one": "5",
-            "content": "createCanvas()"
+            "one": "1",
+            "content": "globals.cabinPos = canvasHeight - canvasPadding\n- (globals.currentFloor - 1) * floorHeight\n- floorThickness"
         },
         "4": {
             "type": "action",
-            "one": "1",
-            "content": "updateWorld()"
-        },
-        "5": {
-            "type": "action",
-            "one": "4",
-            "content": "buildStructures()"
+            "one": "3",
+            "content": "canvasHeight = getCanvasHeight()"
         }
     }
 }

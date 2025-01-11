@@ -21,6 +21,16 @@ window.addEventListener('load', main);
 function add(parent, child) {
     parent.appendChild(child);
 }
+function buildStructures() {
+    globals.floors = [undefined];
+    globals.delta = 0;
+    createFloor(1, true, false);
+    createFloor(2, true, true);
+    createFloor(3, true, true);
+    createFloor(4, false, true);
+    globals.currentFloor = 1;
+    takeCabinPositionFromFloor();
+}
 function clear(node) {
     while (true) {
         if (node.firstChild) {
@@ -36,13 +46,16 @@ function createCanvas() {
     mainDiv = get('main-container');
     clear(mainDiv);
     canvas = document.createElement('canvas');
-    scale = 1;
+    scale = getRetinaFactor();
     canvas.width = canvasWidth * scale;
     canvas.height = canvasHeight * scale;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     add(mainDiv, canvas);
     globals.canvas = canvas;
+    globals.retina = scale;
+}
+function createFloor(number, up, down) {
 }
 function drawActiveButton(x, y, text) {
     drawButton(x, y, buttonSize, buttonSize, text, normalButton, lineColor);
@@ -174,6 +187,20 @@ function get(id) {
 function getCanvasHeight() {
     return canvasPadding * 2 + floorCount * floorHeight;
 }
+function getRetina() {
+    return window.matchMedia && (window.matchMedia('only screen and (min-resolution: 124dpi), only screen and (min-resolution: 1.3dppx), only screen and (min-resolution: 48.8dpcm)').matches || window.matchMedia('only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (min-device-pixel-ratio: 1.3)').matches) || window.devicePixelRatio && window.devicePixelRatio > 1.3;
+}
+function getRetinaFactor() {
+    if (window.devicePixelRatio) {
+        return window.devicePixelRatio;
+    } else {
+        if (isRetina()) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+}
 function line(x1, y1, x2, y2) {
     var ctx;
     ctx = globals.ctx;
@@ -188,7 +215,8 @@ function line(x1, y1, x2, y2) {
 }
 function main() {
     createCanvas();
-    redraw();
+    buildStructures();
+    updateWorld();
 }
 function rect(x, y, width, height) {
     var ctx;
@@ -200,6 +228,7 @@ function rect(x, y, width, height) {
 function redraw() {
     var canvasHeight, ctx, i;
     ctx = globals.canvas.getContext('2d');
+    ctx.scale(globals.retina, globals.retina);
     globals.ctx = ctx;
     ctx.fillStyle = background;
     canvasHeight = getCanvasHeight();
@@ -215,4 +244,27 @@ function redraw() {
     drawNormalUp(400, 200);
     drawActiveDown(300, 150);
     drawNormalDown(300, 200);
+}
+function takeCabinPositionFromFloor() {
+    var canvasHeight;
+    canvasHeight = getCanvasHeight();
+    globals.cabinPos = canvasHeight - canvasPadding - (globals.currentFloor - 1) * floorHeight - floorThickness;
+}
+function updateFrameTime() {
+    var now;
+    now = new Date().getTime();
+    if (globals.lastFrame) {
+        globals.delta = Math.min(0.2, (now - globals.lastFrame) / 1000);
+    } else {
+        globals.delta = 0;
+    }
+    globals.lastFrame = now;
+}
+function updateWorld() {
+    updateFrameTime();
+    redraw();
+    if (globals.requestRedraw) {
+        globals.requestRedraw = false;
+        requestAnimationFrame(updateWorld);
+    }
 }

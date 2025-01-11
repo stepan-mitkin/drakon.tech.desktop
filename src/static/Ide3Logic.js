@@ -651,7 +651,6 @@ function DiagramCreator_Done_onError(self, data) {
 }
 
 function DiagramCreator_EnterName_onData(self, data) {
-    browser.hideInputBox()
     browser.showWorking()
     sendCreateFolder(
         self.spaceId,
@@ -669,7 +668,21 @@ function DiagramCreator_EnterName_onError(self, data) {
     self.state = null;
 }
 
+function handleDiagramCreationError(self, message) {
+    browser.setInputBoxError(
+        translate(message)
+    )
+    browser.hideWorking()
+    self.state = "EnterName"
+    return
+}
+
 function DiagramCreator_SendToServer_onData(self, data) {
+    if (data.error) {
+        handleDiagramCreationError(self, data.error)
+        return
+    }
+    browser.hideInputBox()
     var onDone = function() {
         self.onData(null)
     }
@@ -685,18 +698,7 @@ function DiagramCreator_SendToServer_onData(self, data) {
 }
 
 function DiagramCreator_SendToServer_onError(self, data) {
-    browser.hideWorking()
-    if ((data.error == "ERR_DIAGRAM_LIMIT") && (data.suggested)) {
-        complete(self, data)
-        browser.suggest(
-            data.error,
-            data.suggested,
-            "createDiagram"
-        )
-    } else {
-        forwardError(self, data)
-    }
-    self.state = null;
+    handleDiagramCreationError(self, data.message)
 }
 
 function DiagramSearch_Folders_onData(self, data) {
@@ -794,6 +796,11 @@ function DrakonRenamer_SaveNewName_onData(self, data) {
 }
 
 function DrakonRenamer_SavingChanges_onData(self, data) {
+    if (data && data.error) {
+        forwardError(self, data)
+        self.state = null;
+        return
+    }
     if (globs.current.id == self.data.id) {
         cancelPolling()
         globs.saver = null
@@ -909,6 +916,11 @@ function FolderCreatorGeneric_Done_onError(self, data) {
 }
 
 function FolderCreatorGeneric_Expand_onData(self, data) {
+    if (data.error) {
+        forwardError(self, data)
+        return
+    }
+    browser.hideInputBox()
     var machine, start
     if (data.folder_id) {
         self.folderId = makeId(
@@ -930,7 +942,6 @@ function FolderCreatorGeneric_Expand_onData(self, data) {
 
 function FolderCreatorGeneric_Expand_onError(self, data) {
     forwardError(self, data)
-    self.state = null;
 }
 
 function FolderCreatorGeneric_RefreshParent_onData(self, data) {
@@ -1000,14 +1011,19 @@ function FolderCreator_CreateFolder_onError(self, data) {
 }
 
 function FolderCreator_Done_onData(self, data) {
+    if (data && data.error) {
+        handleDiagramCreationError(self, data.error)
+        self.state = "CreateFolder"
+        return
+    }    
     browser.hideWorking()
     complete(self, data)
     self.state = null;
 }
 
 function FolderCreator_Done_onError(self, data) {
-    forwardError(self, data)
-    self.state = null;
+    handleDiagramCreationError(self, data.message || data.error)
+    self.state = "CreateFolder"
 }
 
 function FolderCreator_EnterName_onData(self, data) {
@@ -2227,6 +2243,10 @@ function Renamer_EnteringName_onError(self, data) {
 }
 
 function Renamer_SendingToServer_onData(self, data) {
+    if (data && data.error) {
+        Renamer_SendingToServer_onError(self, data)
+        return
+    }
     browser.hideWorking()
     browser.hideInputBox()
     renameEverywhere(
@@ -2514,8 +2534,9 @@ function Saver_Saving_notSaved(self, data) {
 }
 
 function Saver_Saving_onError(self, data) {
-    panic(data)
-    self.state = null;
+    reloadDiagram()
+    browser.showNotification(translate(data.error || data.message))
+    self.state = "Loading";
 }
 
 function Saver_Saving_save(self, data) {
@@ -5857,8 +5878,17 @@ function onDiagramError(data) {
     }
 }
 
-function onDiagramSaved() {
+function onDiagramSaved(data) {
     var saver = globs.saver
+    if (data && data.error) {
+        onDiagramError(data)
+        return
+    }
+
+    if (saver.nameChanged) {
+        setDecoratedTitle(saver.nameChanged)
+        renameEverywhere(saver.idForRename, saver.nameChanged)
+    }    
     if (saver) {
         saver.saved()
     }
@@ -6887,10 +6917,8 @@ function saveNow(saver, data) {
     var id, ids, target
     pushTag(saver, data.tag)
     id = globs.current.id
-    if (data.name) {
-        browser.setTitle(data.name)
-        renameEverywhere(id, data.name)
-    }
+    saver.nameChanged = data.name
+    saver.idForRename = id
     target = makeTarget(
         onDiagramSaved,
         onDiagramError
@@ -7472,7 +7500,6 @@ function showCreateDialog(type, target, language) {
     title = translate(title)
     var onSave = function(text) {
     	target.name = text.trim()
-    	browser.hideInputBox()
     	target.onData(undefined)
     }
     browser.showInputBox(
@@ -7531,13 +7558,21 @@ function showDemoCore() {
     }
 }
 
+function setDecoratedTitle(name) {
+    if (name) {
+        browser.setTitle(name + " | " + getAppName())
+    } else {
+        browser.setTitle(getAppName())
+    }
+}
+
 function showFolderCommon(id, data) {
     var name, path
     globs.current.id = id
     globs.current.type = data.type
     name = getNormalName(data)
     browser.setMobileHeader(name)
-    browser.setTitle(name + " | " + getAppName())
+    setDecoratedTitle(name)
     setPath(data.path)
     path = convertPathToIds(data.path)
     addToPrevious(path)

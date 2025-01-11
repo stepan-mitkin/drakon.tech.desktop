@@ -530,7 +530,8 @@ var gStringsEn = {
 	"Export project": "Export project",
 	"Import project": "Import project",
 	"Cannot build a read-only project": "Cannot build a read-only project",
-	"MES_STATE_MACHINE": "State machine"
+	"MES_STATE_MACHINE": "State machine",
+	"ERR_NAME_NOT_UNIQUE": "An object with this name already exists"
 }
 
 var gStringsRu = {
@@ -1066,7 +1067,8 @@ var gStringsRu = {
 	"Export project": "Экспортировать проект",
 	"Import project": "Импортировать проект",
 	"Cannot build a read-only project": "Невозможно генерировать код для проекта в режиме только для чтения",
-	"MES_STATE_MACHINE": "Конечный автомат"
+	"MES_STATE_MACHINE": "Конечный автомат",
+	"ERR_NAME_NOT_UNIQUE": "Объект с таким именем уже существует"
 }
 
 function translate(text) {

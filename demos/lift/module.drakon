@@ -37,7 +37,7 @@
         "9": {
             "type": "action",
             "one": "10",
-            "content": "const fontFace = \"Arial\"\nconst fontSize = 17\nconst buttonSize = 40"
+            "content": "const fontFace = \"Arial\"\nconst fontSize = 17\nconst buttonSize = 40\nconst buttonMargin = 10"
         },
         "10": {
             "type": "action",

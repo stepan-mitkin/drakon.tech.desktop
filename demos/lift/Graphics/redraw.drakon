@@ -6,17 +6,18 @@
         },
         "2": {
             "type": "branch",
-            "branchId": 0,
-            "one": "3"
+            "branchId": 1,
+            "one": "3",
+            "content": "Background"
         },
         "3": {
             "type": "action",
-            "one": "6",
+            "one": "32",
             "content": "ctx = globals.canvas.getContext(\"2d\")"
         },
         "4": {
             "type": "action",
-            "one": "9",
+            "one": "20",
             "content": "ctx.fillRect(\n    0,\n    0,\n    canvasWidth,\n    canvasHeight\n)"
         },
         "5": {
@@ -29,57 +30,84 @@
             "one": "5",
             "content": "globals.ctx = ctx"
         },
-        "8": {
-            "type": "loopend",
-            "one": "12",
-            "two": "",
-            "content": ""
-        },
-        "9": {
-            "type": "loopbegin",
-            "one": "10",
-            "two": "",
-            "content": "i = 1; i <= floorCount; i++"
-        },
-        "10": {
-            "type": "action",
-            "one": "8",
-            "content": "drawFloor(i)"
-        },
         "11": {
             "type": "action",
             "one": "4",
             "content": "canvasHeight = getCanvasHeight()"
         },
-        "12": {
+        "19": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 5,
+            "content": "Exit"
+        },
+        "20": {
+            "type": "branch",
+            "one": "22",
+            "branchId": 2,
+            "content": "Floors"
+        },
+        "21": {
+            "type": "loopend",
+            "one": "24",
+            "two": "",
+            "content": ""
+        },
+        "22": {
+            "type": "loopbegin",
+            "one": "23",
+            "two": "",
+            "content": "i = 1; i <= floorCount; i++"
+        },
+        "23": {
             "type": "action",
-            "one": "13",
+            "one": "21",
+            "two": "",
+            "content": "drawFloor(i)"
+        },
+        "24": {
+            "type": "branch",
+            "branchId": 3,
+            "one": "30",
+            "content": "Cabin"
+        },
+        "25": {
+            "type": "branch",
+            "branchId": 4,
+            "one": "34",
+            "content": "Buttons"
+        },
+        "30": {
+            "type": "action",
+            "one": "31",
+            "two": "",
             "content": "drawCabin(\n    canvasHeight - canvasPadding - floorThickness,\n    0\n)"
         },
-        "13": {
+        "31": {
             "type": "action",
-            "one": "14",
+            "one": "25",
+            "two": "",
             "content": "drawCabin(\n    canvasHeight - canvasPadding - floorThickness\n    - floorHeight * 2,\n    1\n)"
         },
-        "14": {
+        "32": {
             "type": "action",
-            "one": "15",
-            "content": "drawActiveButton(350, 100, \"2\")"
+            "one": "6",
+            "content": "ctx.scale(globals.retina, globals.retina)"
         },
-        "15": {
-            "type": "action",
-            "one": "17",
-            "content": "drawNormalButton(350, 200, \"4\")"
+        "33": {
+            "type": "loopend",
+            "one": "19",
+            "content": ""
         },
-        "17": {
-            "type": "action",
-            "one": "18",
-            "content": "drawActiveUp(400, 150)\ndrawNormalUp(400, 200)"
+        "34": {
+            "type": "loopbegin",
+            "one": "35",
+            "content": "button; globals.buttons"
         },
-        "18": {
+        "35": {
             "type": "action",
-            "one": "1",
-            "content": "drawActiveDown(300, 150)\ndrawNormalDown(300, 200)"
+            "one": "33",
+            "content": "drawButton(button)"
         }
     }
 }

@@ -242,14 +242,13 @@ function generateUniqueId() {
 
 async function createFolder(winInfo, spaceId, body) {
     const parentFolder = getFilePathById(winInfo, body.parent);
-
     let newPath, record, id;
     if (body.type === 'folder') {
         const newFilename = body.name;
         newPath = path.join(parentFolder, newFilename);
 
         if (await fileOrFolderExists(newPath)) {
-            throw new Error('ERR_NAME_NOT_UNIQUE');
+            return {error:'ERR_NAME_NOT_UNIQUE'};
         } else {
             record = { type: 'folder', parent: body.parent };
             id = generateUniqueId();
@@ -262,7 +261,7 @@ async function createFolder(winInfo, spaceId, body) {
         newPath = path.join(parentFolder, newFilename);
 
         if (await fileOrFolderExists(newPath)) {
-            throw new Error('ERR_NAME_NOT_UNIQUE');
+            return {error:'ERR_NAME_NOT_UNIQUE'};
         } else {
             record = {};
             copyDiagramData(body, record);
@@ -538,7 +537,7 @@ async function updateFolder(winInfo, spaceId, folderId, body) {
             const newPath = path.join(parentFolder, newFilename);
 
             if (await fileOrFolderExists(newPath)) {
-                throw new Error('ERR_NAME_NOT_UNIQUE');
+                return {error:'ERR_NAME_NOT_UNIQUE'};
             } else {
                 // Rename the folder
                 await renameFolder(filepath, newPath);
@@ -563,7 +562,7 @@ async function updateFolder(winInfo, spaceId, folderId, body) {
             const newPath = path.join(parentFolder, newFilename);
 
             if (await fileOrFolderExists(newPath)) {
-                throw new Error('ERR_NAME_NOT_UNIQUE');
+                return {error:'ERR_NAME_NOT_UNIQUE'};
             } else {
                 // Delete the old file and rename it
                 await deleteFile(filepath);

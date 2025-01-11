@@ -1,6 +1,6 @@
 (function () {
     async function getAppVersion() {
-        return "v2025.01.10"
+        return "v2025.01.11"
     }
 
     var gLanguage = undefined
@@ -281,10 +281,22 @@
         }
     }
 
+    function nameIsUnique(parentId, name) {
+        var targetFolder = getFolderWithChildren(gSpaceId, parentId)
+        while (!isUnique(targetFolder.children, name)) {
+            return false
+        }
+        return true
+    }
+
     async function createFolder(spaceId, body) {
         console.log("createFolder", spaceId, body)
         await pause(10)
-        body.parent = buildId(spaceId, body.parent)
+        var parentId = body.parent
+        body.parent = buildId(spaceId, parentId)
+        if (!nameIsUnique(parentId, body.name)) {
+            return {error:'ERR_NAME_NOT_UNIQUE'};
+        }
         var folderId = createFolderCore(spaceId, body)
         return { folder_id: folderId }
     }
@@ -380,6 +392,12 @@
             gFolders[id] = getFolderBody(id)
         }
         var folder = gFolders[id]
+        if (change.name && change.name !== folder.name) {
+            var parsed = parseId(folder.parent)
+            if (!nameIsUnique(parsed.folderId, change.name)) {
+                return {error:'ERR_NAME_NOT_UNIQUE'};
+            }
+        }
         setProperty(folder, change, "name")
         setProperty(folder, change, "params")
         setProperty(folder, change, "keywords")

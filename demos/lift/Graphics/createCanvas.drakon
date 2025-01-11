@@ -42,12 +42,12 @@
         "10": {
             "type": "action",
             "one": "7",
-            "content": "scale = 1"
+            "content": "scale = getRetinaFactor()"
         },
         "11": {
             "type": "action",
             "one": "1",
-            "content": "globals.canvas = canvas"
+            "content": "globals.canvas = canvas\nglobals.retina = scale"
         },
         "12": {
             "type": "action",

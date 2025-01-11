@@ -1,0 +1,44 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "5"
+        },
+        "4": {
+            "type": "question",
+            "one": "7",
+            "two": "8",
+            "flag1": 1,
+            "content": "globals.lastFrame"
+        },
+        "5": {
+            "type": "action",
+            "one": "4",
+            "two": "",
+            "content": "now = new Date().getTime()"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "globals.lastFrame = now"
+        },
+        "7": {
+            "type": "action",
+            "one": "6",
+            "two": "",
+            "content": "globals.delta = Math.min(\n    0.2,\n    (now - globals.lastFrame) / 1000\n)"
+        },
+        "8": {
+            "type": "action",
+            "one": "6",
+            "two": "",
+            "content": "globals.delta = 0"
+        }
+    }
+}

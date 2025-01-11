@@ -12,7 +12,7 @@
         "3": {
             "type": "action",
             "one": "8",
-            "content": "bottom = canvasHeight - canvasPadding - (\n    number - 1\n) * floorHeight"
+            "content": "bottom = getFloorBottom(number)"
         },
         "5": {
             "type": "action",
