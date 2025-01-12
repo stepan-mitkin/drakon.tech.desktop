@@ -36,13 +36,28 @@
         },
         "9": {
             "type": "action",
-            "one": "10",
+            "one": "11",
             "content": "globals.currentFloor = 1"
         },
         "10": {
             "type": "action",
             "one": "1",
             "content": "takeCabinPositionFromFloor()"
+        },
+        "11": {
+            "type": "action",
+            "one": "12",
+            "content": "cabin = CabinMachine()"
+        },
+        "12": {
+            "type": "action",
+            "one": "13",
+            "content": "cabin.door = LinearMotor(\n    cabin.onDoor,\n    doorVelocity\n)\ncabin.motor = AcceleratedMotor(\n    cabin.onArrived,\n    cabinVelocity,\n    accelerationDistance\n)"
+        },
+        "13": {
+            "type": "action",
+            "one": "10",
+            "content": "globals.cabin = cabin"
         }
     }
 }

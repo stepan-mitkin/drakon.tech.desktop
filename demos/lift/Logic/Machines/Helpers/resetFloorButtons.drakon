@@ -1,0 +1,48 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "floor = globals.floors[\n    globals.currentFloor\n]"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "6",
+            "flag1": 1,
+            "content": "floor.up"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "floor.up.machine.reset()"
+        },
+        "6": {
+            "type": "question",
+            "one": "7",
+            "two": "8",
+            "flag1": 1,
+            "content": "floor.down"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "two": "",
+            "content": "floor.down.machine.reset()"
+        },
+        "8": {
+            "type": "action",
+            "one": "1",
+            "content": "floor.inner.machine.reset()"
+        }
+    }
+}

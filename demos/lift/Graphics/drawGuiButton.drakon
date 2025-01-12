@@ -1,0 +1,99 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "4": {
+            "type": "case",
+            "one": "9",
+            "content": "\"inner\""
+        },
+        "5": {
+            "type": "case",
+            "one": "12",
+            "two": "4",
+            "content": "\"down\""
+        },
+        "6": {
+            "type": "case",
+            "one": "15",
+            "two": "5",
+            "content": "\"up\""
+        },
+        "7": {
+            "type": "select",
+            "one": "6",
+            "content": "button.type"
+        },
+        "8": {
+            "type": "action",
+            "one": "1",
+            "content": "drawNormalButton(\n    button.x,\n    button.y,\n    button.text\n)"
+        },
+        "9": {
+            "type": "question",
+            "one": "8",
+            "two": "10",
+            "flag1": 0,
+            "content": "button.machine.on"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "content": "drawActiveButton(\n    button.x,\n    button.y,\n    button.text\n)"
+        },
+        "12": {
+            "type": "question",
+            "one": "17",
+            "two": "18",
+            "flag1": 0,
+            "content": "button.machine.on"
+        },
+        "14": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "drawNormalUp(button.x, button.y)"
+        },
+        "15": {
+            "type": "question",
+            "one": "14",
+            "two": "16",
+            "flag1": 0,
+            "content": "button.machine.on"
+        },
+        "16": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "drawActiveUp(button.x, button.y)"
+        },
+        "17": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "drawNormalDown(button.x, button.y)"
+        },
+        "18": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "drawActiveDown(button.x, button.y)"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "button"
+}

@@ -1,0 +1,193 @@
+{
+    "type": "drakon",
+    "items": {
+        "2": {
+            "type": "branch",
+            "branchId": 2,
+            "one": "8",
+            "content": "Still"
+        },
+        "5": {
+            "type": "branch",
+            "one": "12",
+            "branchId": 4,
+            "content": "Increasing"
+        },
+        "6": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "7",
+            "content": "Init"
+        },
+        "7": {
+            "type": "action",
+            "one": "2",
+            "content": "self.current = 0\nself.velocity = 0"
+        },
+        "8": {
+            "type": "sinput",
+            "one": "39",
+            "content": "start(target)"
+        },
+        "10": {
+            "type": "case",
+            "one": "22",
+            "two": "43",
+            "content": "newTarget(target)"
+        },
+        "11": {
+            "type": "case",
+            "one": "14",
+            "two": "10",
+            "content": "update()"
+        },
+        "12": {
+            "type": "select",
+            "one": "11",
+            "content": "receive"
+        },
+        "14": {
+            "type": "action",
+            "one": "19",
+            "content": "scheduleUpdate()"
+        },
+        "18": {
+            "type": "question",
+            "one": "5",
+            "two": "21",
+            "flag1": 0,
+            "content": "self.current >= self.target"
+        },
+        "19": {
+            "type": "action",
+            "one": "47",
+            "content": "self.current += self.velocity * globals.delta"
+        },
+        "21": {
+            "type": "action",
+            "one": "33",
+            "content": "self.current = self.target"
+        },
+        "22": {
+            "type": "action",
+            "one": "5",
+            "content": "self.target = target"
+        },
+        "23": {
+            "type": "branch",
+            "one": "26",
+            "branchId": 5,
+            "content": "Decreasing"
+        },
+        "24": {
+            "type": "case",
+            "one": "31",
+            "two": "44",
+            "content": "newTarget(target)"
+        },
+        "25": {
+            "type": "case",
+            "one": "37",
+            "two": "24",
+            "content": "update()"
+        },
+        "26": {
+            "type": "select",
+            "one": "25",
+            "content": "receive"
+        },
+        "28": {
+            "type": "question",
+            "one": "23",
+            "two": "30",
+            "flag1": 0,
+            "content": "self.current <= self.target"
+        },
+        "30": {
+            "type": "action",
+            "one": "34",
+            "content": "self.current = self.target"
+        },
+        "31": {
+            "type": "action",
+            "one": "23",
+            "content": "self.target = target"
+        },
+        "33": {
+            "type": "soutput",
+            "one": "2",
+            "content": "onDone()"
+        },
+        "34": {
+            "type": "soutput",
+            "one": "2",
+            "content": "onDone()"
+        },
+        "37": {
+            "type": "action",
+            "one": "48",
+            "content": "scheduleUpdate()"
+        },
+        "39": {
+            "type": "branch",
+            "branchId": 3,
+            "one": "42",
+            "content": "Start"
+        },
+        "40": {
+            "type": "question",
+            "one": "5",
+            "two": "23",
+            "flag1": 1,
+            "content": "target > self.current"
+        },
+        "41": {
+            "type": "action",
+            "one": "40",
+            "two": "",
+            "content": "self.target = target\nself.startPos = self.current"
+        },
+        "42": {
+            "type": "action",
+            "one": "41",
+            "two": "",
+            "content": "scheduleUpdate()"
+        },
+        "43": {
+            "one": "39",
+            "type": "case",
+            "two": null,
+            "content": "start(target)"
+        },
+        "44": {
+            "one": "39",
+            "type": "case",
+            "two": null,
+            "content": "start(target)"
+        },
+        "46": {
+            "type": "action",
+            "one": "28",
+            "content": "self.velocity = getDecVelocity(\n    self,\n    maxVelocity,\n    accDistance\n)"
+        },
+        "47": {
+            "type": "action",
+            "one": "18",
+            "content": "self.velocity = getIncVelocity(\n    self,\n    maxVelocity,\n    accDistance\n)"
+        },
+        "48": {
+            "type": "action",
+            "one": "46",
+            "content": "self.current -= self.velocity * globals.delta"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": true,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "onDone\nmaxVelocity\naccDistance"
+}

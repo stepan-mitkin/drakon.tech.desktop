@@ -6,8 +6,8 @@
         },
         "2": {
             "type": "branch",
-            "branchId": 1,
-            "one": "7",
+            "branchId": 2,
+            "one": "4",
             "content": "Floor button"
         },
         "4": {
@@ -20,24 +20,9 @@
         "5": {
             "type": "question",
             "one": "9",
-            "two": "13",
+            "two": "27",
             "flag1": 1,
             "content": "down"
-        },
-        "6": {
-            "type": "action",
-            "one": "8",
-            "content": "centerY = Math.round(\n    bottom + floorHeight / 2\n)"
-        },
-        "7": {
-            "type": "action",
-            "one": "6",
-            "content": "bottom = getFloorBottom(number)"
-        },
-        "8": {
-            "type": "action",
-            "one": "4",
-            "content": "left = canvasPadding + floorWidth + canvasPadding"
         },
         "9": {
             "type": "action",
@@ -59,21 +44,10 @@
             "one": "19",
             "content": "floor.down = createButton(\n    \"down\",\n    undefined,\n    left,\n    y2\n)"
         },
-        "13": {
-            "type": "action",
-            "one": "14",
-            "content": "y = centerY - buttonSize / 2"
-        },
         "14": {
             "type": "action",
             "one": "19",
             "content": "floor.up = createButton(\n    \"up\",\n    undefined,\n    left,\n    y\n)"
-        },
-        "15": {
-            "type": "action",
-            "one": "16",
-            "two": "",
-            "content": "y = centerY - buttonSize / 2"
         },
         "16": {
             "type": "action",
@@ -83,38 +57,89 @@
         },
         "17": {
             "type": "question",
-            "one": "15",
+            "one": "28",
             "two": "19",
             "flag1": 1,
             "content": "down"
         },
         "18": {
             "type": "branch",
-            "one": "1",
-            "branchId": 3,
+            "one": "24",
+            "branchId": 4,
             "content": "Exit"
         },
         "19": {
             "type": "branch",
-            "one": "20",
-            "branchId": 2,
+            "one": "35",
+            "branchId": 3,
             "content": "Cabin button"
         },
         "20": {
             "type": "action",
-            "one": "21",
-            "content": "nleft = left + buttonSize + canvasPadding"
-        },
-        "21": {
-            "type": "action",
-            "one": "22",
-            "content": "ny = bottom - (number - 1) * (\n    buttonSize + buttonMargin\n)"
+            "one": "29",
+            "content": "nleft = left + buttonSize + canvasPadding\n* 2"
         },
         "22": {
             "type": "action",
             "one": "18",
             "two": "",
-            "content": "floor.inner = createButton(\n    \"inner\",\n    number,\n    nleft,\n    ny\n)"
+            "content": "floor.inner = createButton(\n    \"inner\",\n    number,\n    nleft,\n    y\n)"
+        },
+        "24": {
+            "type": "action",
+            "one": "1",
+            "content": "globals.floors.push(floor)"
+        },
+        "27": {
+            "type": "action",
+            "one": "14",
+            "content": "y = centerY - buttonSize / 2"
+        },
+        "28": {
+            "type": "action",
+            "one": "16",
+            "content": "y = centerY - buttonSize / 2"
+        },
+        "29": {
+            "type": "action",
+            "one": "22",
+            "content": "y = innerBottom - canvasPadding - floorThickness\n- buttonSize - (number - 1) * (\n    buttonSize + buttonMargin\n)"
+        },
+        "30": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "34",
+            "content": "Common values"
+        },
+        "31": {
+            "type": "action",
+            "one": "33",
+            "two": "",
+            "content": "centerY = Math.round(\n    bottom - floorHeight / 2\n)"
+        },
+        "32": {
+            "type": "action",
+            "one": "31",
+            "two": "",
+            "content": "bottom = getFloorBottom(number)"
+        },
+        "33": {
+            "type": "action",
+            "one": "2",
+            "two": "",
+            "content": "left = canvasPadding + floorWidth + canvasPadding"
+        },
+        "34": {
+            "type": "action",
+            "one": "32",
+            "two": "",
+            "content": "floor = {number: number}"
+        },
+        "35": {
+            "type": "action",
+            "one": "20",
+            "two": "",
+            "content": "innerBottom = getFloorBottom(1)"
         }
     },
     "keywords": {

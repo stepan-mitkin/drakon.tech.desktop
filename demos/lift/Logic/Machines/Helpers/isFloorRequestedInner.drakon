@@ -12,17 +12,12 @@
         "3": {
             "type": "action",
             "one": "4",
-            "content": "button = {\n    x: x,\n    y: y,\n    type: type,\n    text: text,\n    machine: OneWayButton()\n}"
+            "content": "floor = globals.floors[number]"
         },
         "4": {
             "type": "action",
-            "one": "5",
-            "content": "globals.buttons.push(button)"
-        },
-        "5": {
-            "type": "action",
             "one": "1",
-            "content": "return button"
+            "content": "return floor.inner.machine.on"
         }
     },
     "keywords": {
@@ -33,5 +28,5 @@
         "algoprop": false,
         "lazy": false
     },
-    "params": "type\ntext\nx\ny"
+    "params": "number"
 }

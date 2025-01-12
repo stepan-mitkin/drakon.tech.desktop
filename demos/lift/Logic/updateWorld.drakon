@@ -11,30 +11,35 @@
         },
         "3": {
             "type": "action",
-            "one": "6",
+            "one": "10",
             "content": "updateFrameTime()"
-        },
-        "5": {
-            "type": "question",
-            "one": "8",
-            "two": "1",
-            "flag1": 1,
-            "content": "globals.requestRedraw"
         },
         "6": {
             "type": "action",
-            "one": "5",
+            "one": "11",
             "content": "redraw()"
         },
-        "7": {
+        "10": {
+            "type": "action",
+            "one": "6",
+            "content": "globals.cabin.update()"
+        },
+        "11": {
+            "type": "question",
+            "one": "12",
+            "two": "13",
+            "flag1": 1,
+            "content": "globals.updateScheduled"
+        },
+        "12": {
             "type": "action",
             "one": "1",
-            "content": "requestAnimationFrame(updateWorld)"
+            "content": "globals.updateScheduled = false"
         },
-        "8": {
+        "13": {
             "type": "action",
-            "one": "7",
-            "content": "globals.requestRedraw = false"
+            "one": "1",
+            "content": "globals.lastFrame = 0"
         }
     }
 }

@@ -7,22 +7,19 @@
         "2": {
             "type": "branch",
             "branchId": 0,
-            "one": "3"
-        },
-        "3": {
-            "type": "action",
-            "one": "4",
-            "content": "button = {\n    x: x,\n    y: y,\n    type: type,\n    text: text,\n    machine: OneWayButton()\n}"
+            "one": "5"
         },
         "4": {
             "type": "action",
-            "one": "5",
-            "content": "globals.buttons.push(button)"
+            "one": "1",
+            "two": "",
+            "content": "return canvasHeight - canvasPadding - (\n    number - 1\n) * floorHeight - floorThickness"
         },
         "5": {
             "type": "action",
-            "one": "1",
-            "content": "return button"
+            "one": "4",
+            "two": "",
+            "content": "canvasHeight = getCanvasHeight()"
         }
     },
     "keywords": {
@@ -33,5 +30,5 @@
         "algoprop": false,
         "lazy": false
     },
-    "params": "type\ntext\nx\ny"
+    "params": "number"
 }

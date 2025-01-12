@@ -1,0 +1,61 @@
+{
+    "type": "drakon",
+    "items": {
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "3",
+            "content": "Off"
+        },
+        "3": {
+            "type": "action",
+            "one": "6",
+            "content": "self.on = false"
+        },
+        "5": {
+            "type": "branch",
+            "one": "7",
+            "branchId": 2,
+            "content": "On"
+        },
+        "6": {
+            "type": "sinput",
+            "one": "12",
+            "content": "click()"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "self.on = true"
+        },
+        "8": {
+            "type": "sinput",
+            "one": "14",
+            "content": "reset()"
+        },
+        "12": {
+            "type": "soutput",
+            "one": "13",
+            "content": "onUserCommand()"
+        },
+        "13": {
+            "type": "action",
+            "one": "5",
+            "content": "scheduleUpdate()"
+        },
+        "14": {
+            "type": "action",
+            "one": "2",
+            "content": "scheduleUpdate()"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": true,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": ""
+}

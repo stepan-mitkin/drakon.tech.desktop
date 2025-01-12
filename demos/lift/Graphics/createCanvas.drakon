@@ -46,13 +46,18 @@
         },
         "11": {
             "type": "action",
-            "one": "1",
+            "one": "13",
             "content": "globals.canvas = canvas\nglobals.retina = scale"
         },
         "12": {
             "type": "action",
             "one": "3",
             "content": "canvasHeight = getCanvasHeight()"
+        },
+        "13": {
+            "type": "action",
+            "one": "1",
+            "content": "canvas.addEventListener(\"click\", onClick)\ncanvas.addEventListener(\n    \"mousemove\",\n    onHover\n)"
         }
     }
 }

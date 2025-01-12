@@ -11,13 +11,8 @@
         },
         "3": {
             "type": "action",
-            "one": "4",
-            "content": "globals.cabin.motor.current = floorToPosition(\n    globals.currentFloor\n)"
-        },
-        "4": {
-            "type": "action",
             "one": "1",
-            "content": "globals.cabin.door.current = 0"
+            "content": "globals.cabin.onCommand()"
         }
     }
 }

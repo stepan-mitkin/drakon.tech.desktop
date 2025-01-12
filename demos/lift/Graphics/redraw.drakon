@@ -79,15 +79,9 @@
         },
         "30": {
             "type": "action",
-            "one": "31",
-            "two": "",
-            "content": "drawCabin(\n    canvasHeight - canvasPadding - floorThickness,\n    0\n)"
-        },
-        "31": {
-            "type": "action",
             "one": "25",
             "two": "",
-            "content": "drawCabin(\n    canvasHeight - canvasPadding - floorThickness\n    - floorHeight * 2,\n    1\n)"
+            "content": "drawCabin(getCabinPos(), getDoorPos())"
         },
         "32": {
             "type": "action",
@@ -107,7 +101,7 @@
         "35": {
             "type": "action",
             "one": "33",
-            "content": "drawButton(button)"
+            "content": "drawGuiButton(button)"
         }
     }
 }

@@ -17,12 +17,12 @@
         "4": {
             "type": "action",
             "one": "7",
-            "content": "const canvasWidth = 600\nconst canvasPadding = 30"
+            "content": "const canvasWidth = 380\nconst canvasPadding = 30"
         },
         "5": {
             "type": "action",
             "one": "3",
-            "content": "globals = {canvas: undefined}"
+            "content": "globals = {\n    floors: undefined,\n    delta: undefined,\n    buttons: undefined,\n    canvas: undefined,\n    ctx: undefined,\n    target: undefined,\n    currentFloor: undefined,\n    cabin: undefined\n}"
         },
         "7": {
             "type": "action",
@@ -31,7 +31,7 @@
         },
         "8": {
             "type": "action",
-            "one": "9",
+            "one": "12",
             "content": "const floorCount = 4"
         },
         "9": {
@@ -48,6 +48,11 @@
             "type": "action",
             "one": "5",
             "content": "const background = \"white\"\nconst lineColor = \"black\"\nconst openColor = \"#8a98d1\""
+        },
+        "12": {
+            "type": "action",
+            "one": "9",
+            "content": "const accelerationDistance = 60\nconst cabinVelocity = 100\nconst doorVelocity = 1\nconst doorTimeout = 1000"
         }
     }
 }

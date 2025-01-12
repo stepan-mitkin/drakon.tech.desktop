@@ -1,0 +1,100 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "4",
+            "content": "Check"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "8",
+            "flag1": 1,
+            "content": "self.direction === \"up\""
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "two": "",
+            "content": "nextTarget = findNextTargetUp()"
+        },
+        "6": {
+            "type": "question",
+            "one": "15",
+            "two": "21",
+            "flag1": 1,
+            "content": "nextTarget"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "two": "",
+            "content": "nextTarget = findNextTargetDown()"
+        },
+        "9": {
+            "type": "question",
+            "one": "17",
+            "two": "21",
+            "flag1": 1,
+            "content": "nextTarget"
+        },
+        "15": {
+            "type": "question",
+            "one": "22",
+            "two": "21",
+            "flag1": 1,
+            "content": "nextTarget < globals.target"
+        },
+        "17": {
+            "type": "question",
+            "one": "22",
+            "two": "21",
+            "flag1": 1,
+            "content": "nextTarget > globals.target"
+        },
+        "21": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "22": {
+            "type": "branch",
+            "one": "23",
+            "branchId": 2,
+            "content": "Set new target"
+        },
+        "23": {
+            "type": "action",
+            "one": "25",
+            "two": "",
+            "content": "globals.target = nextTarget"
+        },
+        "24": {
+            "type": "action",
+            "one": "21",
+            "two": "",
+            "content": "self.motor.newTarget(targetY)"
+        },
+        "25": {
+            "type": "action",
+            "one": "24",
+            "two": "",
+            "content": "targetY = floorToPosition(globals.target)"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "self"
+}

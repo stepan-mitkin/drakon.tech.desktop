@@ -1,0 +1,120 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "20",
+            "content": "globals.target = nextTarget"
+        },
+        "4": {
+            "type": "question",
+            "one": "11",
+            "two": "14",
+            "flag1": 1,
+            "content": "self.direction === \"up\""
+        },
+        "11": {
+            "type": "action",
+            "one": "12",
+            "content": "nextTarget = findNextTargetUp()"
+        },
+        "12": {
+            "type": "question",
+            "one": "29",
+            "two": "13",
+            "flag1": 1,
+            "content": "nextTarget"
+        },
+        "13": {
+            "type": "action",
+            "one": "17",
+            "content": "nextTarget = findNextTargetDown()"
+        },
+        "14": {
+            "type": "action",
+            "one": "15",
+            "content": "nextTarget = findNextTargetDown()"
+        },
+        "15": {
+            "type": "question",
+            "one": "27",
+            "two": "16",
+            "flag1": 1,
+            "content": "nextTarget"
+        },
+        "16": {
+            "type": "action",
+            "one": "19",
+            "content": "nextTarget = findNextTargetUp()"
+        },
+        "17": {
+            "type": "action",
+            "one": "3",
+            "content": "self.direction = \"down\""
+        },
+        "19": {
+            "type": "action",
+            "one": "3",
+            "content": "self.direction = \"up\""
+        },
+        "20": {
+            "type": "question",
+            "one": "24",
+            "two": "26",
+            "flag1": 1,
+            "content": "globals.target"
+        },
+        "21": {
+            "type": "action",
+            "one": "1",
+            "content": "return true"
+        },
+        "22": {
+            "type": "action",
+            "one": "1",
+            "content": "return false"
+        },
+        "23": {
+            "type": "action",
+            "one": "21",
+            "content": "self.motor.start(targetY)"
+        },
+        "24": {
+            "type": "action",
+            "one": "23",
+            "content": "targetY = floorToPosition(globals.target)"
+        },
+        "26": {
+            "type": "action",
+            "one": "22",
+            "content": "self.direction = undefined"
+        },
+        "27": {
+            "type": "action",
+            "one": "3",
+            "content": "self.direction = \"down\""
+        },
+        "29": {
+            "type": "action",
+            "one": "3",
+            "content": "self.direction = \"up\""
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "self"
+}

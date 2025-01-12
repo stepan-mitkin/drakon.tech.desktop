@@ -1,0 +1,84 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "22"
+        },
+        "16": {
+            "type": "question",
+            "one": "20",
+            "two": "17",
+            "flag1": 1,
+            "content": "self.current > m1"
+        },
+        "17": {
+            "type": "question",
+            "one": "24",
+            "two": "19",
+            "flag1": 1,
+            "content": "self.current < m2"
+        },
+        "18": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "return Math.max(\n    maxVelocity * 0.05,\n    Math.min(result, maxVelocity)\n)"
+        },
+        "19": {
+            "type": "action",
+            "one": "18",
+            "two": "",
+            "content": "result = maxVelocity"
+        },
+        "20": {
+            "type": "action",
+            "one": "18",
+            "two": "",
+            "content": "result = self.velocity + acc * globals.delta"
+        },
+        "22": {
+            "type": "action",
+            "one": "23",
+            "two": "",
+            "content": "accTime = 2 * accDistance / maxVelocity"
+        },
+        "23": {
+            "type": "action",
+            "one": "25",
+            "two": "",
+            "content": "acc = maxVelocity / accTime"
+        },
+        "24": {
+            "type": "action",
+            "one": "18",
+            "two": "",
+            "content": "result = self.velocity - acc * globals.delta"
+        },
+        "25": {
+            "type": "action",
+            "one": "26",
+            "two": "",
+            "content": "m1 = self.startPos - accDistance"
+        },
+        "26": {
+            "type": "action",
+            "one": "16",
+            "two": "",
+            "content": "m2 = self.target + accDistance"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "self\nmaxVelocity\naccDistance"
+}
