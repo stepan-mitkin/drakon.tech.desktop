@@ -57,6 +57,7 @@ function AcceleratedMotor(onDone, maxVelocity, accDistance) {
         self.velocity = getDecVelocity(self, maxVelocity, accDistance);
         if (self.current <= self.target) {
             self.current = self.target;
+            self.velocity = 0;
             setTimeout(() => {
                 onDone();
             }, 0);
@@ -85,6 +86,7 @@ function AcceleratedMotor(onDone, maxVelocity, accDistance) {
         self.velocity = getIncVelocity(self, maxVelocity, accDistance);
         if (self.current >= self.target) {
             self.current = self.target;
+            self.velocity = 0;
             setTimeout(() => {
                 onDone();
             }, 0);
@@ -145,11 +147,11 @@ function CabinMachine() {
     self.state = 'ClosedStill';
     function ClosedStill_onCommand() {
         if (requestedCurrentFloor()) {
-            resetFloorButtons();
             openDoor(self);
             self.state = 'Opening';
         } else {
             if (startMovement(self)) {
+                globals.currentFloor = undefined;
                 self.state = 'Moving';
             } else {
                 self.state = 'ClosedStill';
@@ -158,7 +160,6 @@ function CabinMachine() {
     }
     function Closing_onCommand() {
         if (requestedCurrentFloor()) {
-            resetFloorButtons();
             openDoor(self);
             self.state = 'Opening';
         } else {
@@ -167,6 +168,7 @@ function CabinMachine() {
     }
     function Closing_onDoor() {
         if (startMovement(self)) {
+            globals.currentFloor = undefined;
             self.state = 'Moving';
         } else {
             self.state = 'ClosedStill';
@@ -177,32 +179,25 @@ function CabinMachine() {
         self.state = 'Closing';
     }
     function Moving_onArrived() {
-        globals.currentFloor = globals.target;
-        globals.target = undefined;
+        globals.currentFloor = self.target;
+        self.target = undefined;
         resetFloorButtons();
         openDoor(self);
         self.state = 'Opening';
     }
     function Moving_onCommand() {
         updateDestination(self);
+        globals.currentFloor = undefined;
         self.state = 'Moving';
     }
     function Moving_update() {
         self.motor.update();
+        globals.currentFloor = undefined;
         self.state = 'Moving';
-    }
-    function Open_onCommand() {
-        resetFloorButtons();
-        setTimeout(self.onTimeout, doorTimeout);
-        self.state = 'Open';
     }
     function Open_onTimeout() {
         closeDoor(self);
         self.state = 'Closing';
-    }
-    function Opening_onCommand() {
-        resetFloorButtons();
-        self.state = 'Opening';
     }
     function Opening_onDoor() {
         setTimeout(self.onTimeout, doorTimeout);
@@ -224,14 +219,10 @@ function CabinMachine() {
         switch (self.state) {
         case 'Moving':
             return Moving_onCommand();
-        case 'Opening':
-            return Opening_onCommand();
         case 'ClosedStill':
             return ClosedStill_onCommand();
         case 'Closing':
             return Closing_onCommand();
-        case 'Open':
-            return Open_onCommand();
         default:
             return undefined;
         }
@@ -415,6 +406,48 @@ function OneWayButton() {
 function add(parent, child) {
     parent.appendChild(child);
 }
+function addElementWithText(container, tag, text) {
+    var element;
+    element = document.createElement(tag);
+    addText(element, text);
+    add(container, element);
+}
+function addLine(depth, container, name, value, bold) {
+    var indent, nameEl, objLine, valueEl, valueStr;
+    objLine = document.createElement('div');
+    objLine.style.margin = '5px';
+    if (depth) {
+        indent = document.createElement('span');
+        indent.style.display = 'inline-block';
+        indent.style.verticalAlign = 'middle';
+        indent.style.width = 20 * depth + 'px';
+        add(objLine, indent);
+    }
+    nameEl = document.createElement('span');
+    nameEl.style.display = 'inline-block';
+    nameEl.style.verticalAlign = 'middle';
+    addText(nameEl, name + ': ');
+    nameEl.style.minWidth = '100px';
+    add(objLine, nameEl);
+    if (bold) {
+        nameEl.style.fontWeight = 'bold';
+    }
+    if (value !== undefined) {
+        valueStr = formatValue(value);
+        valueEl = document.createElement('span');
+        valueEl.style.display = 'inline-block';
+        valueEl.style.verticalAlign = 'middle';
+        addText(valueEl, valueStr);
+        add(objLine, valueEl);
+        valueEl.style.fontWeight = 'bold';
+    }
+    add(container, objLine);
+}
+function addText(element, text) {
+    var tnode;
+    tnode = document.createTextNode(text);
+    element.appendChild(tnode);
+}
 function buildStructures() {
     var cabin;
     globals.floors = [undefined];
@@ -456,18 +489,27 @@ function createButton(type, text, x, y) {
     return button;
 }
 function createCanvas() {
-    var canvas, canvasHeight, mainDiv, scale;
+    var canvas, canvasHeight, mainDiv, scale, status;
     canvasHeight = getCanvasHeight();
     mainDiv = get('main-container');
     clear(mainDiv);
+    addElementWithText(mainDiv, 'h1', 'Lift: a state machine demo');
+    addElementWithText(mainDiv, 'p', 'Press the lift buttons to make it move');
     canvas = document.createElement('canvas');
+    canvas.style.display = 'inline-block';
+    canvas.style.verticalAlign = 'top';
+    status = document.createElement('div');
+    status.style.display = 'inline-block';
+    status.style.verticalAlign = 'top';
     scale = getRetinaFactor();
     canvas.width = canvasWidth * scale;
     canvas.height = canvasHeight * scale;
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
     add(mainDiv, canvas);
+    add(mainDiv, status);
     globals.canvas = canvas;
+    globals.status = status;
     globals.retina = scale;
     canvas.addEventListener('click', onClick);
     canvas.addEventListener('mousemove', onHover);
@@ -610,24 +652,24 @@ function drawFloor(number) {
     line(middle, doorLow - doorHeight, middle, doorLow);
 }
 function drawGuiButton(button) {
-    var _selectValue_34;
-    _selectValue_34 = button.type;
-    if (_selectValue_34 === 'up') {
+    var _selectValue_32;
+    _selectValue_32 = button.type;
+    if (_selectValue_32 === 'up') {
         if (button.machine.on) {
             drawActiveUp(button.x, button.y);
         } else {
             drawNormalUp(button.x, button.y);
         }
     } else {
-        if (_selectValue_34 === 'down') {
+        if (_selectValue_32 === 'down') {
             if (button.machine.on) {
                 drawActiveDown(button.x, button.y);
             } else {
                 drawNormalDown(button.x, button.y);
             }
         } else {
-            if (_selectValue_34 !== 'inner') {
-                throw new Error('Unexpected case value: ' + _selectValue_34);
+            if (_selectValue_32 !== 'inner') {
+                throw new Error('Unexpected case value: ' + _selectValue_32);
             }
             if (button.machine.on) {
                 drawActiveButton(button.x, button.y, button.text);
@@ -671,12 +713,12 @@ function fillRect(x, y, width, height) {
     ctx.fillRect(x, y, width, height);
 }
 function findButton(evt) {
-    var _collection_38, button, crect, x, y;
+    var _collection_36, button, crect, x, y;
     crect = globals.canvas.getBoundingClientRect();
     x = evt.clientX - crect.left;
     y = evt.clientY - crect.top;
-    _collection_38 = globals.buttons;
-    for (button of _collection_38) {
+    _collection_36 = globals.buttons;
+    for (button of _collection_36) {
         if (hitBox(button.x, button.y, buttonSize, buttonSize, x, y)) {
             return button;
         }
@@ -731,6 +773,17 @@ function floorToPosition(number) {
     var canvasHeight;
     canvasHeight = getCanvasHeight();
     return canvasHeight - canvasPadding - (number - 1) * floorHeight - floorThickness;
+}
+function formatValue(value) {
+    if (typeof value === 'number') {
+        if (value === Math.round(value)) {
+            return value.toString();
+        } else {
+            return value.toFixed(2).toString();
+        }
+    } else {
+        return value.toString();
+    }
 }
 function get(id) {
     var element;
@@ -905,9 +958,32 @@ function onHover(evt) {
 }
 function onUserCommand() {
     globals.cabin.onCommand();
+    resetFloorButtons();
 }
 function openDoor(self) {
     self.door.start(1);
+}
+function printMachine(container, machine, depth) {
+    var _selectValue_38, name, names, value;
+    if (machine && machine.state) {
+        addLine(depth, container, 'state', machine.state, true);
+        names = Object.keys(machine);
+        names.sort();
+        for (name of names) {
+            if (name !== 'state') {
+                value = machine[name];
+                _selectValue_38 = typeof value;
+                if (_selectValue_38 === 'object') {
+                    addLine(depth, container, name, undefined, false);
+                    printMachine(container, value, depth + 1);
+                } else {
+                    if (_selectValue_38 !== 'function') {
+                        addLine(depth, container, name, value, false);
+                    }
+                }
+            }
+        }
+    }
 }
 function rect(x, y, width, height) {
     var ctx;
@@ -917,7 +993,7 @@ function rect(x, y, width, height) {
     ctx.strokeRect(x, y, width, height);
 }
 function redraw() {
-    var _collection_36, button, canvasHeight, ctx, i;
+    var _collection_34, button, canvasHeight, ctx, i;
     ctx = globals.canvas.getContext('2d');
     ctx.scale(globals.retina, globals.retina);
     globals.ctx = ctx;
@@ -928,10 +1004,11 @@ function redraw() {
         drawFloor(i);
     }
     drawCabin(getCabinPos(), getDoorPos());
-    _collection_36 = globals.buttons;
-    for (button of _collection_36) {
+    _collection_34 = globals.buttons;
+    for (button of _collection_34) {
         drawGuiButton(button);
     }
+    showMachineStatus();
 }
 function requestedCurrentFloor() {
     var i;
@@ -946,18 +1023,31 @@ function requestedCurrentFloor() {
 }
 function resetFloorButtons() {
     var floor;
-    floor = globals.floors[globals.currentFloor];
-    if (floor.up) {
-        floor.up.machine.reset();
+    if (globals.currentFloor) {
+        floor = globals.floors[globals.currentFloor];
+        if (floor.up) {
+            floor.up.machine.reset();
+        }
+        if (floor.down) {
+            floor.down.machine.reset();
+        }
+        floor.inner.machine.reset();
     }
-    if (floor.down) {
-        floor.down.machine.reset();
-    }
-    floor.inner.machine.reset();
 }
 function scheduleUpdate() {
     globals.updateScheduled = true;
     requestAnimationFrame(updateWorld);
+}
+function showMachineStatus() {
+    var root, status;
+    status = globals.status;
+    clear(status);
+    root = {
+        cabin: globals.cabin,
+        currentFloor: globals.currentFloor,
+        state: 'ok'
+    };
+    printMachine(status, root, 0);
 }
 function startMovement(self) {
     var nextTarget, targetY;
@@ -978,9 +1068,9 @@ function startMovement(self) {
             self.direction = 'up';
         }
     }
-    globals.target = nextTarget;
-    if (globals.target) {
-        targetY = floorToPosition(globals.target);
+    self.target = nextTarget;
+    if (self.target) {
+        targetY = floorToPosition(self.target);
         self.motor.start(targetY);
         return true;
     } else {
@@ -1000,14 +1090,14 @@ function updateDestination(self) {
         case 'Check':
             if (self.direction === 'up') {
                 nextTarget = findNextTargetUp();
-                if (nextTarget && nextTarget < globals.target) {
+                if (nextTarget && nextTarget < self.target) {
                     _state_ = 'Set new target';
                 } else {
                     _state_ = 'Exit';
                 }
             } else {
                 nextTarget = findNextTargetDown();
-                if (nextTarget && nextTarget > globals.target) {
+                if (nextTarget && nextTarget > self.target) {
                     _state_ = 'Set new target';
                 } else {
                     _state_ = 'Exit';
@@ -1015,8 +1105,8 @@ function updateDestination(self) {
             }
             break;
         case 'Set new target':
-            globals.target = nextTarget;
-            targetY = floorToPosition(globals.target);
+            self.target = nextTarget;
+            targetY = floorToPosition(self.target);
             self.motor.newTarget(targetY);
             _state_ = 'Exit';
             break;

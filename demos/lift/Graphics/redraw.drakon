@@ -37,7 +37,7 @@
         },
         "19": {
             "type": "branch",
-            "one": "1",
+            "one": "36",
             "branchId": 5,
             "content": "Exit"
         },
@@ -102,6 +102,11 @@
             "type": "action",
             "one": "33",
             "content": "drawGuiButton(button)"
+        },
+        "36": {
+            "type": "action",
+            "one": "1",
+            "content": "showMachineStatus()"
         }
     }
 }

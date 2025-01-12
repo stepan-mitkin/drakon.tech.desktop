@@ -1,0 +1,109 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "12"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "addLine(\n    depth,\n    container,\n    \"state\",\n    machine.state,\n    true\n)"
+        },
+        "4": {
+            "type": "question",
+            "one": "3",
+            "two": "1",
+            "flag1": 1,
+            "content": "machine.state"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "names = Object.keys(machine)"
+        },
+        "6": {
+            "type": "action",
+            "one": "8",
+            "content": "names.sort()"
+        },
+        "7": {
+            "type": "loopend",
+            "one": "1",
+            "content": ""
+        },
+        "8": {
+            "type": "loopbegin",
+            "one": "10",
+            "content": "name; names"
+        },
+        "10": {
+            "type": "question",
+            "one": "14",
+            "two": "7",
+            "flag1": 0,
+            "content": "name === \"state\""
+        },
+        "12": {
+            "type": "question",
+            "one": "4",
+            "two": "1",
+            "flag1": 1,
+            "content": "machine"
+        },
+        "14": {
+            "type": "action",
+            "one": "18",
+            "content": "value = machine[name]"
+        },
+        "15": {
+            "type": "case",
+            "one": "19"
+        },
+        "16": {
+            "type": "case",
+            "one": "7",
+            "two": "15",
+            "content": "\"function\""
+        },
+        "17": {
+            "type": "case",
+            "one": "21",
+            "two": "16",
+            "content": "\"object\""
+        },
+        "18": {
+            "type": "select",
+            "one": "17",
+            "content": " typeof value"
+        },
+        "19": {
+            "type": "action",
+            "one": "7",
+            "content": "addLine(\n    depth,\n    container,\n    name,\n    value,\n    false\n)"
+        },
+        "20": {
+            "type": "action",
+            "one": "7",
+            "content": "printMachine(container, value, depth + 1)"
+        },
+        "21": {
+            "type": "action",
+            "one": "20",
+            "content": "addLine(\n    depth,\n    container,\n    name,\n    undefined,\n    false\n)"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "container\nmachine\ndepth"
+}

@@ -1,0 +1,51 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "8",
+            "flag1": 1,
+            "content": " typeof value === \"number\""
+        },
+        "5": {
+            "type": "question",
+            "one": "6",
+            "two": "7",
+            "flag1": 1,
+            "content": "value === Math.round(value)"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "return value.toString()"
+        },
+        "7": {
+            "type": "action",
+            "one": "1",
+            "content": "return value.toFixed(2).toString()"
+        },
+        "8": {
+            "type": "action",
+            "one": "1",
+            "content": "return value.toString()"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "value"
+}

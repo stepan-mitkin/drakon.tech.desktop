@@ -9,8 +9,8 @@
         },
         "5": {
             "type": "branch",
-            "one": "10",
-            "branchId": 6,
+            "one": "69",
+            "branchId": 5,
             "content": "Moving"
         },
         "10": {
@@ -48,18 +48,18 @@
         },
         "25": {
             "type": "action",
-            "one": "57",
-            "content": "globals.currentFloor = globals.target\nglobals.target = undefined"
+            "one": "74",
+            "content": "globals.currentFloor = self.target\nself.target = undefined"
         },
         "27": {
             "type": "branch",
-            "branchId": 3,
+            "branchId": 2,
             "one": "30",
             "content": "Opening"
         },
         "28": {
             "type": "branch",
-            "branchId": 5,
+            "branchId": 4,
             "one": "42",
             "content": "Closing"
         },
@@ -71,7 +71,7 @@
         "31": {
             "type": "case",
             "one": "35",
-            "two": "67",
+            "two": "32",
             "content": "update()"
         },
         "32": {
@@ -88,7 +88,7 @@
         "37": {
             "type": "question",
             "one": "40",
-            "two": "57",
+            "two": "70",
             "flag1": 0,
             "content": "requestedCurrentFloor()"
         },
@@ -135,13 +135,13 @@
         },
         "50": {
             "type": "branch",
-            "branchId": 4,
+            "branchId": 3,
             "one": "51",
             "content": "Open"
         },
         "51": {
             "type": "action",
-            "one": "62",
+            "one": "72",
             "content": "setTimeout(self.onTimeout, doorTimeout)"
         },
         "53": {
@@ -155,63 +155,44 @@
             "two": "44",
             "content": "onCommand()"
         },
-        "57": {
-            "type": "branch",
-            "branchId": 2,
-            "one": "59",
-            "content": "OpenDoor"
+        "60": {
+            "type": "question",
+            "one": "28",
+            "two": "73",
+            "flag1": 0,
+            "content": "requestedCurrentFloor()"
         },
-        "58": {
+        "69": {
+            "type": "action",
+            "one": "10",
+            "content": "globals.currentFloor = undefined"
+        },
+        "70": {
             "type": "action",
             "one": "27",
             "two": "",
             "content": "openDoor(self)"
         },
-        "59": {
-            "type": "action",
-            "one": "58",
-            "two": "",
-            "content": "resetFloorButtons()"
-        },
-        "60": {
-            "type": "question",
-            "one": "28",
-            "two": "57",
-            "flag1": 0,
-            "content": "requestedCurrentFloor()"
-        },
-        "62": {
-            "type": "select",
-            "one": "63",
-            "content": "receive"
-        },
-        "63": {
-            "type": "case",
-            "one": "53",
-            "two": "64",
-            "content": "onTimeout()"
-        },
-        "64": {
-            "one": "66",
-            "type": "case",
-            "two": null,
-            "content": "onCommand()"
-        },
-        "66": {
-            "type": "action",
-            "one": "50",
-            "two": "",
-            "content": "resetFloorButtons()"
-        },
-        "67": {
-            "one": "68",
-            "type": "case",
-            "two": "32",
-            "content": "onCommand()"
-        },
-        "68": {
+        "71": {
             "type": "action",
             "one": "27",
+            "two": "",
+            "content": "openDoor(self)"
+        },
+        "72": {
+            "type": "sinput",
+            "one": "53",
+            "content": "onTimeout()"
+        },
+        "73": {
+            "type": "action",
+            "one": "27",
+            "two": "",
+            "content": "openDoor(self)"
+        },
+        "74": {
+            "type": "action",
+            "one": "71",
             "two": "",
             "content": "resetFloorButtons()"
         }

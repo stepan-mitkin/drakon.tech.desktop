@@ -7,7 +7,7 @@
         "2": {
             "type": "branch",
             "branchId": 0,
-            "one": "3"
+            "one": "9"
         },
         "3": {
             "type": "action",
@@ -43,6 +43,13 @@
             "type": "action",
             "one": "1",
             "content": "floor.inner.machine.reset()"
+        },
+        "9": {
+            "type": "question",
+            "one": "3",
+            "two": "1",
+            "flag1": 1,
+            "content": "globals.currentFloor"
         }
     }
 }

@@ -48,14 +48,14 @@
             "one": "22",
             "two": "21",
             "flag1": 1,
-            "content": "nextTarget < globals.target"
+            "content": "nextTarget < self.target"
         },
         "17": {
             "type": "question",
             "one": "22",
             "two": "21",
             "flag1": 1,
-            "content": "nextTarget > globals.target"
+            "content": "nextTarget > self.target"
         },
         "21": {
             "type": "branch",
@@ -73,7 +73,7 @@
             "type": "action",
             "one": "25",
             "two": "",
-            "content": "globals.target = nextTarget"
+            "content": "self.target = nextTarget"
         },
         "24": {
             "type": "action",
@@ -85,7 +85,7 @@
             "type": "action",
             "one": "24",
             "two": "",
-            "content": "targetY = floorToPosition(globals.target)"
+            "content": "targetY = floorToPosition(self.target)"
         }
     },
     "keywords": {

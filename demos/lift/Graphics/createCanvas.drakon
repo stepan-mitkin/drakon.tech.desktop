@@ -16,12 +16,12 @@
         },
         "4": {
             "type": "action",
-            "one": "5",
+            "one": "17",
             "content": "clear(mainDiv)"
         },
         "5": {
             "type": "action",
-            "one": "10",
+            "one": "16",
             "content": "canvas = document.createElement(\"canvas\")"
         },
         "7": {
@@ -32,7 +32,7 @@
         "8": {
             "type": "action",
             "one": "11",
-            "content": "add(mainDiv, canvas)"
+            "content": "add(mainDiv, canvas)\nadd(mainDiv, status)"
         },
         "9": {
             "type": "action",
@@ -47,7 +47,7 @@
         "11": {
             "type": "action",
             "one": "13",
-            "content": "globals.canvas = canvas\nglobals.retina = scale"
+            "content": "globals.canvas = canvas\nglobals.status = status\nglobals.retina = scale"
         },
         "12": {
             "type": "action",
@@ -58,6 +58,31 @@
             "type": "action",
             "one": "1",
             "content": "canvas.addEventListener(\"click\", onClick)\ncanvas.addEventListener(\n    \"mousemove\",\n    onHover\n)"
+        },
+        "14": {
+            "type": "action",
+            "one": "15",
+            "content": "status = document.createElement(\"div\")"
+        },
+        "15": {
+            "type": "action",
+            "one": "10",
+            "content": "status.style.display = \"inline-block\"\nstatus.style.verticalAlign = \"top\""
+        },
+        "16": {
+            "type": "action",
+            "one": "14",
+            "content": "canvas.style.display = \"inline-block\"\ncanvas.style.verticalAlign = \"top\""
+        },
+        "17": {
+            "type": "action",
+            "one": "18",
+            "content": "addElementWithText(\n    mainDiv,\n    \"h1\",\n    \"Lift: a state machine demo\"\n)"
+        },
+        "18": {
+            "type": "action",
+            "one": "5",
+            "content": "addElementWithText(\n    mainDiv,\n    \"p\",\n    \"Press the lift buttons to make it move\"\n)"
         }
     }
 }

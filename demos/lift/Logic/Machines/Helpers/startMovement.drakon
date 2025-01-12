@@ -12,7 +12,7 @@
         "3": {
             "type": "action",
             "one": "20",
-            "content": "globals.target = nextTarget"
+            "content": "self.target = nextTarget"
         },
         "4": {
             "type": "question",
@@ -70,7 +70,7 @@
             "one": "24",
             "two": "26",
             "flag1": 1,
-            "content": "globals.target"
+            "content": "self.target"
         },
         "21": {
             "type": "action",
@@ -90,7 +90,7 @@
         "24": {
             "type": "action",
             "one": "23",
-            "content": "targetY = floorToPosition(globals.target)"
+            "content": "targetY = floorToPosition(self.target)"
         },
         "26": {
             "type": "action",
