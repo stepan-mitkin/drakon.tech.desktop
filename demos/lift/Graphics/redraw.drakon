@@ -86,7 +86,7 @@
         "32": {
             "type": "action",
             "one": "6",
-            "content": "ctx.scale(globals.retina, globals.retina)"
+            "content": "ctx.resetTransform()\nctx.scale(globals.retina, globals.retina)"
         },
         "33": {
             "type": "loopend",

@@ -85,7 +85,7 @@ function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate)
 module.exports = { drakonToPseudocode };
 },{"./drakonToStruct":3,"./printPseudo":5,"./tools":8}],3:[function(require,module,exports){
 const { structFlow, redirectNode } = require("./structFlow");
-const { createError } = require("./tools");
+const { createError, remove } = require("./tools");
 
 var translate
 
@@ -122,9 +122,7 @@ function drakonToStruct(drakonJson, name, filename, translateFunction) {
     branches.forEach(branch => checkBranchIsReferenced(branch, firstNodeId, filename))
     rewireShortcircuit(nodes, filename)
     branches.forEach(branch => cutOffBranch(nodes, branch))
-    
     var branchTrees = structFlow(nodes, branches, filename, translate)
-
     return {
         name: name,
         params: drakonGraph.params || "",
@@ -237,8 +235,11 @@ function addFakeEnd(nodes, prev, node, end, addresses) {
         nodes[address.id] = address
         end.prev.push(address.id)
         addresses.push(address)
+        node.prev.push(address.id)
     }
     redirectNode(nodes, prev, node.id, address.id)
+    address.prev.push(prev.id)
+    node.prev = remove(node.prev, prev.id)
 }
 
 function buildTwoWayConnections(nodes, firstNodeId) {
@@ -1160,6 +1161,10 @@ function createError(message, filename, nodeId) {
     return error
 }
 
+function remove(array, element) {
+    return array.filter(item => item != element)
+}
+
 function sortByProperty(array, property, order = "asc") {
     if (!Array.isArray(array)) {
         throw new Error("First argument must be an array");
@@ -1187,7 +1192,7 @@ function addRange(to, from) {
         to.push(item)
     }
 }
-module.exports = { createError, sortByProperty, addRange }
+module.exports = { createError, sortByProperty, addRange, remove }
 },{}],9:[function(require,module,exports){
 var translationsRu = {
     "error": "ОШИБКА",

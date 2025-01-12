@@ -515,56 +515,32 @@ function createCanvas() {
     canvas.addEventListener('mousemove', onHover);
 }
 function createFloor(number, up, down) {
-    var _state_, bottom, centerY, floor, innerBottom, left, nleft, y, y1, y2;
-    _state_ = 'Common values';
-    while (true) {
-        switch (_state_) {
-        case 'Common values':
-            floor = { number: number };
-            bottom = getFloorBottom(number);
-            centerY = Math.round(bottom - floorHeight / 2);
-            left = canvasPadding + floorWidth + canvasPadding;
-            _state_ = 'Floor button';
-            break;
-        case 'Floor button':
-            if (up) {
-                if (down) {
-                    y1 = centerY - (buttonSize + buttonMargin / 2);
-                    y2 = y1 + buttonSize + buttonMargin;
-                    floor.up = createButton('up', undefined, left, y1);
-                    floor.down = createButton('down', undefined, left, y2);
-                    _state_ = 'Cabin button';
-                } else {
-                    y = centerY - buttonSize / 2;
-                    floor.up = createButton('up', undefined, left, y);
-                    _state_ = 'Cabin button';
-                }
-            } else {
-                if (down) {
-                    y = centerY - buttonSize / 2;
-                    floor.down = createButton('down', undefined, left, y);
-                    _state_ = 'Cabin button';
-                } else {
-                    _state_ = 'Cabin button';
-                }
-            }
-            _state_ = 'Cabin button';
-            break;
-        case 'Cabin button':
-            innerBottom = getFloorBottom(1);
-            nleft = left + buttonSize + canvasPadding * 2;
-            y = innerBottom - canvasPadding - floorThickness - buttonSize - (number - 1) * (buttonSize + buttonMargin);
-            floor.inner = createButton('inner', number, nleft, y);
-            _state_ = 'Exit';
-            break;
-        case 'Exit':
-            _state_ = undefined;
-            globals.floors.push(floor);
-            break;
-        default:
-            return;
+    var bottom, centerY, floor, innerBottom, left, nleft, y, y1, y2;
+    floor = { number: number };
+    bottom = getFloorBottom(number);
+    centerY = Math.round(bottom - floorHeight / 2);
+    left = canvasPadding + floorWidth + canvasPadding;
+    if (up) {
+        if (down) {
+            y1 = centerY - (buttonSize + buttonMargin / 2);
+            y2 = y1 + buttonSize + buttonMargin;
+            floor.up = createButton('up', undefined, left, y1);
+            floor.down = createButton('down', undefined, left, y2);
+        } else {
+            y = centerY - buttonSize / 2;
+            floor.up = createButton('up', undefined, left, y);
+        }
+    } else {
+        if (down) {
+            y = centerY - buttonSize / 2;
+            floor.down = createButton('down', undefined, left, y);
         }
     }
+    innerBottom = getFloorBottom(1);
+    nleft = left + buttonSize + canvasPadding * 2;
+    y = innerBottom - canvasPadding - floorThickness - buttonSize - (number - 1) * (buttonSize + buttonMargin);
+    floor.inner = createButton('inner', number, nleft, y);
+    globals.floors.push(floor);
 }
 function drawActiveButton(x, y, text) {
     drawButton(x, y, buttonSize, buttonSize, text, normalButton, lineColor);
@@ -995,6 +971,7 @@ function rect(x, y, width, height) {
 function redraw() {
     var _collection_34, button, canvasHeight, ctx, i;
     ctx = globals.canvas.getContext('2d');
+    ctx.resetTransform();
     ctx.scale(globals.retina, globals.retina);
     globals.ctx = ctx;
     ctx.fillStyle = background;

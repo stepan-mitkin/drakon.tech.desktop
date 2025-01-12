@@ -1,7 +1,7 @@
 {
   "name": "drakontech",
   "productName": "DrakonTech",
-  "version": "2025.01.11",
+  "version": "2025.01.12",
   "description": "A DRAKON-based IDE for JavaScript",
   "main": "main.js",
   "scripts": {
