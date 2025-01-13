@@ -468,7 +468,7 @@ const createWindow = async (folderpath) => {
 }
 
 function getFilenameFromCommandLine(argv) {
-    for (var i = argv.length - 1; i > 1; i--) {
+    for (var i = argv.length - 1; i > 0; i--) {
         var part = argv[i]
         if (part && part.substring(0, 2) !== "--") {
             var result = path.normalize(part)
@@ -509,7 +509,7 @@ async function main() {
 
     //logg = await fs.open(path.join(app.getPath("home"), "log.txt"), "a")
 
-    await log("main: started")
+    await log("main: started: " + JSON.stringify(process.argv))
 
     app.on('second-instance', onSecondInstance)
     app.on('window-all-closed', quitApp)

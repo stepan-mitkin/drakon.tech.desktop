@@ -35,7 +35,7 @@ async function main() {
     
     var launcher = [
         "#!/bin/bash",
-        "/usr/share/" + package.name + "/" + package.name + " $1 --no-sandbox 1>/dev/null 2>&1 &"
+        "/usr/share/" + package.name + "/" + package.name + " $1 $2 --no-sandbox 1>/dev/null 2>&1 &"
     ]
     await fs.writeFile(path.join(bin, package.name), launcher.join("\n"))
     await fs.chmod(path.join(bin, package.name), 0o775)
