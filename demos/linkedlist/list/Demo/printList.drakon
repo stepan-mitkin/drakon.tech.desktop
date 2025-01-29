@@ -1,0 +1,65 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "10"
+        },
+        "5": {
+            "type": "question",
+            "one": "1",
+            "two": "11",
+            "flag1": 0,
+            "content": "node"
+        },
+        "7": {
+            "type": "arrow-loop",
+            "one": "5",
+            "two": ""
+        },
+        "9": {
+            "type": "action",
+            "one": "7",
+            "two": "",
+            "content": "node = node.next"
+        },
+        "10": {
+            "type": "action",
+            "one": "12",
+            "content": "listDiv = document.createElement(\"div\")\nlistDiv.className = \"list-div\""
+        },
+        "11": {
+            "type": "action",
+            "one": "13",
+            "content": "nodeElement = createNodeElement(\n    node.value\n)"
+        },
+        "12": {
+            "type": "action",
+            "one": "14",
+            "content": "add(get(\"playground\"), listDiv)"
+        },
+        "13": {
+            "type": "action",
+            "one": "9",
+            "content": "add(listDiv, nodeElement)"
+        },
+        "14": {
+            "type": "action",
+            "one": "7",
+            "content": "node = list.head"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "list"
+}

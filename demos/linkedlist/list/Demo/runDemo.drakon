@@ -1,0 +1,53 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "9"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "runExample(\"Empty\", [])"
+        },
+        "4": {
+            "type": "action",
+            "one": "5",
+            "content": "runExample(\n    \"Only black\",\n    [\"black\", \"black\", \"black\"]\n)"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "runExample(\n    \"No black\",\n    [\n        \"#FFC759\",\n        \"#FF7B9C\",\n        \"#607196\",\n        \"#BABFD1\",\n        \"#E8E9ED\"\n    ]\n)"
+        },
+        "6": {
+            "type": "action",
+            "one": "7",
+            "content": "runExample(\n    \"Black at the start\",\n    [\n        \"black\",\n        \"black\",\n        \"#FFC759\",\n        \"#FF7B9C\",\n        \"#607196\",\n        \"#BABFD1\",\n        \"#E8E9ED\"\n    ]\n)"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "runExample(\n    \"Black at the end\",\n    [\n        \"#FFC759\",\n        \"#FF7B9C\",\n        \"#607196\",\n        \"#BABFD1\",\n        \"#E8E9ED\",\n        \"black\",\n        \"black\"\n    ]\n)"
+        },
+        "8": {
+            "type": "action",
+            "one": "10",
+            "content": "runExample(\n    \"Black at the start, middle, and end\",\n    [\n        \"black\",\n        \"black\",\n        \"#FFC759\",\n        \"#FF7B9C\",\n        \"#607196\",\n        \"black\",\n        \"black\",\n        \"#BABFD1\",\n        \"#E8E9ED\",\n        \"black\",\n        \"black\"\n    ]\n)"
+        },
+        "9": {
+            "type": "action",
+            "one": "3",
+            "content": "clear(get(\"playground\"))"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "content": "runExample(\n    \"No duplicates\",\n    [\n        \"black\",\n        \"#FFC759\",\n        \"#FF7B9C\",\n        \"#607196\",\n        \"black\",\n        \"#BABFD1\",\n        \"#E8E9ED\",\n        \"black\"\n    ]\n)"
+        }
+    }
+}

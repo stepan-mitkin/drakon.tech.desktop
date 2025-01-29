@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+    <title>Algorithms on a Singly Linked List</title>
+    <link rel="stylesheet" href="styles/joshreset.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta name="description" content="Basic linked list algorithms using DRAKON-JavaScript and DrakonTech">
+    <style>
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <p><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Home</a></p>
+        <h1 id="example-basic-algorithms-on-a-singly-linked-list-using-drakon-language">Example: Basic Algorithms on a Singly Linked List Using DRAKON Language</h1>
+        <p>Even though you will unlikely encounter self-made linked list classes in production, the following algorithms give a good overview of how to depict loops and branching on drakon flowcharts.</p>
+        <div class="button-container">
+            <div class="button" id="start">Run demo</div>
+        </div>
+        <div id="playground"></div>
+        <h2 id="-addnode-">addNode</h2>
+        <a href="images/addNode.png" target="_blank"><img class="ill" style="width:320px;" src="images/addNode.png" alt="Insert a new node into a linked list in DRAKON language"></a>
+        <p>The <code>addNode</code> function creates a new node with a given value and adds it to the head of the list. The new node’s <code>next</code> property points to the previous head. Then, the function updates the list&#39;s head to be the new node.</p>
+        <h2 id="-countvalues-">countValues</h2>
+        <a href="images/countValues.png" target="_blank"><img class="ill" style="width:402px;" src="images/countValues.png" alt="Count nodes of a linked list in DRAKON language"></a>
+        <p>The <code>countValues</code> function goes through the list and counts how many nodes have a specific value. It starts at the head and continues until it reaches the end (where <code>next</code> is empty). Each time a node’s value matches the specified value, it increments the count.</p>
+        <h2 id="-createlistfromvalues-">createListFromValues</h2>
+        <a href="images/createListFromValues.png" target="_blank"><img class="ill" style="width:400px;" src="images/createListFromValues.png" alt="Convert an array into a linked list in DRAKON language"></a>
+        <p>The <code>createListFromValues</code> function takes an array of values and creates a linked list. Since nodes can only be added to the start of the list, the function first reverses the input array. Then, it iterates through the reversed array, adding each value as a new node to the list.</p>
+        <h2 id="-reverselist-">reverseList</h2>
+        <a href="images/reverseList.png" target="_blank"><img class="ill" style="width:342px;" src="images/reverseList.png" alt="Reverse a linked list in place in DRAKON language"></a>
+        <p>The <code>reverseList</code> function reverses the linked list in place. It starts at the head and traverses each node, changing the <code>next</code> pointer to point to the previous node. The original head’s <code>next</code> becomes empty, making it the new tail of the reversed list.</p>
+        <h2 id="-removeduplicates-">removeDuplicates</h2>
+        <a href="images/removeDuplicates.png" target="_blank"><img class="ill" src="images/removeDuplicates.png" alt="Reverse a linked list in place in DRAKON language"></a>
+        <p>The <code>removeDuplicates</code> function scans the list to ensure there are no consecutive nodes with the specified value. After running, the list will not have two neighboring nodes with that value, although duplicates of other values are allowed.</p>
+        <p>The algorithm has two parts:</p>
+        <ol>
+        <li><strong>Handling the Head:</strong> If the list starts with nodes that have the specified value, it removes the extra nodes by updating the head to the next different node.</li>
+        <li><strong>Processing the Rest:</strong> It then processes the remaining nodes using a finite state machine with two states:<ul>
+        <li><strong>Previous Node Has Value:</strong> If the previous node has the specified value, it removes the current node if it also has that value.</li>
+        <li><strong>Previous Node Does Not Have Value:</strong> It keeps the current node and updates the previous node tracker.</li>
+        </ul>
+        </li>
+        </ol>
+        <p>This ensures that only one node with the specified value remains in any consecutive sequence. It also handles the case where the last node has the specified value by properly updating the <code>next</code> pointer.</p>
+        <h2 id="notes">Notes</h2>
+        <ol>
+        <li><strong>No Complex Logical Operators:</strong> This example avoids using NOT, NOT EQUAL, AND, and OR operators. DRAKON flowcharts help the reader, making complex logic operators unnecessary.</li>
+        <li><strong>One Idea per Icon:</strong> Each icon in the diagrams represents a single statement or a closely related set of statements, following the &quot;one icon—one idea&quot; principle.</li>
+        <li><strong>Clear Loop Visibility:</strong> Every loop in a function is clearly marked, either with an arrow or a LOOP icon, making loops easy to identify.</li>
+        </ol>
+        <div style="height: 50px;"></div>
+        <p><a href="https://stepan-mitkin.github.io/drakon.tech.desktop/src/drakontech?folder=linkedlist">Source code</a></p>
+        <div style="height: 50px;"></div>
+    </div>
+    <script src="list/list.js"></script>
+</body>
+
+</html>
