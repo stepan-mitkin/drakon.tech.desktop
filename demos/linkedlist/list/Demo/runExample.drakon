@@ -1,0 +1,82 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "originalList = createListFromValues(\n    values\n)"
+        },
+        "4": {
+            "type": "action",
+            "one": "5",
+            "content": "changedList = copyList(originalList)"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "count = countValues(\n    originalList,\n    \"black\"\n)"
+        },
+        "6": {
+            "type": "action",
+            "one": "7",
+            "content": "removeDuplicates(changedList, \"black\")"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "startSection(name)"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "content": "addSubheader(\"Original list\")"
+        },
+        "9": {
+            "type": "action",
+            "one": "10",
+            "content": "printList(originalList)"
+        },
+        "10": {
+            "type": "action",
+            "one": "11",
+            "content": "addSubheader(\"Count of black nodes\")"
+        },
+        "11": {
+            "type": "action",
+            "one": "12",
+            "content": "addPar(count)"
+        },
+        "12": {
+            "type": "action",
+            "one": "13",
+            "content": "addSubheader(\"After duplicates removal\")"
+        },
+        "13": {
+            "type": "action",
+            "one": "14",
+            "content": "printList(changedList)"
+        },
+        "14": {
+            "type": "action",
+            "one": "1",
+            "content": "addSpacer()"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "name\nvalues"
+}

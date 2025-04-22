@@ -1,0 +1,133 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "3",
+            "content": "Handle nodes with the specified\nvalue at the head"
+        },
+        "3": {
+            "type": "action",
+            "one": "10",
+            "content": "node = list.head"
+        },
+        "4": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "5": {
+            "type": "branch",
+            "one": "17",
+            "branchId": 2,
+            "content": "Rest of the nodes"
+        },
+        "6": {
+            "type": "question",
+            "one": "5",
+            "two": "8",
+            "flag1": 0,
+            "content": "node"
+        },
+        "8": {
+            "type": "question",
+            "one": "5",
+            "two": "9",
+            "flag1": 0,
+            "content": "node.value === value"
+        },
+        "9": {
+            "type": "action",
+            "one": "11",
+            "content": "list.head = node"
+        },
+        "10": {
+            "type": "arrow-loop",
+            "one": "6"
+        },
+        "11": {
+            "type": "action",
+            "one": "10",
+            "content": "node = node.next"
+        },
+        "12": {
+            "type": "question",
+            "one": "4",
+            "two": "18",
+            "flag1": 0,
+            "content": "node"
+        },
+        "15": {
+            "type": "arrow-loop",
+            "one": "12"
+        },
+        "17": {
+            "type": "action",
+            "one": "15",
+            "content": "prevWithValue = undefined"
+        },
+        "18": {
+            "type": "question",
+            "one": "31",
+            "two": "33",
+            "flag1": 0,
+            "content": "prevWithValue"
+        },
+        "24": {
+            "type": "action",
+            "one": "15",
+            "content": "node = node.next"
+        },
+        "31": {
+            "type": "question",
+            "one": "24",
+            "two": "32",
+            "flag1": 0,
+            "content": "node.value === value"
+        },
+        "32": {
+            "type": "action",
+            "one": "24",
+            "content": "prevWithValue = node"
+        },
+        "33": {
+            "type": "question",
+            "one": "35",
+            "two": "36",
+            "flag1": 0,
+            "content": "node.value === value"
+        },
+        "34": {
+            "type": "action",
+            "one": "24",
+            "two": "",
+            "content": "prevWithValue = undefined"
+        },
+        "35": {
+            "type": "action",
+            "one": "34",
+            "two": "",
+            "content": "prevWithValue.next = node"
+        },
+        "36": {
+            "type": "action",
+            "one": "24",
+            "two": "",
+            "content": "prevWithValue.next = undefined"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "list\nvalue"
+}
