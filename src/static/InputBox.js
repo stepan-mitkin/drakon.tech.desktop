@@ -25,7 +25,7 @@ function buildWindow(headerText, oldText, cmOptions) {
             main.style.maxWidth = "100vw"
         } else {
             main.style.minWidth = "200px"
-            main.style.width = "500px"
+            main.style.width = "700px"
         }
     }
     HtmlUtils.makePopupModal()
@@ -120,15 +120,89 @@ function createPlainTextEditor(parent, fontFamily, fontSize, oldText) {
     editor.style.width = "100%"
     editor.style.padding = "10px"
     editor.style.border = "none"
-    editor.style.height = "180px"
+    editor.style.height = "300px"
     editor.style.margin = "0px"
     editor.style.borderBottom = "solid 1px #707070"
     editor.style.verticalAlign = "top"
     editor.value = oldText
     editor.spellcheck = false
     editor.onfocus = fixIPadKeyboard
-    editor.onkeydown = handleTab
+    var getValue = function() {
+        return {
+            selectionStart: editor.selectionStart,
+            selectionEnd: editor.selectionEnd,
+            value: editor.value
+        }
+    }
+    var setValue = function(value) {
+        editor.value = value.value
+        editor.selectionStart = value.selectionStart
+        editor.selectionEnd = value.selectionEnd
+    }
+    var widget = {
+        textarea: editor,
+        buffer: createUndoBuffer(getValue, setValue)        
+    }
+    editor.onkeydown = (evt) => onEditorKeyDown(widget, evt)
+    editor.oninput = () => onEditorInput(widget)
     return editor
+}
+
+function createUndoBuffer(getValue, setValue) {
+    let history = [getValue()];
+    let currentIndex = 0;
+  
+    function undoEdit() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        setValue(history[currentIndex]);
+      }
+    }
+  
+    function redoEdit() {
+      if (currentIndex < history.length - 1) {
+        currentIndex++;
+        setValue(history[currentIndex]);
+      }
+    }
+  
+    function recordUndoAction() {
+      const currentValue = getValue();
+      // Truncate history after current index (discards redo states)
+      history = history.slice(0, currentIndex + 1);
+      // Append new state
+      history.push(currentValue);
+      currentIndex++;
+    }
+  
+    return {
+      undoEdit,
+      redoEdit,
+      recordUndoAction
+    };
+}
+
+function onEditorKeyDown(widget, evt) {
+    if (((evt.keyCode == 9) || (evt.key == "Tab")) || (evt.which == 9)) {
+        evt.preventDefault();
+        if (evt.shiftKey) {
+            onUnTab(evt)
+        } else {
+            onTab(evt)
+        }        
+        widget.buffer.recordUndoAction()    
+    } else if (evt.key === "z" && (evt.metaKey || evt.ctrlKey)) {
+        evt.preventDefault()
+        if (evt.shiftKey) {
+            widget.buffer.redoEdit()
+        } else {
+            widget.buffer.undoEdit()
+        }        
+    }
+}
+
+function onEditorInput(widget) {
+    widget.buffer.recordUndoAction() 
 }
 
 function fixIPadKeyboard() {
@@ -137,16 +211,6 @@ function fixIPadKeyboard() {
     }
     document.body.scrollTop = 0
     document.body.scrollLeft = 0
-}
-
-function handleTab(evt) {
-    if (((evt.keyCode == 9) || (evt.key == "Tab")) || (evt.which == 9)) {
-        if (evt.shiftKey) {
-            onUnTab(evt)
-        } else {
-            onTab(evt)
-        }
-    }
 }
 
 function hide() {
@@ -199,9 +263,6 @@ function onTab(evt) {
         // Move caret after tab
         textarea.selectionStart = textarea.selectionEnd = start + 1;
     }
-    
-    // Prevent default tab behavior
-    evt.preventDefault();
 }
 
 function onUnTab(evt) {
@@ -278,9 +339,6 @@ function onUnTab(evt) {
         textarea.selectionStart = lineStart;
         textarea.selectionEnd = lineStart + newText.length;
     }
-    
-    // Prevent default behavior
-    evt.preventDefault();
 }
 
 function isVisible() {
