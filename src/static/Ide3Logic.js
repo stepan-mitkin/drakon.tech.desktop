@@ -4577,6 +4577,12 @@ function getHandler(handlers, widget, type) {
 }
 
 function getImage(type) {
+    if (type === "txt") {
+        return "list-tx.png"
+    }
+    if (type === "proj") {
+        return "list-pj.png"
+    }
     var image
     if (type === "space") {
         image = "workspace-s2.png"
