@@ -494,7 +494,13 @@ async function openFolderCore(winInfo, folderPath) {
 }
 
 async function loadProjectSettings(winInfo) {
-    winInfo.language = "JS"
+    var language = "JS"
+    var solution = await readJson(path.join(winInfo.path, "solution.json"))
+    if (solution.language) {
+        language = solution.language
+    }
+    console.log(solution, language)
+    winInfo.language = language
 }
 
 async function determineAccess(winInfo, folderPath) {

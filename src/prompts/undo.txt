@@ -1,0 +1,21 @@
+Implement an undo buffer in JavaScript.
+Do not use "class", "new", and "this" keywords.
+
+The factory method that creates an instance of undo buffer.
+
+function createUndoBuffer(getValue, setValue)
+Where:
+- getValue: gets the current value of some external editor object
+- setValue: sets the current value to some external editor object
+createUndoBuffer initializes the buffer with the initial state of the editor.
+
+Methods:
+
+Undo the previous action (if available)
+function undoEdit()
+
+Redo the previous action (if available)
+function redoEdit()
+
+Discard the actions that were redone and append a new editor state to the undo buffer
+function recordUndoAction()
