@@ -9295,7 +9295,6 @@ function lexInit() {
     addLongOp("===")
     addLongOp("...")
     addLongOp("!==")
-    addLongOp(">>>")
     addLongOp("!=")
     addLongOp("<=")
     addLongOp(">=")
@@ -9311,6 +9310,16 @@ function lexInit() {
     addLongOp("=>")
     addLongOp("++")
     addLongOp("--")
+    addLongOp("<<")
+    addLongOp(">>")
+    addLongOp("<<<")
+    addLongOp(">>>")
+    addLongOp("<<=")
+    addLongOp(">>=")
+    addLongOp("**=")
+    addLongOp("**")
+    addLongOp("??")
+    addLongOp("??=")
     module.keywords = arrayToSet([
     "abstract", "arguments", "boolean", "break", "byte", "case", "catch",
     "char", "class", "const", "continue", "debugger", "default", "delete",
