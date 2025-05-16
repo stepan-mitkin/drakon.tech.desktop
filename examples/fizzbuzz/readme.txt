@@ -8,4 +8,4 @@ Build the progam using drakongen like this:
 drakongen --project fizzbuzz.proj --output .
 
 drakongen will overwrite fizzbuzz.txt
-Use fizzbuzz.txt a prompt for an AI app like Grok, Gemini, or ChatGPT.
+Use fizzbuzz.txt a prompt for an AI app like Grok, Gemini, or Copilot.

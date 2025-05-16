@@ -145,24 +145,38 @@ function createPlainTextEditor(parent, fontFamily, fontSize, oldText) {
     }
     editor.onkeydown = (evt) => onEditorKeyDown(widget, evt)
     editor.oninput = () => onEditorInput(widget)
+    editor.onselectionchange = () => onEditorSelectionChange(widget)
+
     return editor
 }
 
+function onEditorSelectionChange(widget) {
+    widget.buffer.recordLatestState()
+}
+
 function createUndoBuffer(getValue, setValue) {
-    let history = [getValue()];
     let currentIndex = 0;
+    let latestState = getValue()
+    let history = [createHistoryItem(latestState, latestState)]
+
+    function createHistoryItem(before, after) {
+        return {
+            before,
+            after
+        }
+    }
   
     function undoEdit() {
       if (currentIndex > 0) {
         currentIndex--;
-        setValue(history[currentIndex]);
+        setValue(history[currentIndex].before);
       }
     }
   
     function redoEdit() {
       if (currentIndex < history.length - 1) {
         currentIndex++;
-        setValue(history[currentIndex]);
+        setValue(history[currentIndex].after);
       }
     }
   
@@ -171,11 +185,17 @@ function createUndoBuffer(getValue, setValue) {
       // Truncate history after current index (discards redo states)
       history = history.slice(0, currentIndex + 1);
       // Append new state
-      history.push(currentValue);
+      var item = createHistoryItem(latestState, currentValue)
+      history.push(item);
       currentIndex++;
+    }
+
+    function recordLatestState() {
+        latestState = getValue()
     }
   
     return {
+      recordLatestState,
       undoEdit,
       redoEdit,
       recordUndoAction
@@ -193,11 +213,10 @@ function onEditorKeyDown(widget, evt) {
         widget.buffer.recordUndoAction()    
     } else if (evt.key === "z" && (evt.metaKey || evt.ctrlKey)) {
         evt.preventDefault()
-        if (evt.shiftKey) {
-            widget.buffer.redoEdit()
-        } else {
-            widget.buffer.undoEdit()
-        }        
+        widget.buffer.undoEdit()
+    } else if (evt.key === "y" && (evt.metaKey || evt.ctrlKey)) {
+        evt.preventDefault()
+        widget.buffer.redoEdit()
     }
 }
 
