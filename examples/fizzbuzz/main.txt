@@ -1,0 +1,4 @@
+Generate a JavaScript program.
+Entry point: "Start fizzbuzz"
+Do not use "this", "new", and "class" keywords.
+

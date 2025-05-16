@@ -1,0 +1,58 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "print number, \"FizzBuzz\""
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "7",
+            "flag1": 1,
+            "content": "number is divisible by 3"
+        },
+        "5": {
+            "type": "question",
+            "one": "3",
+            "two": "6",
+            "flag1": 1,
+            "content": "number is divisible by 5"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "print number, \"Fizz\""
+        },
+        "7": {
+            "type": "question",
+            "one": "8",
+            "two": "1",
+            "flag1": 1,
+            "content": "number is divisible by 5"
+        },
+        "8": {
+            "type": "action",
+            "one": "1",
+            "content": "print number, \"Buzz\""
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "number"
+}
