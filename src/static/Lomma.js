@@ -3446,7 +3446,7 @@ function buildManhattan(visuals, startNode) {
             } else {
                 mountUp = node2.mountUp
                 mountRight = node2.mountRight
-                if (mountUp) {
+                if ((mountUp) && (!(isUglyMountUp(node1, node2)))) {
                     makeDownEdge(
                         visuals,
                         node1,
@@ -3457,6 +3457,7 @@ function buildManhattan(visuals, startNode) {
                         node2.mountUp = null
                     }
                 } else {
+                    node2.mountUp = null
                     jun2 = createLeftUp(
                         visuals,
                         node2,
@@ -8955,6 +8956,20 @@ function isSubset(larger, smaller) {
         }
     } else {
         return false
+    }
+}
+
+function isUglyMountUp(node1, node2) {
+    var below
+    if (node1.type === "junction") {
+        return false
+    } else {
+        below = getDown(node2.mountUp)
+        if (below.type === "junction") {
+            return true
+        } else {
+            return false
+        }
     }
 }
 
