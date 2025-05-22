@@ -4776,9 +4776,9 @@ async function buildPseudocodeWindow(container, pseudo) {
     var pre = make(bottom, "pre")
     pre.style.fontFamily = '"Consolas", "Courier New", Courier, monospace'
     pre.style.fontSize = "16px"
-    pre.style.height = "100%"
+    pre.style.height = "calc(100% - 20px)"
     pre.style.padding = "10px"
-    pre.style.margin = "10px"
+    pre.style.margin = "0px"
     pre.style.overflow = "auto"
     pre.innerText = pseudo
 }
