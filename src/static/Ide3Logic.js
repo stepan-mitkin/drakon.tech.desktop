@@ -262,7 +262,8 @@ function BuildManager_Building_onData(self, msg) {
     options = {
         state : msg.state,
         module : msg.module,
-        url : msg.url
+        url : msg.url,
+        generatedPseudocode: msg.generatedPseudocode
     }
     if (msg.state == "error") {
         options.errors = msg.errors || []
@@ -334,6 +335,7 @@ function BuildManager_Idle_buildModule(self, msg) {
     current = msg
     console.log(folderName, msg)
     self.current = current
+    console.log(current, isHuman(current))
     if (isHuman(current)) {
         browser.showWorking()
         url = "/api/prog_modules/" + 
@@ -4499,6 +4501,7 @@ function getCurrent() {
         ids = parseId(current.id)
     }
     return {
+        id: current.id,
         type : current.type,
         screen : current.screen,
         spaceId : ids.spaceId,
@@ -8003,7 +8006,9 @@ function startBuild(self) {
     if (isReadonly()) {
         browser.showNotification("Cannot build a read-only project")
     } else {
-        build_start().then(self.onData).catch(self.onError)
+        var current = getCurrent()
+        var folder = getFromCache(current.id)
+        build_start(folder).then(self.onData).catch(self.onError)
     }
 }
 

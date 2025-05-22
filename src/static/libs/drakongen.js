@@ -3,7 +3,7 @@
 function htmlToString(html) {
     if (!html) return '';
     if (!html.startsWith('<') || !html.endsWith('>')) {
-        return html.split("\n").map(line => {return line.trim()})
+        return html.split("\n")
     }
 
     const parser = new DOMParser();
@@ -16,21 +16,17 @@ function htmlToString(html) {
         if (node.tagName === 'P') {
             output.push(node.textContent.trim());
         } else if (node.tagName === 'UL') {
-            output.push('');
             node.childNodes.forEach((item) => {
                 if (item.tagName === 'LI') {
                     output.push(`- ${item.textContent.trim()}`);
                 }
             });
-            output.push('');
         } else if (node.tagName === 'OL') {
-            output.push('');
             node.childNodes.forEach((item, index) => {
                 if (item.tagName === 'LI') {
                     output.push(`${index + 1}. ${item.textContent.trim()}`);
                 }
             });
-            output.push('');
         }
     });
 
@@ -40,18 +36,18 @@ function htmlToString(html) {
 module.exports = {htmlToString}
 },{}],2:[function(require,module,exports){
 const {drakonToStruct} = require("./drakonToStruct");
-const {printPseudo} = require('./printPseudo');
-const {addRange} = require("./tools")
+const {printPseudo, printWithIndent, makeIndent} = require('./printPseudo');
+const {addRange, sortByProperty} = require("./tools")
 
-function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate) {
+function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate) {    
     var diagram = drakonToStruct(drakonJson, name, filename, translate)
     var lines = []
-    if (diagram.params) {
-        addRange(lines, htmlToString(diagram.params))
-        lines.push("")
-    }
 
-    lines.push(translate("Procedure") + " \"" + diagram.name + "\"")
+    lines.push("## " + translate("Procedure") + " \"" + diagram.name + "\"")
+    if (diagram.params) {
+        lines.push(translate("Parameters") + ":")
+        addRange(lines, htmlToString(diagram.params))
+    }    
     lines.push("")
     lines.push(translate("Algorithm") + ":")    
     
@@ -70,6 +66,7 @@ function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate)
             lines.push(translate("End of subroutine"))
         })
     }  
+    lines.push("")
     lines.push(translate("End of procedure"))
     if (diagram.description) {
         lines.push("")       
@@ -82,7 +79,80 @@ function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate)
     return {text:text,json:str}
 }
 
-module.exports = { drakonToPseudocode };
+
+function mindToTree(drakonJson, name, filename, htmlToString) {
+    let drakonGraph;
+    try {
+        drakonJson = drakonJson || ""
+        drakonJson = drakonJson.trim()
+        drakonJson = drakonJson || "{}"
+        drakonGraph = JSON.parse(drakonJson);
+    } catch (error) {
+        var message = translate("Error parsing JSON") + ": " + error.message
+        throw createError(message, filename)
+    }
+
+    const nodes = drakonGraph.items || {};
+    var root = createMindNode("## " + name)
+    nodes["root"] = root
+    connectMindNodesToParent(nodes)
+    sortMindChildren(nodes)
+    var lines = []
+    printMindNode(root, 0, lines, htmlToString, true)
+    lines.push("")
+    var text = lines.join("\n")
+    return {text:text}
+}
+
+function connectMindNodesToParent(nodes) {
+    for (var id in nodes) {
+        var node = nodes[id]
+        if (node.parent) {
+            var parent = nodes[node.parent]
+            if (!parent.children) {
+                parent.children = []
+            }
+            parent.children.push(node)
+        }
+    }
+}
+
+function sortMindChildren(nodes) {
+    for (var id in nodes) {
+        var node = nodes[id]
+        if (node.children) {
+            sortByProperty(node.children, "ordinal")
+        }
+    }
+}
+
+function printMindNode(node, depth, lines, htmlToString, first) {
+    var printed = htmlToString(node.content)
+    const indent = makeIndent(depth)
+    printWithIndent(printed, indent, lines)
+    var childDepth = depth + 1
+    if (first) {
+        lines.push("")
+        childDepth = 0
+    }
+    if (node.children) {
+        for (var child of node.children) {
+            printMindNode(child, childDepth, lines, htmlToString, false)
+        }
+    }
+}
+
+function createMindNode(name) {
+    return {
+        "type": "idea",
+        "content": "<p>" + name + "</p>",
+        "parent": undefined,
+        "treeType": "treeview",
+        "ordinal": 0
+    }
+}
+
+module.exports = { drakonToPseudocode, mindToTree };
 },{"./drakonToStruct":3,"./printPseudo":5,"./tools":8}],3:[function(require,module,exports){
 const { structFlow, redirectNode } = require("./structFlow");
 const { createError, remove } = require("./tools");
@@ -502,7 +572,7 @@ function markLoopBody(nodes, start, filename) {
 
 module.exports = { drakonToStruct, drakonToGraph };
 },{"./structFlow":6,"./tools":8}],4:[function(require,module,exports){
-const { drakonToPseudocode } = require('./drakonToPromptStruct');
+const { drakonToPseudocode, mindToTree } = require('./drakonToPromptStruct');
 const { htmlToString } = require("./browserTools")
 const { setUpLanguage, translate } = require("./translate")
 const { drakonToStruct } = require("./drakonToStruct");
@@ -514,6 +584,12 @@ window.drakongen = {
         return drakonToPseudocode(drakonJson, name, filename, htmlToString, translate).text
     },
 
+    toMindTree: function (mindJson, name, filename, language) {
+        setUpLanguage(language)    
+        var result = mindToTree(mindJson, name, filename, htmlToString)
+        return result.text
+    },    
+
     toTree: function (drakonJson, name, filename, language) {
         setUpLanguage(language)
         var result = drakonToStruct(drakonJson, name, filename, translate)
@@ -523,17 +599,19 @@ window.drakongen = {
 },{"./browserTools":1,"./drakonToPromptStruct":2,"./drakonToStruct":3,"./translate":9}],5:[function(require,module,exports){
 var {addRange} = require("./tools")
 
+function makeIndent(depth) {
+    return " ".repeat(depth * 4); 
+}
+
+function printWithIndent(lines, indent, output) {
+    if (!lines) {return}
+    lines.forEach(line => output.push(indent + line))
+}
+
 function printPseudo(algorithm, translate, output, htmlToString) {
-
-
-
     function printStructuredContent(content, indent, output) {
         var lines = printStructuredContentNoIdent(content)
         printWithIndent(lines, indent, output)
-    }
-
-    function printWithIndent(lines, indent, output) {
-        lines.forEach(line => output.push(indent + line))
     }
 
     function printStructuredContentNoIdent(content) {
@@ -582,14 +660,10 @@ function printPseudo(algorithm, translate, output, htmlToString) {
         return lines
     }
 
-    function makeIndent(depth) {
-        return " ".repeat(depth * 4); 
-    }
-
     function printSteps(steps, depth, output) {
         const indent = makeIndent(depth)
         for (var step of steps) {
-            if (step.type === "end" || step.type === "branch" || step.type === "comment") { continue }
+            if (step.type === "end" || step.type === "branch") { continue }
             if (step.type === "question") {
                 printQuestion(step, depth, output)
             } else if (step.type === "loop") {
@@ -613,8 +687,7 @@ function printPseudo(algorithm, translate, output, htmlToString) {
         }
         if (step.content) {
             printStructuredContent(step.content, indent, output)
-        }        
-        output.push("")
+        }
     }
 
     function printAddress(step, indent, output) {
@@ -629,11 +702,12 @@ function printPseudo(algorithm, translate, output, htmlToString) {
 
     function printError(step, indent, output) {
         output.push(indent + translate("error") + ":")
-        output.push(indent + step.message)
+        var ind2 = indent + makeIndent(1)
+        output.push(ind2 + step.message)
         if (step.content) {
-            printStructuredContent(step.content, indent, output)
+            var ind3 = indent + makeIndent(2)
+            printStructuredContent(step.content, ind3, output)
         }        
-        output.push("")
     }    
 
     function empty(array) {
@@ -680,7 +754,7 @@ function printPseudo(algorithm, translate, output, htmlToString) {
     printSteps(algorithm.body, 0, output)
 }
 
-module.exports = {printPseudo}
+module.exports = {printPseudo, printWithIndent, makeIndent}
 },{"./tools":8}],6:[function(require,module,exports){
 var {buildTree} = require("./technicalTree")
 const { createError, sortByProperty } = require("./tools");
@@ -1220,7 +1294,8 @@ var translationsRu = {
     "End of subroutine": "Конец подпрограммы",
     "Description": "Описание",
     "Algorithm": "Алгоритм",
-    Remarks: "Замечания"
+    Remarks: "Замечания",
+    Parameters: "Параметры"
 }
 
 var translationsEn = {
@@ -1249,7 +1324,8 @@ var translationsEn = {
     'End of subroutine': 'End of subroutine',
     Description: 'Description',
     Algorithm: 'Algorithm',
-    Remarks: "Remarks"
+    Remarks: "Remarks",
+    Parameters: "Parameters"
 }
 
 var translationsNo = {
@@ -1278,7 +1354,8 @@ var translationsNo = {
     'End of subroutine': 'Slutt på delprosedyre',
     Description: 'Beskrivelse',
     Algorithm: 'Algoritme',
-    Remarks: "Bemerkninger"
+    Remarks: "Bemerkninger",
+    Parameters: "Parametere"
 };
 
 
@@ -1308,8 +1385,8 @@ function optimizeTree(steps) {
     var result = []
 
     for (var step of steps) {
-        if (step.type === "end" || step.type === "branch" || step.type === "comment" || step.type === "loopend") { continue }
-        if (step.type === "action" && !step.content) { continue }
+        if (step.type === "end" || step.type === "branch" || step.type === "loopend") { continue }
+        if ((step.type === "action" || step.type === "comment") && !step.content) { continue }
         var copy
         if (step.type === "question") {
             copy = optimizeQuestion(step)

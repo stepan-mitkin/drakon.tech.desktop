@@ -8,6 +8,7 @@
     var generator = undefined
     var errors = []
     var failed = false
+    var generatedPseudocode = undefined
 
 
     async function convertError(err) {
@@ -45,6 +46,8 @@
         failed = true
         if (err.stack) {
             console.log(err.message, err.stack)
+        } else {
+            console.log(err.message)
         }
     }
 
@@ -58,18 +61,85 @@
         }
     }
 
+    function onDataHuman(data) {
+        generatedPseudocode = data
+    }
+
+    function buildHumanGenerator(root, getObjectByHandle, onData) {
+        var generatedBlocks = []
+        var diagrams = []
+        var stopRequested = false
+        async function runHumanGenerator() {
+            await collectDiagrams(root)
+            for (var diagram of diagrams) {                
+                generatePseudo(diagram)
+                await pause(1)
+                if (stopRequested) { return }
+            }
+            var output = generatedBlocks.join("\n\n")
+            onData(output)
+        }
+
+        function generatePseudo(diagram) {
+            var userLanguage = "en"
+            var content
+            try {
+                content = window.drakongen.toPseudocode(diagram.json, diagram.name, diagram.handle, userLanguage)            
+                generatedBlocks.push(content)
+            } catch (ex) {                
+                onError(ex)
+            }
+        }
+
+        async function collectDiagrams(handle) {
+            var folder = await getObjectByHandle(handle)
+            if (!folder) { return }
+            if (folder.type === "folder") {
+                console.log("Processing folder " + folder.name)
+                for (var childPath of folder.children) {
+                    await collectDiagrams(childPath)
+                    if (stopRequested) { return }
+                }
+            } else if (folder.type === "drakon") {
+                diagrams.push({
+                    handle: handle,
+                    name: folder.name,
+                    json: JSON.stringify(folder)
+                })
+            }
+        }
+
+        function stopHumanGenerator() {
+            stopRequested = true
+        }
+        return {
+            run: runHumanGenerator,
+            stop: stopHumanGenerator
+        }
+    }
 
 
-    window.build_start = async function() {
+    window.build_start = async function(folder) {
         console.log("build_start")
-        name = await backend.getProjectName()
+        console.log(folder)
         state = "working"
         errors = []
         failed = false
+        generatedPseudocode = undefined
 
-        var root = await backend.getRootHandle()
-        var onData = backend.saveGeneratedFile
-        generator = drakontechgen.buildGenerator(name, root, backend.getObjectByHandle, onError, onData)
+        var root, onData
+        if (folder.language === "LANG_HUMAN") {
+            name = folder.name
+            root = await backend.getFilePathById(folder.folderId)
+            onData = onDataHuman
+            generator = buildHumanGenerator(root, backend.getObjectByHandle, onData)
+
+        } else {
+            name = await backend.getProjectName()
+            root = await backend.getRootHandle()
+            onData = backend.saveGeneratedFile
+            generator = drakontechgen.buildGenerator(name, root, backend.getObjectByHandle, onError, onData)            
+        }
 
         runBuild()
 
@@ -98,7 +168,8 @@
             state: state,
             name: name,
             module: name,
-            url: "none"
+            url: "none",
+            generatedPseudocode: generatedPseudocode
         }
     }
 })();

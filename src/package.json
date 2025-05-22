@@ -1,8 +1,8 @@
 {
   "name": "drakontech",
   "productName": "DrakonTech",
-  "version": "2025.01.12",
-  "description": "A DRAKON-based IDE for JavaScript",
+  "version": "2025.05.17",
+  "description": "A DRAKON-based IDE that transforms flowcharts into JavaScript code and generates text prompts for AI applications",
   "main": "main.js",
   "scripts": {
     "build:mac": "electron-builder --mac",

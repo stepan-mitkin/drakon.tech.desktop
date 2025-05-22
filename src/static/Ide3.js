@@ -1102,6 +1102,7 @@ function createButton(parent, textId, action, color) {
     div.style.padding = "10px"
     div.style.borderRadius = "8px"
     div.style.textAlign = "center"
+    return div
 }
 
 function createCentral(node, centralMachine) {
@@ -4746,6 +4747,42 @@ function showAddUserScreen(machine) {
     getWidget("searchUsers").focus()
 }
 
+async function buildPseudocodeWindow(container, pseudo) {
+    await navigator.clipboard.writeText(pseudo)
+    container.style.position = "fixed"
+    container.style.display = "inline-block"
+    container.style.background = "white"
+    container.style.left = "0px"
+    container.style.top = "0px"
+    container.style.width = "100vw"
+    container.style.height = "100vh"
+    var top = make(container, "div")
+    top.innerText = translate("MES_COPIED")
+    var bottom = make(container, "div")
+    top.style.height = "50px"
+    top.style.textAlign = "right"
+    bottom.style.height = "calc(100% - 50px)"    
+    var copyButton = createButton(top, "MES_COPY", async function() {await navigator.clipboard.writeText(pseudo); copyButton.remove()})
+    copyButton.style.display = "inline-block"
+    copyButton.style.background = "#f0f0f0"
+    copyButton.style.color = "black"
+    copyButton.style.marginLeft = "5px"
+    var closeButton = createButton(top, "MES_CLOSE", HtmlUtils.hidePopup)
+    closeButton.style.display = "inline-block"
+    closeButton.style.background = "#f0f0f0"
+    closeButton.style.color = "black"
+    closeButton.style.marginLeft = "5px"
+    closeButton.style.marginRight = "5px"
+    var pre = make(bottom, "pre")
+    pre.style.fontFamily = '"Consolas", "Courier New", Courier, monospace'
+    pre.style.fontSize = "16px"
+    pre.style.height = "100%"
+    pre.style.padding = "10px"
+    pre.style.margin = "10px"
+    pre.style.overflow = "auto"
+    pre.innerText = pseudo
+}
+
 function showBuild(options) {
     var _sw46310000_ = 0;
     var buildInfo = globs.build
@@ -4767,6 +4804,13 @@ function showBuild(options) {
     )
     _sw46310000_ = options.state;
     if (_sw46310000_ === "success") {
+        if (options.generatedPseudocode) {
+            console.log("got pseudo")
+            destroyBuildWindow()
+            var main = createPopup()
+            buildPseudocodeWindow(main, options.generatedPseudocode)
+            return
+        }
         var success = make(client, "div")
         success.style.color = "white"
         success.style.background = "green"

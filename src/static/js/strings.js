@@ -1,6 +1,7 @@
 var gLanguage = "en"
 
 var gStringsEn = {
+	"MES_COPIED": "Copied to clipboard",
 	"MES_SAVE_TO_FILE": "Save to file",
 	"MES_LOAD_FROM_FILE": "Load from file",
 	"MES_LOAD_AND_REPLACE": "Load and replace",
@@ -535,6 +536,7 @@ var gStringsEn = {
 }
 
 var gStringsRu = {
+	"MES_COPIED": "Скопировано в буфер обмена",
 	"MES_SAVE_TO_FILE": "Сохранить в файл",
 	"MES_LOAD_FROM_FILE": "Загрузить из файла",
 	"MES_LOAD_AND_REPLACE": "Загрузить и заменить",

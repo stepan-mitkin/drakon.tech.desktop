@@ -35,6 +35,7 @@ contextBridge.exposeInMainWorld('backend', {
     saveGeneratedFile: (content) => ipcRenderer.invoke("saveGeneratedFile", content),
     showGeneratedFile: (content) => ipcRenderer.invoke("showGeneratedFile", content),
     getObjectByHandle: (handle) => ipcRenderer.invoke("getObjectByHandle", handle),
+    getFilePathById: (id) => ipcRenderer.invoke("getFilePathById", id),
     getFolderInfoByHandle: (handle) => ipcRenderer.invoke("getFolderInfoByHandle", handle),
     setLocalClipboard: (callback) => ipcRenderer.on('setLocalClipboard', callback),
 })

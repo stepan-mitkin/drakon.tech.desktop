@@ -287,6 +287,8 @@ function registerMainCallbacks() {
     registerHandler(clearProject)
     registerHandler(getProjectName)
 
+    registerHandler(getFilePathById)
+
     registerHandler(getRootHandle)
     registerHandler(saveGeneratedFile)
     registerHandler(getObjectByHandle)
