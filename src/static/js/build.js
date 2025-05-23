@@ -81,7 +81,7 @@
         }
 
         function generatePseudo(diagram) {
-            var userLanguage = "en"
+            var userLanguage = getLanguage()
             var content
             try {
                 content = window.drakongen.toPseudocode(diagram.json, diagram.name, diagram.handle, userLanguage)            
