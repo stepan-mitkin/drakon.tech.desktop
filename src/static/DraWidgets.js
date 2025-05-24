@@ -1857,15 +1857,16 @@ function createTextButton(div, node, widget) {
 
 function createTreeNode(widget, prevDiv, item) {
     var icon, left, onPlus, plus, plusImg, textPart
-    var myDiv = document.createElement("div")
+    var tr = document.createElement("tr")
     if (prevDiv) {
-        prevDiv.after(myDiv)
+        prevDiv.after(tr)
     } else {
-        widget.div.appendChild(myDiv)
+        widget.table.appendChild(tr)
     }
+    var myDiv = make(tr, "td")
+    item.tr = tr
     item.div = myDiv
     item.div.className = "list_item"
-    item.div.display = "block"
     item.div.style.paddingLeft = (item.depth *
       TreeIconWidth) + "px"
     bindEvent(
@@ -1925,7 +1926,7 @@ function createTreeNode(widget, prevDiv, item) {
         setDivColor(textPart, item.color)
     }
     left = (item.depth + 2) * TreeIconWidth
-    return myDiv
+    return tr
 }
 
 function setDivColor(element, color) {
@@ -2002,6 +2003,8 @@ function createTreeViewRoot(widget) {
         0,
         undefined
     )
+    widget.table = make(widget.div, "table")
+    widget.table.style.width = "100%"
     widget.root = rootItem.id
     rootItem.expanded = true
     rootItem.depth = -1
@@ -2717,8 +2720,8 @@ function removeNode(widget, item) {
     for (var kid of kids) {
         removeNode(widget, kid)
     }
-    deleteDiv(item.div)
-    item.div = undefined
+    deleteDiv(item.tr)
+    item.tr = undefined
     widget.items.remove(
         "items",
         item.id
@@ -3081,10 +3084,11 @@ function tree_collapse(itemId) {
 }
 
 function removeTreeNodeDiv(item) {
-    if (!item.div) {
+    if (!item.tr) {
         return
-    }
-    item.div.remove()
+    }    
+    item.tr.remove()
+    item.tr = undefined
     for (var kid of item.kids) {
         removeTreeNodeDiv(kid)
     }
@@ -3123,7 +3127,7 @@ function tree_expand(itemId) {
             "plus-expand.png"
         )
         item.expanded = true
-        var prev = item.div
+        var prev = item.tr
         for (var kid of item.kids) {
             prev = createTreeNode(
             	this,
@@ -3276,7 +3280,7 @@ function tree_setChildren(parentId, kids) {
     if (parentId === this.root) {
         prev = undefined
     } else {
-        prev = parent.div
+        prev = parent.tr
     }
     for (var kid of kids) {
         if (parent.expanded) {
