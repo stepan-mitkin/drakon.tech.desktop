@@ -1855,17 +1855,21 @@ function createTextButton(div, node, widget) {
     )
 }
 
-function createTreeNode(widget, parentDiv, item) {
+function createTreeNode(widget, prevDiv, item) {
     var icon, left, onPlus, plus, plusImg, textPart
-    item.div = make(parentDiv, "div")
-    item.myDiv = make(item.div, "div")
-    item.kidsDiv = make(item.div, "div")
-    item.myDiv.className = "list_item"
-    item.myDiv.display = "inline-block"
-    item.myDiv.style.paddingLeft = (item.depth *
+    var myDiv = document.createElement("div")
+    if (prevDiv) {
+        prevDiv.after(myDiv)
+    } else {
+        widget.div.appendChild(myDiv)
+    }
+    item.div = myDiv
+    item.div.className = "list_item"
+    item.div.display = "block"
+    item.div.style.paddingLeft = (item.depth *
       TreeIconWidth) + "px"
     bindEvent(
-        item.myDiv,
+        item.div,
         "click",
         widget.id,
         item.id,
@@ -1873,14 +1877,14 @@ function createTreeNode(widget, parentDiv, item) {
         false
     )
     bindOnContext(
-        item.myDiv,
+        item.div,
         widget.id,
         item.id,
         null
     )
     if (item.isFolder) {
         plusImg = makeImg(
-            item.myDiv,
+            item.div,
             "plus-collapse.png",
             TreeIconWidth,
             TreeIconWidth
@@ -1902,18 +1906,18 @@ function createTreeNode(widget, parentDiv, item) {
             onPlus
         )
     } else {
-        plus = makeIB(item.myDiv)
+        plus = makeIB(item.div)
         plus.style.width = TreeIconWidth + "px"
     }
     icon = makeImg(
-        item.myDiv,
+        item.div,
         item.icon,
         TreeIconWidth,
         TreeIconWidth
     )
     icon.style.verticalAlign = "middle"
     item.iconDiv = icon
-    textPart = makeIB(item.myDiv)
+    textPart = makeIB(item.div)
     textPart.style.padding = "8px"
     item.textDiv = textPart
     HtmlUtils.setDivText(textPart, item.text)
@@ -1921,6 +1925,7 @@ function createTreeNode(widget, parentDiv, item) {
         setDivColor(textPart, item.color)
     }
     left = (item.depth + 2) * TreeIconWidth
+    return myDiv
 }
 
 function setDivColor(element, color) {
@@ -1974,7 +1979,7 @@ function createTreeView(div, node, widget) {
     resetTreeData(widget)
     copyStyle(node, div)
     div.style.overflowY = "auto"
-    div.style.overflowX = "hidden"
+    div.style.overflowX = "auto"
     div.style.whiteSpace = "nowrap"
     createTreeViewRoot(widget)
     bindOnContext(
@@ -1998,7 +2003,6 @@ function createTreeViewRoot(widget) {
         undefined
     )
     widget.root = rootItem.id
-    rootItem.kidsDiv = widget.div
     rootItem.expanded = true
     rootItem.depth = -1
 }
@@ -2709,22 +2713,12 @@ function removeAt(array, index) {
 }
 
 function removeNode(widget, item) {
-    var kids
-    kids = copyArray(item.kids)
-    var _ind3238 = 0;
-    var _col3238 = kids;
-    var _len3238 = _col3238.length;
-    while (true) {
-        if (_ind3238 < _len3238) {
-            
-        } else {
-            break;
-        }
-        var kid = _col3238[_ind3238];
+    var kids = copyArray(item.kids)
+    for (var kid of kids) {
         removeNode(widget, kid)
-        _ind3238++;
     }
     deleteDiv(item.div)
+    item.div = undefined
     widget.items.remove(
         "items",
         item.id
@@ -3080,7 +3074,19 @@ function tree_collapse(itemId) {
             "plus-collapse.png"
         )
         item.expanded = false
-        clearDiv(item.kidsDiv)
+        for (var kid of item.kids) {
+            removeTreeNodeDiv(kid)
+        }
+    }
+}
+
+function removeTreeNodeDiv(item) {
+    if (!item.div) {
+        return
+    }
+    item.div.remove()
+    for (var kid of item.kids) {
+        removeTreeNodeDiv(kid)
     }
 }
 
@@ -3098,10 +3104,10 @@ function tree_deselect() {
             break;
         }
         var currentId = _keys3101[_ind3101]; var item = _col3101[currentId];
-        if (item.myDiv) {
-            item.myDiv.style.background = ""
-            item.myDiv.style.color = ""
-            item.myDiv.className = "list_item"
+        if (item.div) {
+            item.div.style.background = ""
+            item.div.style.color = ""
+            item.div.className = "list_item"
         }
         _ind3101++;
     }
@@ -3117,22 +3123,13 @@ function tree_expand(itemId) {
             "plus-expand.png"
         )
         item.expanded = true
-        var _ind3116 = 0;
-        var _col3116 = item.kids;
-        var _len3116 = _col3116.length;
-        while (true) {
-            if (_ind3116 < _len3116) {
-                
-            } else {
-                break;
-            }
-            var kid = _col3116[_ind3116];
-            createTreeNode(
+        var prev = item.div
+        for (var kid of item.kids) {
+            prev = createTreeNode(
             	this,
-            	item.kidsDiv,
+            	prev,
             	kid
             )
-            _ind3116++;
         }
     }
 }
@@ -3171,11 +3168,11 @@ function tree_mark(id) {
             break;
         }
         var currentId = _keys3154[_ind3154]; var item = _col3154[currentId];
-        if (item.myDiv) {
+        if (item.div) {
             if (currentId == id) {
-                item.myDiv.className = "list_item_marked"
+                item.div.className = "list_item_marked"
             } else {
-                item.myDiv.className = "list_item"
+                item.div.className = "list_item"
             }
         }
         _ind3154++;
@@ -3196,21 +3193,10 @@ function tree_remove(id) {
 function tree_removeChildren(id) {
     var kids, parent
     id = id || this.root
-    parent = getTreeItem(this, id)
-    clearDiv(parent.kidsDiv)
+    parent = getTreeItem(this, id)    
     kids = copyArray(parent.kids)
-    var _ind3068 = 0;
-    var _col3068 = kids;
-    var _len3068 = _col3068.length;
-    while (true) {
-        if (_ind3068 < _len3068) {
-            
-        } else {
-            break;
-        }
-        var kid = _col3068[_ind3068];
+    for (var kid of kids) {
         removeNode(this, kid)
-        _ind3068++;
     }
 }
 
@@ -3249,9 +3235,9 @@ function tree_select(id) {
             break;
         }
         var currentId = _keys3089[_ind3089]; var item = _col3089[currentId];
-        if ((item.myDiv) && (currentId == id)) {
-            item.myDiv.style.background = DarkBackground
-            item.myDiv.style.color = "white"
+        if ((item.div) && (currentId == id)) {
+            item.div.style.background = DarkBackground
+            item.div.style.color = "white"
         }
         _ind3089++;
     }
@@ -3286,24 +3272,20 @@ function tree_setChildren(parentId, kids) {
     }
     kids = parent.kids
     kids.sort(compareTreeItems)
-    var _ind3208 = 0;
-    var _col3208 = kids;
-    var _len3208 = _col3208.length;
-    while (true) {
-        if (_ind3208 < _len3208) {
-            
-        } else {
-            break;
-        }
-        var kid = _col3208[_ind3208];
+    var prev
+    if (parentId === this.root) {
+        prev = undefined
+    } else {
+        prev = parent.div
+    }
+    for (var kid of kids) {
         if (parent.expanded) {
-            createTreeNode(
+            prev = createTreeNode(
                 this,
-                parent.kidsDiv,
+                prev,
                 kid
             )
         }
-        _ind3208++;
     }
 }
 
