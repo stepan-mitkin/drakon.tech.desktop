@@ -1076,14 +1076,14 @@ function FolderCreator_SetModuleProps_onError(self, data) {
 
 function FolderCutterDeleter_GettingHistory_onData(self, data) {
     resetCutFolders()
+    var currentDeleted = deleteFoldersFromUi(
+        self.folders
+    )
     if (self.cut) {        
         self.folders.forEach(onCut)
     } else {
         self.folders.forEach(onDelete)
-    }
-    var currentDeleted = deleteFoldersFromUi(
-        self.folders
-    )
+    }    
     if (currentDeleted) {
         goToFolder(
             self.parentId,
