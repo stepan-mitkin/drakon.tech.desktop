@@ -243,9 +243,25 @@ function createClojureGenerator(options) {
         }
     }
 
+    function inSquareBrackets(text) {
+        if (!text) {
+            return false
+        }
+        if (text.length < 2) {
+            return false
+        }
+        if (text[0] === "[" && text[text.length - 1] === "]") {
+            return true
+        }
+        return false
+    }
     function handleLet(fun, item, content, output) {
         var noLet = makeOneLine(content.substring(4))
-        var core = "[" + noLet +"]"
+        var core = noLet
+        if (!inSquareBrackets(core)) {
+            core = "[" + core +"]"
+        }
+        
         var node = createClojureNode("let")
         node.strings.push(core)
         output.push(node)

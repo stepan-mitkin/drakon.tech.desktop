@@ -48,7 +48,7 @@
         "9": {
             "type": "action",
             "one": "4",
-            "content": "let result right"
+            "content": "let [result right]"
         }
     },
     "keywords": {
