@@ -1058,7 +1058,11 @@ async function writeJson(filepath, object) {
 }
 
 function getGeneratedFilename(winInfo) {
-    return path.join(winInfo.path, winInfo.name + ".js")
+    var extension = ".js"
+    if (winInfo.language === "clojure") {
+        extension = ".clj"
+    }
+    return path.join(winInfo.path, winInfo.name + extension)
 }
 
 async function getRootHandle(winInfo) {

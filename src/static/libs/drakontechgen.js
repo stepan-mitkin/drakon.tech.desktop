@@ -48,10 +48,10 @@ module.exports = {
     traverseAst
 }
 },{}],2:[function(require,module,exports){
-const { createDrakonTechGenerator } = require("./drakontechgen")
+const { createDrakonTechGenerator, createClojureGenerator } = require("./drakontechgen")
 
 window.drakontechgen = {
-    buildGenerator: function (name, root, getObjectByHandle, onError, onData, language) {        
+    buildGenerator: function (name, root, getObjectByHandle, onError, onData, language) {
         language = language || "JS"
         var genOptions = {
             toTree: window.drakongen.toTree,
@@ -61,22 +61,411 @@ window.drakontechgen = {
             root: root,
             getObjectByHandle: getObjectByHandle,
             onError: onError,
-            onData: onData,
-            language: language
+            onData: onData
         }
-        
-        return createDrakonTechGenerator(genOptions)
+
+        if (language === "JS") {
+            return createDrakonTechGenerator(genOptions)
+        } else {
+            return createClojureGenerator(genOptions)
+        } 
     }
 }
 },{"./drakontechgen":3}],3:[function(require,module,exports){
 const { sortBy, findFirst, addRange, clone, replace } = require("./tools")
 const { traverseAst } = require("./astScanner")
-const { topologicaSort } = require("./sort")
+const { topologicaSort } = require("./sort");
+
 
 var verbose = false
 
 async function pause(milliseconds) {
     return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+function tr(text) {
+    return text
+}
+
+function createClojureGenerator(options) {
+    var state = "idle"
+    var failed = false
+    var project = {
+        functions: {}
+    }
+
+    function checkCancellation() {
+        if (!state) {
+            var error = new Error("Cancelled")
+            error.cancelled = true
+            throw error
+        }
+    }    
+
+    async function readChildren(folder) {
+        var result = []
+        for (var filepath of folder.children) {
+            var child = await options.getObjectByHandle(filepath)
+            if (child) {
+                result.push(child)
+            }
+        }
+        return result
+    }
+
+
+    function isModule(folder) {
+        return folder.type === "drakon" && folder.name === "module"
+    }
+
+    function isFunction(folder) {
+        if (folder.type === "drakon") {
+            return true
+        }
+        return false
+    }
+
+    async function traverseModuleItem(folder) {
+        if (verbose) { console.log("traverseModuleItem", folder.path) }
+        checkCancellation()        
+        if (folder.type === "folder") {
+            var children = await readChildren(folder)
+            for (var child of children) {
+                await traverseModuleItem(child)
+            }
+        } else if (isModule(folder)) {
+            reportError("module not expected here", folder.path)
+        } else if (isFunction(folder)) {
+            addFunction(folder)
+        }
+    }
+
+    function addFunction(folder) {
+        if (verbose) {
+            console.log("addFunction", folder.name, folder.path)
+        }
+        var name = folder.name
+        if (project.functions[name]) {
+            reportError(tr("Function name is not unique") + ": " + name, folder.path)            
+        }
+        project.functions[name] = folder
+    }
+
+
+    function reportError(message, filename, nodeId, data) {
+        failed = true
+        options.onError({
+            message: message,
+            filename: filename,
+            nodeId: nodeId,
+            data: data
+        })
+    }
+
+    function generateModuleInit(output) {
+        var fun = project.moduleInit
+        if (!fun) { return }
+        try {
+            var tree = generateFunctionTree(fun)
+            var toutput = []
+            generateClojureBody(fun, tree, toutput)
+            var lines = []
+            for (var node of toutput) {
+                printClojureNode(node, lines, 0)
+            }
+            var generated = lines.join("\n")
+            output.push(generated)
+            output.push("")            
+        } catch (ex) {
+            console.log(ex)
+            reportError(ex.message, fun.path, ex.nodeId)            
+        }        
+    }
+
+    async function generateSourceCode() {
+        var output = []
+        generateModuleInit(output)
+        var names = Object.keys(project.functions)
+        names.sort()
+        for (var name of names) {
+            var fun = project.functions[name]
+            writeFunction(fun, output)
+        }
+        return output.join("\n")
+    }
+
+    function createClojureNode(tag) {
+        return {
+            strings: [tag],
+            children: []
+        }
+    }
+
+    function printClojureNode(node, output, depth) {
+        var indent = " ".repeat(depth * 4)
+        if (typeof node === "string") {
+            output.push(indent + node)
+            return
+        }
+        var firstLine = indent + "(" + node.strings.join(" ")
+        output.push(firstLine)
+        for (var child of node.children) {
+            printClojureNode(child, output, depth + 1)
+        }
+        closeBracket(output)
+    }
+
+    function closeBracket(output) {
+        var last = output[output.length - 1]
+        last += ")"
+        output[output.length - 1] = last
+    }
+
+    function handleError(fun, item, output) {
+        var node = createClojureNode("throw")
+        var ex = createClojureNode("RuntimeException.")
+        var messageNode = createClojureNode("str")
+        messageNode.strings.push("\"" + item.message + "\"")
+        messageNode.strings.push("\": \"")
+        messageNode.strings.push(makeCondition(item.content))
+        ex.children.push(messageNode)
+        node.children.push(ex)
+        output.push(node)
+    }
+
+    function handleAction(fun, item, output) {
+        var content = item.content || ""
+        content = content.trim()        
+        if (content.startsWith("let ") || content.startsWith("let\t")) {
+            handleLet(fun, item, content, output)
+        } else {
+            handleNormalAction(fun, item, content, output)
+        }
+    }
+
+    function handleLet(fun, item, content, output) {
+        var noLet = makeOneLine(content.substring(4))
+        var core = "[" + noLet +"]"
+        var node = createClojureNode("let")
+        node.strings.push(core)
+        output.push(node)
+        handleItem(fun, item.next, node.children)
+    }
+
+    function makeOneLine(content) {
+        if (!content) { return ""}
+        var lines = content
+            .split("\n")
+            .map(line => { return line.trim() })
+        return lines.join(" ")
+    }
+
+    function handleNormalAction(fun, item, content, output) {
+        if (content) {
+            var line = makeOneLine(content)
+            output.push(line)
+        }
+        handleItem(fun, item.next, output)
+    }
+
+    function makeCondition(content) {
+        if (!content) {
+            return "true"
+        }
+        if (typeof content === "string") {
+            var line = makeOneLine(content)
+            if (!line.startsWith("(") && (line.indexOf(" ") !== -1 || line.indexOf("\t") !== -1)) {
+                line = "(" + line + ")"
+            }
+            return line
+        }
+
+        if (content.operator === "not") {
+            return "(not " + makeCondition(content.operand) + ")"
+        }
+        if (content.operator === "and") {
+            return "(and " + makeCondition(content.left) + " " + makeCondition(content.right) +")"
+        }
+        if (content.operator === "or") {
+            return "(or " + makeCondition(content.left) + " " + makeCondition(content.right) +")"
+        }        
+        if (content.operator === "equal") {
+            return "(= " + makeCondition(content.left) + " " + makeCondition(content.right) +")"
+        }  
+        return makeOneLine(content)
+    }
+
+    function handleQuestion(fun, item, output) {
+        var condition = makeCondition(item.content)        
+        if (!condition.startsWith("(")) {
+            condition = "(" + condition + ")"
+        }
+        var ifNode = createClojureNode("if")
+        output.push(ifNode)
+        ifNode.strings.push(condition)
+        addIfBranch(fun, ifNode, item.yes)
+        addIfBranch(fun, ifNode, item.no)
+    }
+
+    function addIfBranch(fun, ifNode, children) {
+        var output = []
+        handleItem(fun, children, output)
+        if (output.length === 1) {
+            ifNode.children.push(output[0])
+        } else {
+            var doNode = createClojureNode("do")
+            ifNode.children.push(doNode)
+            doNode.children = output
+        }
+    }
+
+
+
+    function expandTreeItem(fun, body, next, tree, visited) {
+        var newNode = next
+        for (var i = body.length - 1; i >= 0; i--) {
+            var oldNode = body[i]
+            if (oldNode.type === "action") {
+                newNode = {
+                    type: oldNode.type,
+                    id: oldNode.id,
+                    content: oldNode.content,
+                    next: newNode
+                }
+            } else if (oldNode.type === "address") {
+                if (visited.indexOf(oldNode.content) !== -1) {
+                    reportError(tr("Cycle detected") + ": " + oldNode.content, fun.path, oldNode.id)
+                    return undefined                  
+                }                
+                var nextBranch = findFirst(tree.branches, br => {return br.name === oldNode.content})
+                var visited2 = visited.slice()
+                visited2.push(oldNode.content)
+                newNode = expandTreeItem(fun, nextBranch.body, newNode, tree, visited2)
+            } else if (oldNode.type === "error") {
+                newNode = {
+                    type: oldNode.type,
+                    id: oldNode.id,
+                    content: oldNode.content,
+                    message: oldNode.message,
+                    next: newNode
+                }           
+            } else if (oldNode.type === "question") {
+                newNode = {
+                    type: oldNode.type,
+                    id: oldNode.id,
+                    content: oldNode.content,                    
+                    yes: expandTreeItem(fun, oldNode.yes, newNode, tree, visited),
+                    no: expandTreeItem(fun, oldNode.no, newNode, tree, visited)
+                }
+            } else if (oldNode.type === "end") {
+                // don't do anything
+            } else {
+                reportError(tr("Unsupported item type") + ": " + oldNode.type, fun.path, oldNode.id)
+                return undefined
+            }
+        }
+        return newNode
+    }
+
+    function generateClojureBody(fun, tree, output) {        
+        if (tree.branches.length === 0) {return}
+
+        var firstBranch = tree.branches[0]
+        
+        var firstName = firstBranch.name
+        var expanded = expandTreeItem(fun, firstBranch.body, undefined, tree, [firstName])
+        handleItem(fun, expanded, output)
+    }
+
+    function handleItem(fun, item, output) {    
+        if (!item) {return}
+        if (item.type === "action") {
+            handleAction(fun, item, output)
+        } else if (item.type === "error") {
+            handleError(fun, item, output)
+        } else if (item.type === "question") {
+            handleQuestion(fun, item, output)
+        } else if (item.type === "end") {
+            // don't do anything
+        } else {
+            reportError(tr("Unsupported item type") + ": " + item.type, fun.path, item.id)
+        }
+    }
+
+    function makeArgumentList(fun) {
+        var params = makeOneLine(fun.params)
+        return "[" + params + "]"
+    }
+
+    function generateClojure(fun, tree) {
+        //console.log(fun.name, JSON.stringify(tree, null, 4))        
+        var funNode = createClojureNode("defn")
+        funNode.strings.push(fun.name)
+        funNode.strings.push(makeArgumentList(fun))
+        generateClojureBody(fun, tree, funNode.children)
+        var lines = []
+        printClojureNode(funNode, lines, 0)        
+        return lines.join("\n")
+    }
+
+    function writeFunction(fun, output) {
+        try {
+            var tree = generateFunctionTree(fun)
+            //console.log(JSON.stringify(tree, null, 2))
+            var generated = generateClojure(fun, tree)
+            output.push(generated)
+            output.push("")            
+        } catch (ex) {
+            console.log(ex)
+            reportError(ex.message, fun.path, ex.nodeId)            
+        }
+    }
+
+    function generateFunctionTree(fun) {
+        var drakonJson = JSON.stringify(fun, null, 4)
+        var treeStr = options.toTree(drakonJson, fun.name, fun.path, options.language)
+        var tree = JSON.parse(treeStr)
+        return tree
+    }    
+
+    async function cljPreprosess() {
+        var rootFolder = await options.getObjectByHandle(options.root)
+        for (var childPath of rootFolder.children) {
+            var child = await options.getObjectByHandle(childPath)
+            if (!child) { continue }            
+            if (isModule(child)) {
+                project.moduleInit = child
+            } else {
+                await traverseModuleItem(child)
+            }
+        }
+    }
+
+
+    function stop() {
+        state = undefined
+    }
+    async function run() {
+        if (state !== "idle") {
+            throw new Error("Invalid state " + state)
+        }
+        try {
+            await cljPreprosess()
+            var src = await generateSourceCode()
+            await options.onData(src)
+        } catch (ex) {
+            if (ex.cancelled) {
+                reportError("Cancelled by user")
+            } else {
+                options.onError(ex)
+            }
+        }
+    }
+
+    var self = {}
+    self.stop = stop
+    self.run = run
+    return self
 }
 
 function createDrakonTechGenerator(options) {
@@ -1980,7 +2369,8 @@ function createDrakonTechGenerator(options) {
 
 
 module.exports = {
-    createDrakonTechGenerator
+    createDrakonTechGenerator,
+    createClojureGenerator
 }
 },{"./astScanner":1,"./sort":4,"./tools":5}],4:[function(require,module,exports){
 function topologicaSort(start, getAdjacentNodes, reportError) {
