@@ -51,7 +51,8 @@ module.exports = {
 const { createDrakonTechGenerator } = require("./drakontechgen")
 
 window.drakontechgen = {
-    buildGenerator: function (name, root, getObjectByHandle, onError, onData) {
+    buildGenerator: function (name, root, getObjectByHandle, onError, onData, language) {        
+        language = language || "JS"
         var genOptions = {
             toTree: window.drakongen.toTree,
             escodegen: window.escodegen,
@@ -60,9 +61,10 @@ window.drakontechgen = {
             root: root,
             getObjectByHandle: getObjectByHandle,
             onError: onError,
-            onData: onData
+            onData: onData,
+            language: language
         }
-
+        
         return createDrakonTechGenerator(genOptions)
     }
 }

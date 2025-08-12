@@ -8782,7 +8782,7 @@ function isEnd(state) {
 }
 
 function isHuman() {
-    return module.language == "LANG_HUMAN"
+    return module.language == "LANG_HUMAN" || module.language == "clojure"
 }
 
 function isLazyAlgoprop() {

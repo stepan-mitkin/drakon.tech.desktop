@@ -138,7 +138,13 @@
             name = await backend.getProjectName()
             root = await backend.getRootHandle()
             onData = backend.saveGeneratedFile
-            generator = drakontechgen.buildGenerator(name, root, backend.getObjectByHandle, onError, onData)            
+            generator = drakontechgen.buildGenerator(
+                name,
+                root,
+                backend.getObjectByHandle,
+                onError,
+                onData,
+                folder.language)            
         }
 
         runBuild()
