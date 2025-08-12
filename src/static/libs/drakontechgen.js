@@ -202,7 +202,7 @@ function createClojureGenerator(options) {
     }
 
     function printClojureNode(node, output, depth) {
-        var indent = " ".repeat(depth * 4)
+        var indent = " ".repeat(depth * 2)
         if (typeof node === "string") {
             output.push(indent + node)
             return
