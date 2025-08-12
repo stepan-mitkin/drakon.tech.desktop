@@ -501,6 +501,7 @@ async function loadProjectSettings(winInfo) {
     }
     console.log(solution, language)
     winInfo.language = language
+    winInfo.outputFolder = solution.outputFolder
 }
 
 async function determineAccess(winInfo, folderPath) {
@@ -1062,6 +1063,9 @@ function getGeneratedFilename(winInfo) {
     if (winInfo.language === "clojure") {
         extension = ".clj"
     }
+    if (winInfo.outputFolder) {
+        return path.normalize(path.join(winInfo.path, winInfo.outputFolder, winInfo.name + extension))
+    } 
     return path.join(winInfo.path, winInfo.name + extension)
 }
 

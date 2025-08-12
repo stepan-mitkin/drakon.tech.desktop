@@ -120,8 +120,7 @@
 
 
     window.build_start = async function(folder) {
-        console.log("build_start")
-        console.log(folder)
+        console.log("build_start", folder)
         state = "working"
         errors = []
         failed = false
