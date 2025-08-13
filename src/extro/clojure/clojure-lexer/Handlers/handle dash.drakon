@@ -1,0 +1,52 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "62"
+        },
+        "62": {
+            "type": "question",
+            "one": "63",
+            "two": "65",
+            "flag1": 1,
+            "content": "symbol === \"#\""
+        },
+        "63": {
+            "type": "action",
+            "one": "64",
+            "two": "",
+            "content": "append \"#\" to lexer.buffer\nappend \"#\" to lexer.buffer"
+        },
+        "64": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"building\"\nlexer.tokenType = \"special\""
+        },
+        "65": {
+            "type": "action",
+            "one": "66",
+            "two": "",
+            "content": "forward token\n\ttype: \"operator\"\n\tsymbol: \"#\""
+        },
+        "66": {
+            "type": "action",
+            "one": "1",
+            "content": "handle idle(lexer, symbol)"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "lexer\nsymbol"
+}

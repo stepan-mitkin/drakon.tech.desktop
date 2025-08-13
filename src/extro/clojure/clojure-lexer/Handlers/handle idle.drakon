@@ -1,0 +1,174 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "4": {
+            "type": "case",
+            "one": "14",
+            "two": ""
+        },
+        "5": {
+            "type": "case",
+            "one": "9",
+            "two": "11",
+            "content": "\";\""
+        },
+        "6": {
+            "type": "case",
+            "one": "8",
+            "two": "5",
+            "content": "\"#\""
+        },
+        "7": {
+            "type": "select",
+            "one": "6",
+            "two": "",
+            "content": "symbol"
+        },
+        "8": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"dash\""
+        },
+        "9": {
+            "type": "action",
+            "one": "10",
+            "two": "",
+            "content": "forward token\n\ttype: \"comment\"\n\tsymbol: symbol"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"comment\"\nlexer.substate = \"idle\""
+        },
+        "11": {
+            "one": "12",
+            "type": "case",
+            "two": "23",
+            "content": "\":\""
+        },
+        "12": {
+            "type": "action",
+            "one": "13",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "13": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"building\"\nlexer.tokenType = \"keyword\""
+        },
+        "14": {
+            "type": "question",
+            "one": "15",
+            "two": "16",
+            "flag1": 1,
+            "content": "is whitespace(symbol)"
+        },
+        "15": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "forward token\n\ttype: \"whitespace\"\n\tsymbol: symbol"
+        },
+        "16": {
+            "type": "question",
+            "one": "17",
+            "two": "18",
+            "flag1": 1,
+            "content": "is operator(symbol)"
+        },
+        "17": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "forward token\n\ttype: \"operator\"\n\tsymbol: symbol"
+        },
+        "18": {
+            "type": "question",
+            "one": "19",
+            "two": "21",
+            "flag1": 1,
+            "content": "is digit(symbol)"
+        },
+        "19": {
+            "type": "action",
+            "one": "29",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "21": {
+            "type": "action",
+            "one": "30",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "23": {
+            "one": "25",
+            "type": "case",
+            "two": "26",
+            "content": "\"\\\"\""
+        },
+        "24": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"string\"\nlexer.substate = \"normal\"\nlexer.tokenType = \"string\""
+        },
+        "25": {
+            "type": "action",
+            "one": "24",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "26": {
+            "one": "27",
+            "type": "case",
+            "two": "4",
+            "content": "\"\\\\\""
+        },
+        "27": {
+            "type": "action",
+            "one": "28",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "28": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"building\"\nlexer.tokenType = \"backslash\""
+        },
+        "29": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"building\"\nlexer.tokenType = \"number\""
+        },
+        "30": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"building\"\nlexer.tokenType = \"token\""
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "lexer\nsymbol"
+}

@@ -1,0 +1,89 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "handle idle\n\tlexer\n\tsymbol"
+        },
+        "4": {
+            "type": "question",
+            "one": "9",
+            "two": "1",
+            "flag1": 0,
+            "content": "symbol === \"\\r\""
+        },
+        "7": {
+            "type": "case",
+            "one": "21",
+            "two": "11",
+            "content": "\"building\""
+        },
+        "8": {
+            "type": "case",
+            "one": "3",
+            "two": "19",
+            "content": "\"idle\""
+        },
+        "9": {
+            "type": "select",
+            "one": "8",
+            "content": "lexer.state"
+        },
+        "11": {
+            "one": "22",
+            "type": "case",
+            "two": "12",
+            "content": "\"string\""
+        },
+        "12": {
+            "one": "23",
+            "type": "case",
+            "two": null,
+            "content": "\"comment\""
+        },
+        "19": {
+            "one": "20",
+            "type": "case",
+            "two": "7",
+            "content": "\"dash\""
+        },
+        "20": {
+            "type": "action",
+            "one": "1",
+            "content": "handle dash\n\tlexer\n\tsymbol"
+        },
+        "21": {
+            "type": "action",
+            "one": "1",
+            "content": "handle building\n\tlexer\n\tsymbol"
+        },
+        "22": {
+            "type": "action",
+            "one": "1",
+            "content": "handle string\n\tlexer\n\tsymbol"
+        },
+        "23": {
+            "type": "action",
+            "one": "1",
+            "content": "handle comment\n\tlexer\n\tsymbol"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "lexer\nsymbol"
+}

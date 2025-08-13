@@ -1,0 +1,9 @@
+Generate JavaScript function lexClosure from the pseudocode below.
+Do not use keywords "class", "new", and "this".
+
+Format:
+window.foo = function(arg1, arg2) {
+    ... body
+}
+
+Report errors in the spec.

@@ -1,0 +1,49 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "9",
+            "flag1": 1,
+            "content": "lexer.buffer has data"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "token = create token\n\ttype: lexer.tokenType\n\ttext: lexer.buffer"
+        },
+        "6": {
+            "type": "action",
+            "one": "7",
+            "content": "lexer.tokens.push(token)"
+        },
+        "7": {
+            "type": "action",
+            "one": "9",
+            "content": "lexer.buffer = \"\""
+        },
+        "9": {
+            "type": "action",
+            "one": "1",
+            "content": "lexer.state = \"idle\""
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "lexer"
+}

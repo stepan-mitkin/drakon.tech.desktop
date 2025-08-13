@@ -1,0 +1,146 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "4": {
+            "type": "case",
+            "one": "14",
+            "two": ""
+        },
+        "5": {
+            "type": "case",
+            "one": "32",
+            "two": "11",
+            "content": "\";\""
+        },
+        "6": {
+            "type": "case",
+            "one": "34",
+            "two": "5",
+            "content": "\"#\""
+        },
+        "7": {
+            "type": "select",
+            "one": "6",
+            "two": "",
+            "content": "symbol"
+        },
+        "9": {
+            "type": "action",
+            "one": "10",
+            "two": "",
+            "content": "forward token\n\ttype: \"comment\"\n\tsymbol: symbol"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.state = \"comment\"\nlexer.substate = \"idle\""
+        },
+        "11": {
+            "one": "12",
+            "type": "case",
+            "two": "23",
+            "content": "\":\""
+        },
+        "12": {
+            "type": "action",
+            "one": "13",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "13": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.tokenType = \"error\""
+        },
+        "14": {
+            "type": "question",
+            "one": "33",
+            "two": "16",
+            "flag1": 1,
+            "content": "is whitespace(symbol)"
+        },
+        "15": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "forward token\n\ttype: \"whitespace\"\n\tsymbol: symbol"
+        },
+        "16": {
+            "type": "question",
+            "one": "36",
+            "two": "37",
+            "flag1": 1,
+            "content": "is operator(symbol)"
+        },
+        "17": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "forward token\n\ttype: \"operator\"\n\tsymbol: symbol"
+        },
+        "23": {
+            "one": "12",
+            "type": "case",
+            "two": "26",
+            "content": "\"\\\"\""
+        },
+        "26": {
+            "one": "12",
+            "type": "case",
+            "two": "4",
+            "content": "\"\\\\\""
+        },
+        "32": {
+            "type": "action",
+            "one": "9",
+            "content": "finish token"
+        },
+        "33": {
+            "type": "action",
+            "one": "15",
+            "content": "finish token"
+        },
+        "34": {
+            "type": "action",
+            "one": "35",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "35": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "lexer.tokenType = \"error\""
+        },
+        "36": {
+            "type": "action",
+            "one": "17",
+            "content": "finish token"
+        },
+        "37": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "lexer\nsymbol"
+}

@@ -1,0 +1,97 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "39"
+        },
+        "4": {
+            "type": "case",
+            "one": "1",
+            "two": ""
+        },
+        "7": {
+            "type": "select",
+            "one": "43",
+            "two": "",
+            "content": "symbol"
+        },
+        "38": {
+            "type": "question",
+            "one": "7",
+            "two": "55",
+            "flag1": 1,
+            "content": "lexer.substate === \"normal\""
+        },
+        "39": {
+            "type": "question",
+            "one": "47",
+            "two": "41",
+            "flag1": 0,
+            "content": "symbol === \"\\n\""
+        },
+        "40": {
+            "type": "action",
+            "one": "42",
+            "content": "finish token"
+        },
+        "41": {
+            "type": "action",
+            "one": "40",
+            "two": "",
+            "content": "lexer.tokenType = \"error\""
+        },
+        "42": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "forward token\n\ttype: \"whitespace\"\n\tsymbol: symbol"
+        },
+        "43": {
+            "one": "45",
+            "type": "case",
+            "two": "44",
+            "content": "\"\\\"\""
+        },
+        "44": {
+            "one": "46",
+            "type": "case",
+            "two": "4",
+            "content": "\"\\\\\""
+        },
+        "45": {
+            "type": "action",
+            "one": "1",
+            "content": "finish token"
+        },
+        "46": {
+            "type": "action",
+            "one": "1",
+            "content": "lexer.substate === \"escaping\""
+        },
+        "47": {
+            "type": "action",
+            "one": "38",
+            "two": "",
+            "content": "append symbol to lexer.buffer"
+        },
+        "55": {
+            "type": "action",
+            "one": "1",
+            "content": "lexer.substate === \"normal\""
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "lexer\nsymbol"
+}
