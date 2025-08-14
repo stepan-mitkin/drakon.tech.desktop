@@ -67,6 +67,12 @@ QUnit.module('lexClosure', function() {
         assert.equal(tokens[0].type, 'string', 'First token should be string');
         assert.equal(tokens[0].text, '"hello"', 'First token text should be "hello"');
         assert.equal(tokens[1].type, 'eol', 'Second token should be eol');
+
+        const text2 = "\"hello \\\"world\\\"\"";
+        const tokens2 = window.lexClosure(text2);        
+        var i = 0
+        assert.equal(tokens2[i].type, 'string');
+        assert.equal(tokens2[i++].text, text2);
     });
 
     QUnit.test('should handle unterminated string as error', function(assert) {
