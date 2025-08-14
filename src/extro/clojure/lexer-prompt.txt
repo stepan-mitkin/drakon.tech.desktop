@@ -1,4 +1,4 @@
-Generate JavaScript function lexClosure from the pseudocode below.
+Generate JavaScript function lexClojure from the pseudocode below.
 Do not use keywords "class", "new", and "this".
 
 Format:

@@ -38,18 +38,23 @@
         },
         "8": {
             "type": "action",
-            "one": "1",
+            "one": "11",
             "content": "\"one\""
         },
         "9": {
             "type": "action",
-            "one": "1",
+            "one": "11",
             "content": "\"five\""
         },
         "10": {
             "type": "action",
-            "one": "1",
+            "one": "11",
             "content": "\"seven\""
+        },
+        "11": {
+            "type": "action",
+            "one": "1",
+            "content": "{:foo\tbar :name #\"none\" \\t \"ok\\t\\\"\" 10.234\n\t\t:wow none}"
         }
     },
     "keywords": {

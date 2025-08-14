@@ -41,7 +41,7 @@
         },
         "9": {
             "type": "loopend",
-            "one": "8",
+            "one": "12",
             "content": ""
         },
         "10": {
@@ -53,6 +53,11 @@
             "type": "action",
             "one": "9",
             "content": "process token"
+        },
+        "12": {
+            "type": "action",
+            "one": "8",
+            "content": "strip trailing tokens from state.tokens\nwhere type === \"eol\""
         }
     },
     "keywords": {

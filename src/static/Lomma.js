@@ -2306,7 +2306,7 @@ function addNoWs(self, token) {
             if (token.text in module.keyOps) {
                 token.type = "operator"
             } else {
-                if (token.text in module.keywords) {
+                if (isKeyword(token.text)) {
                     token.type = "keyword"
                 }
             }
@@ -7138,8 +7138,12 @@ function flowIcon(render, item) {
 
 function flowSourceCode(render, node, source) {
     var flower, text, tokens
-    text = node.text
-    tokens = lexSource(text)
+    text = node.text || ""
+    if (module.language === "clojure") {
+        tokens = lexClojure(text)
+    } else {
+        tokens = lexSource(text)
+    }
     if ((source) && (shouldAutoformat(node.type))) {
         tokens = prettify(tokens, node.type)
         node.text = printTokens(tokens)
@@ -7906,7 +7910,7 @@ function getTabPosition(self, x) {
 function getTokenColor(token, source) {
     var type
     if (source) {
-        if ((token.type == "identifier") && ((token.text in module.keywords) || (token.text in module.keyValues))) {
+        if ((token.type == "identifier") && (isKeyword(token.text))) {
             type = "keyword"
         } else {
             type = token.type
@@ -8782,7 +8786,17 @@ function isEnd(state) {
 }
 
 function isHuman() {
-    return module.language == "LANG_HUMAN" || module.language == "clojure"
+    return module.language === "LANG_HUMAN"
+}
+
+function isKeyword(text) {
+    if (module.language === "JS") {
+        return text in module.keywords ||(
+            text in module.keyValues
+        )
+    } else {
+        return text in module.cljkeywords
+    }
 }
 
 function isLazyAlgoprop() {
@@ -9335,6 +9349,23 @@ function lexInit() {
     addLongOp("**")
     addLongOp("??")
     addLongOp("??=")
+    module.cljkeywords = arrayToSet([
+      "first", "rest", "cons", "conj", "map", "filter", "reduce", "into", "take", "drop", 
+      "nth", "get", "assoc", "dissoc", "keys", "vals", "merge", "select-keys",
+      "lazy-seq", "range", "repeat", "cycle", "interleave", "partition", "flatten",
+      "apply", "partial", "comp", "juxt", "memoize", "constantly", "complement",
+      "if", "when", "cond", "case", "and", "or", "not", "some", "every?", "not-any?",
+      "<", ">", "<=", ">=", "=", "==", "not=",
+      "+", "-", "*", "/",
+      "->", "->>", "some->", "as->",
+      "atom", "swap!", "reset!", "deref", "ref", "alter", "dosync",
+      "println", "prn", "slurp", "spit", "with-open", "future", "pmap",
+      "meta", "with-meta", "type", "instance?", "ns",
+      "new", ".", "doto", "bean",
+      "future", "promise", "deliver", "pmap", "pcalls",
+      "str", "format", "clojure.string/split", "clojure.string/join", "re-matches", "re-find",
+      "defn", "let", "fn", "def", "loop", "recur"
+    ])
     module.keywords = arrayToSet([
     "abstract", "arguments", "boolean", "break", "byte", "case", "catch",
     "char", "class", "const", "continue", "debugger", "default", "delete",
@@ -13187,7 +13218,7 @@ function shouldAlignWidth(node) {
 }
 
 function shouldAutoformat(type) {
-    if (((((((type == "branch") || (type == "address")) || (type == "params")) || (type == "header")) || (type == "end")) || (type == "input")) || (type == "pause")) {
+    if ((((((((module.language === "clojure") || (type == "branch")) || (type == "address")) || (type == "params")) || (type == "header")) || (type == "end")) || (type == "input")) || (type == "pause")) {
         return false
     } else {
         return true
@@ -13719,7 +13750,7 @@ function startEdit() {
 }
 
 function startEditText(nodeId) {
-    var cmOptions, node, old, setTextProc, title, validate, x, y
+    var cmOptions, mode, node, old, setTextProc, title, validate, x, y
     node = getNode(nodeId)
     if (node.type == "params") {
         addTrace(
@@ -13746,8 +13777,13 @@ function startEditText(nodeId) {
             if (isHuman()) {
                 
             } else {
+                if (module.language === "JS") {
+                    mode = "javascript"
+                } else {
+                    mode = "clojure"
+                }
                 cmOptions = {
-                	mode: "javascript",
+                	mode: mode,
                 	theme: "base16-dark"
                 }
             }
