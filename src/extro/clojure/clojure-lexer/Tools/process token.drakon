@@ -1,0 +1,104 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "9"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "token.type = \"eol\""
+        },
+        "5": {
+            "type": "question",
+            "one": "3",
+            "two": "1",
+            "flag1": 1,
+            "content": "token.text === \"\\n\""
+        },
+        "6": {
+            "type": "case",
+            "one": "1"
+        },
+        "7": {
+            "type": "case",
+            "one": "13",
+            "two": "18",
+            "content": "\"special\""
+        },
+        "8": {
+            "type": "case",
+            "one": "5",
+            "two": "7",
+            "content": "\"whitespace\""
+        },
+        "9": {
+            "type": "select",
+            "one": "8",
+            "content": "token.type"
+        },
+        "10": {
+            "type": "case",
+            "one": "17",
+            "content": "\"##NaN\"",
+            "two": "14"
+        },
+        "11": {
+            "type": "case",
+            "one": "17",
+            "two": "10",
+            "content": "\"##-Inf\""
+        },
+        "12": {
+            "type": "case",
+            "one": "17",
+            "two": "11",
+            "content": "\"##Inf\""
+        },
+        "13": {
+            "type": "select",
+            "one": "12",
+            "content": "token.text"
+        },
+        "14": {
+            "one": "15",
+            "type": "case",
+            "two": null
+        },
+        "15": {
+            "type": "action",
+            "one": "1",
+            "content": "token.type = \"error\""
+        },
+        "17": {
+            "type": "action",
+            "one": "1",
+            "content": "token.type = \"number\""
+        },
+        "18": {
+            "one": "19",
+            "type": "case",
+            "two": "6",
+            "content": "\"backslash\""
+        },
+        "19": {
+            "type": "action",
+            "one": "1",
+            "content": "token.type = \"number\""
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "token"
+}

@@ -52,7 +52,7 @@
         "11": {
             "type": "action",
             "one": "9",
-            "content": "check token"
+            "content": "process token"
         }
     },
     "keywords": {

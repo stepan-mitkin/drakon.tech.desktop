@@ -20,7 +20,7 @@
             "type": "action",
             "one": "64",
             "two": "",
-            "content": "append \"#\" to lexer.buffer\nappend \"#\" to lexer.buffer"
+            "content": "append \"##\" to lexer.buffer"
         },
         "64": {
             "type": "action",
@@ -30,7 +30,7 @@
         },
         "65": {
             "type": "action",
-            "one": "66",
+            "one": "67",
             "two": "",
             "content": "forward token\n\ttype: \"operator\"\n\tsymbol: \"#\""
         },
@@ -38,6 +38,11 @@
             "type": "action",
             "one": "1",
             "content": "handle idle(lexer, symbol)"
+        },
+        "67": {
+            "type": "action",
+            "one": "66",
+            "content": "lexer.state = \"idle\""
         }
     },
     "keywords": {

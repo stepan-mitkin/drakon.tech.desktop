@@ -159,7 +159,7 @@
             "type": "action",
             "one": "1",
             "two": "",
-            "content": "lexer.state = \"building\"\nlexer.tokenType = \"token\""
+            "content": "lexer.state = \"building\"\nlexer.tokenType = \"identifier\""
         }
     },
     "keywords": {

@@ -71,7 +71,7 @@
         "46": {
             "type": "action",
             "one": "1",
-            "content": "lexer.substate === \"escaping\""
+            "content": "lexer.substate = \"escaping\""
         },
         "47": {
             "type": "action",
@@ -82,7 +82,7 @@
         "55": {
             "type": "action",
             "one": "1",
-            "content": "lexer.substate === \"normal\""
+            "content": "lexer.substate = \"normal\""
         }
     },
     "keywords": {

@@ -57,7 +57,7 @@
         "45": {
             "type": "action",
             "one": "1",
-            "content": "lexer.substate === \"normal\""
+            "content": "lexer.tokenType = \"comment\"\nlexer.substate = \"normal\""
         },
         "46": {
             "type": "question",
@@ -81,7 +81,7 @@
         "49": {
             "type": "action",
             "one": "1",
-            "content": "lexer.substate === \"idle\""
+            "content": "lexer.state = \"comment\"\nlexer.substate = \"idle\""
         },
         "50": {
             "type": "action",

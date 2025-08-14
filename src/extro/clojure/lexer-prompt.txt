@@ -6,4 +6,6 @@ window.foo = function(arg1, arg2) {
     ... body
 }
 
+Implement "is whitespace" and "is digit" using the charcodes. Do not use regex.
+
 Report errors in the spec.
