@@ -6,7 +6,8 @@ A flowchart editor that generates prompts for AI apps and source code in Clojure
 
 ![DrakonTech screenshot: FizzBuzz algorithm](assets/drakontech-screenshot.png)
 
-DrakonTech is a flowchart editor that generates pseudocode for AI app prompts and source code in Clojure and JavaScript, utilizing the DRAKON standard from the aerospace industry. DRAKON’s strict ergonomic rules ensure algorithms are easy to read, while DrakonTech streamlines flowchart creation and modification with minimal user input.
+DrakonTech is a flowchart editor that generates pseudocode for AI app prompts and source code in Clojure and JavaScript.
+In other words, DrakonTech is a prompt-engineering tool and an IDE for JavaScript and Clojure. DrakonTech utilizes the DRAKON standard from the aerospace industry. DRAKON’s strict ergonomic rules ensure algorithms are easy to read, while DrakonTech streamlines flowchart creation and modification with minimal user input.
 
 ## About DrakonTech
 
@@ -18,9 +19,10 @@ DrakonTech enables users to build algorithms using DRAKON, a flowchart standard 
 - **Pseudocode Generation**: Convert flowcharts into pseudocode for AI app prompts.
 - **Clojure and JavaScript Output**: Generate functional code directly from flowcharts.
 
-## Why Use DrakonTech for AI-aided software development
+## Why Use DrakonTech for AI-Aided Software Development
 
 For many real-life algorithms, a text-only description is insufficient to specify program logic clearly. Pseudocode provides a structured way to communicate a program’s intent to an AI app, but it can be difficult to read. With DrakonTech, users create intuitive flowcharts that are easy to understand and then generate precise pseudocode, accurately conveying the programmer’s intention to AI applications.
+
 
 ## Generating Pseudocode for AI Apps
 
@@ -72,6 +74,10 @@ https://github.com/stepan-mitkin/drakon.tech.desktop/tree/main/src/extro/clojure
 7. Click the "Build" button to generate a Clojure module.
 8. The generated file is placed in the project folder by default or at the path specified in `outputFile` (relative or absolute, using `..` for relative paths).
 
+See example:
+
+https://github.com/stepan-mitkin/drakon.tech.desktop/tree/main/demos/hello-drakon-clojure
+
 ## Generating JavaScript Source Code
 
 1. Create an empty folder and add an optional `solution.json` file with:
@@ -87,7 +93,11 @@ https://github.com/stepan-mitkin/drakon.tech.desktop/tree/main/src/extro/clojure
 5. Click the "Build" button to generate a JavaScript module.
 6. The generated file is placed in the project folder by default or at the path specified in `outputFile` (relative or absolute, using `..` for relative paths).
 
+See examples:
 
+https://github.com/stepan-mitkin/drakon.tech.desktop/tree/main/demos/fsm-lift
+
+https://github.com/stepan-mitkin/drakon.tech.desktop/tree/main/demos/linkedlist
 
 
 ## Get DrakonTech
