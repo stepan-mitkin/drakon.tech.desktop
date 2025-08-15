@@ -4,11 +4,9 @@
   (if (<= n 1)
     (do
       (println "trivial case, n =" n)
-      n
-      {:name	\t :type	foo :bar	"why?"})
+      n)
     (let [n-2 (fibonacci (- n 2)) n-1 (fibonacci (- n 1))]
-      (+ n-2 n-1)
-      {:name	\t :type	foo :bar	"why?"})))
+      (+ n-2 n-1))))
 
 (defn hello [first-name second-name]
   (println "hello")

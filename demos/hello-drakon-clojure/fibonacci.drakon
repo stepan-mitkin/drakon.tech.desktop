@@ -11,7 +11,7 @@
         },
         "3": {
             "type": "action",
-            "one": "8",
+            "one": "1",
             "content": "n"
         },
         "4": {
@@ -28,18 +28,13 @@
         },
         "6": {
             "type": "action",
-            "one": "8",
+            "one": "1",
             "content": "(+ n-2 n-1)"
         },
         "7": {
             "type": "action",
             "one": "3",
             "content": "(println \"trivial case, n =\" n)"
-        },
-        "8": {
-            "type": "action",
-            "one": "1",
-            "content": "{:name\t\\t\n :type\tfoo\n :bar\t\"why?\"}"
         }
     },
     "keywords": {
