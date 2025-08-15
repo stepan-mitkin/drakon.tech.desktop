@@ -61,7 +61,7 @@ async function main() {
     var files = await fs.readdir(rootFolder)
     for (var file of files) {
         var filename = path.join(rootFolder, file)
-        if (file != folderName && file != folderName + ".deb" && file != "prompts") {
+        if (file != folderName && file != folderName + ".deb" && file != "prompts" && file !== "extro") {
             await fs.cp(filename, path.join(appRes, file), {recursive: true})
         }
     }    
