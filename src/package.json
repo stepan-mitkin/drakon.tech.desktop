@@ -1,7 +1,7 @@
 {
   "name": "drakontech",
   "productName": "DrakonTech",
-  "version": "2025.08.15",
+  "version": "2025.08.17",
   "description": "A DRAKON-based IDE that transforms flowcharts into JavaScript or Clojure code and generates text prompts for AI applications",
   "main": "main.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "@electron-forge/maker-rpm": "^6.1.1",
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
-    "electron": "^32.1.2",
+    "electron": "^37.3.0",
     "electron-builder": "^25.1.8"
   },
   "build": {
@@ -36,5 +36,5 @@
       "entitlements": "entitlements.mac.plist",
       "entitlementsInherit": "entitlements.mac.plist"
     }
-  }  
+  }
 }
