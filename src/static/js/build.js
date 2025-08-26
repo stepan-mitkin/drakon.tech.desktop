@@ -134,6 +134,9 @@
             generator = buildHumanGenerator(root, backend.getObjectByHandle, onData)
 
         } else {
+            var solutionStr = await backend.getSolution()
+            var solution = JSON.parse(solutionStr)
+            console.log(solutionStr)
             name = await backend.getProjectName()
             root = await backend.getRootHandle()
             onData = backend.saveGeneratedFile
@@ -143,7 +146,8 @@
                 backend.getObjectByHandle,
                 onError,
                 onData,
-                folder.language)            
+                folder.language,
+                solution.mainFun)            
         }
 
         runBuild()

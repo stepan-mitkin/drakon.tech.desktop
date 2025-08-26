@@ -38,4 +38,5 @@ contextBridge.exposeInMainWorld('backend', {
     getFilePathById: (id) => ipcRenderer.invoke("getFilePathById", id),
     getFolderInfoByHandle: (handle) => ipcRenderer.invoke("getFolderInfoByHandle", handle),
     setLocalClipboard: (callback) => ipcRenderer.on('setLocalClipboard', callback),
+    getSolution: () => ipcRenderer.invoke("getSolution"),
 })

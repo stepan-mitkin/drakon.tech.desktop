@@ -1,6 +1,6 @@
 (function () {
     async function getAppVersion() {
-        return "v2025.08.17"
+        return "v2025.08.26"
     }
 
     var gLanguage = undefined
@@ -1016,6 +1016,10 @@
         }, 10000);
     }
 
+    async function getSolution() {
+        return "{}"
+    }
+
     window.backend = {
         getRecent: getRecent,
         setRecent: setRecent,
@@ -1050,7 +1054,8 @@
         saveGeneratedFile: saveGeneratedFile,
         getFolderInfoByHandle: getFolderInfoByHandle,
         showGeneratedFile: showGeneratedFile,
-        downloadExample: downloadExample
+        downloadExample: downloadExample,
+        getSolution: getSolution
     }
 
 

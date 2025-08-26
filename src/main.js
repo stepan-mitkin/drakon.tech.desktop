@@ -25,7 +25,8 @@ const {
     saveGeneratedFile,
     getObjectByHandle,
     getFolderInfoByHandle,
-    showGeneratedFile
+    showGeneratedFile,
+    getSolution
 } = require("./filetree")
 
 var logg = undefined
@@ -295,6 +296,7 @@ function registerMainCallbacks() {
     registerHandler(getFolderInfoByHandle)
     registerHandler(showGeneratedFile)
     registerHandler(downloadExample)
+    registerHandler(getSolution)
 }
 
 function registerHandler(fun) {

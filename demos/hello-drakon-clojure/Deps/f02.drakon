@@ -11,13 +11,8 @@
         },
         "3": {
             "type": "action",
-            "one": "4",
-            "content": "(ns hello3.hello-drakon-clojure)"
-        },
-        "4": {
-            "type": "action",
             "one": "1",
-            "content": "(declare moo)\n(declare fibonacci)"
+            "content": "(f03)"
         }
     }
 }

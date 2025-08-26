@@ -503,6 +503,7 @@ async function loadProjectSettings(winInfo) {
     winInfo.language = language
     winInfo.outputFolder = solution.outputFolder
     winInfo.outputFile = solution.outputFile
+    winInfo.mainFun = solution.mainFun
 }
 
 async function determineAccess(winInfo, folderPath) {
@@ -1049,7 +1050,6 @@ async function readJson(filepath) {
         const content = await fs.readFile(filepath, 'utf-8');
         return JSON.parse(content);
     } catch (ex) {
-        console.log("Error", filepath, ex.message)
         return {};
     }
 }
@@ -1136,6 +1136,14 @@ async function showGeneratedFile(winInfo) {
     shell.showItemInFolder(filename)
 }
 
+async function getSolution(winInfo) {
+    return JSON.stringify({
+        language: winInfo.language,
+        outputFile: winInfo.outputFile || "",
+        mainFun: winInfo.mainFun || ""
+    })
+}
+
 // Exported functions
 module.exports = {
     createFolder,
@@ -1157,5 +1165,6 @@ module.exports = {
     saveGeneratedFile,
     getObjectByHandle,
     getFolderInfoByHandle,
-    showGeneratedFile
+    showGeneratedFile,
+    getSolution
 };
