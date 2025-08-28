@@ -4,6 +4,20 @@
 (defn a-print-of-fibonacci [n]
   (println (map fibonacci (range n))))
 
+(defn short-if [button? value]
+  (if button?
+    (println (str "bye: " value))
+    (do
+      (println "not a button")
+      (println (str "bye: " value)))))
+
+(defn short-if-2 [button? value]
+  (if button?
+    (let [x (* value 2)]
+      (println (str "bye: " (* x 5))))
+    (let [x value]
+      (println (str "bye: " (* x 5))))))
+
 (defn foo []
   (moo))
 
@@ -15,7 +29,9 @@
 
 (defn run-me []
   (a-print-of-fibonacci 5)
-  (test-dependencies))
+  (test-dependencies)
+  (short-if false "grey") (short-if true "yellow")
+  (short-if-2 false 2) (short-if-2 true 3))
 
 (defn f03 []
   (println "f03"))
@@ -39,9 +55,9 @@
 (defn no-content [])
 
 (defn only-no [value]
-  (if (not (> value 0))
-    (println "non-positive")
-    (do)))
+  (if (> value 0)
+    (do)
+    (println "non-positive")))
 
 (defn print-fibonacci [n]
   (println (map fibonacci (range n))))
@@ -52,16 +68,16 @@
       "one"
       (if (= (inc value2) 5)
         "five"
-        (if (not (= (inc value2) 7))
+        (if (= (inc value2) 7)
+          "seven"
           (throw
             (RuntimeException.
-              (str "Unexpected case value" ": " (inc value2))))
-          "seven")))))
+              (str "Unexpected case value" ": " (inc value2)))))))))
 
 (defn short-circuit-and [a b]
   (if (and (> a 0) (> b 0))
     "positive"
-    (if (or a b)
+    (if (or (not a) b)
       "other"
       "unknown")))
 

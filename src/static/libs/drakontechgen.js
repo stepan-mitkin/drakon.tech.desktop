@@ -672,10 +672,18 @@ function createClojureGenerator(options) {
         }
         if (typeof content === "string") {
             var line = makeOneLine(content)
-            if (!line.startsWith("(") && (line.indexOf(" ") !== -1 || line.indexOf("\t") !== -1)) {
-                line = "(" + line + ")"
+            var tokens = lexClojure(line)
+            if (tokens.length === 1) {
+                return tokens[0].text
+            } else if (tokens.length > 1) {
+                var first = tokens[0]
+                var last = tokens[tokens.length - 1]
+                if (first.text !== "(" || last.text !== ")") {
+                    return "(" + line + ")"
+                }
+            } else {
+                return line
             }
-            return line
         }
 
         if (content.operator === "not") {
@@ -720,11 +728,20 @@ function createClojureGenerator(options) {
         return content
     }
 
-    function buildQuestionContent(item) {
-        var condition = makeCondition(item.content)        
-        if (!condition.startsWith("(")) {
-            condition = "(" + condition + ")"
+    function isOneToken(content) {
+        if (!content) {return false}
+        if (typeof content === "string") {
+            content = content.trim()
+            var tokens = lexClojure()
         }
+        if (tokens.length === 1) {
+            return true
+        }
+        return false
+    }
+
+    function buildQuestionContent(content) {
+        var condition = makeCondition(content)        
         return condition
     }
 
@@ -759,13 +776,21 @@ function createClojureGenerator(options) {
                     next: newNode
                 }           
             } else if (oldNode.type === "question") {
+                var yes = oldNode.yes
+                var no = oldNode.no
+                var content = oldNode.content
+                if (content && content.operator === "not") {
+                    content = content.operand
+                    yes = oldNode.no
+                    no = oldNode.yes
+                }
                 newNode = {
                     type: oldNode.type,
                     id: oldNode.id,
-                    content: buildQuestionContent(oldNode),                    
-                    yes: expandTreeItem(fun, oldNode.yes, newNode, tree, visited),
-                    no: expandTreeItem(fun, oldNode.no, newNode, tree, visited)
-                }
+                    content: buildQuestionContent(content),                    
+                    yes: expandTreeItem(fun, yes, newNode, tree, visited),
+                    no: expandTreeItem(fun, no, newNode, tree, visited)
+                }                
                 newNode.tokens = lexClojure(newNode.content)
             } else if (oldNode.type === "end") {
                 // don't do anything

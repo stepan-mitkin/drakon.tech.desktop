@@ -16,8 +16,18 @@
         },
         "4": {
             "type": "action",
-            "one": "1",
+            "one": "5",
             "content": "(test-dependencies)"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "(short-if false \"grey\")\n(short-if true \"yellow\")"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "(short-if-2 false 2)\n(short-if-2 true 3)"
         }
     }
 }
