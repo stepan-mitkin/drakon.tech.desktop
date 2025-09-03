@@ -5,6 +5,36 @@ const config = require("./config")
 
 let globalIdCounter = 2;
 
+var gPunctuation = {
+	"{" : true,
+	"}" : true,
+	"-" : true,
+	"_" : true,
+	"/" : true,
+	"+" : true,
+	"*" : true,
+	"\\" : true,
+	"%" : true,
+	"&" : true,
+	"^" : true,
+	"=" : true,
+	"?" : true,
+	"!" : true,
+	"\"" : true,
+	"\'" : true,
+	"." : true,
+	"," : true,
+	";" : true,
+	":" : true,
+	"(" : true,
+	")" : true,
+	"[" : true,
+	"]" : true,
+	"<" : true,
+	">" : true,
+	"|" : true
+}
+
 function createItemSearch(winInfo, needles) {
     var found = []
     var completed = false
@@ -824,12 +854,42 @@ function getMatchRank(name, needles) {
 function getLinesMatchRank(name, needles) {
     var rank = 10000
     for (var needle of needles) {
-        if (needle.indexOf(name) !== -1) {
+        if (containsName(needle, name)) {
             return 1
         }
     }
     return rank
 }
+
+function containsName(line, name) {
+    var index = line.indexOf(name)
+    if (index === -1) {
+        return false
+    }
+    var before = ""
+    var after = ""
+    if (index > 0) {
+        before = line[index - 1]
+    }
+    var indexAfter = index + name.length
+    if (indexAfter < line.length) {
+        after = line[indexAfter]
+    }
+    if (isEmptyOrPunctuation(before) && isEmptyOrPunctuation(after)) {
+        return true
+    }
+
+    return false
+}
+
+function isEmptyOrPunctuation(char) {
+    if (!char) { return true }
+    if (char === " " || char === "\t" || char === "\r" || char === "\n") {
+        return true
+    }
+    return char in gPunctuation
+}
+
 
 async function folderSearchVisitor(
     winInfo,
