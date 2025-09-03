@@ -35,7 +35,7 @@ var gPunctuation = {
 	"|" : true
 }
 
-function createItemSearch(winInfo, needles) {
+function createItemSearch(winInfo, needles, exact) {
     var found = []
     var completed = false
     async function start() {
@@ -45,7 +45,8 @@ function createItemSearch(winInfo, needles) {
             winInfo.path,
             filepath => itemSearchVisitor(
                 winInfo,
-                filepath
+                filepath,
+                exact
             )
         )
         completed = true
@@ -57,7 +58,8 @@ function createItemSearch(winInfo, needles) {
 
     async function itemSearchVisitor(
         winInfo,
-        filepath) {
+        filepath,
+        exact) {
         if (completed) {
             return true
         }
@@ -69,7 +71,7 @@ function createItemSearch(winInfo, needles) {
         var items = diagram.items || {}
         for (var itemId in items) {
             var item = items[itemId]
-            await searchItem(winInfo, filepath, itemId, item.content)
+            await searchItem(winInfo, filepath, itemId, item.content, exact)
         }
         return false
     }
@@ -83,13 +85,19 @@ function createItemSearch(winInfo, needles) {
         return parts  
     }
     
-    async function searchItem(winInfo, filepath, itemId, content) {
+    async function searchItem(winInfo, filepath, itemId, content, exact) {
         var lines = getLines(content)
         var name = path.parse(filepath).name
         for (var line of lines) {
             var low = line.toLowerCase()
             for (var needle of needles) {
-                if (low.indexOf(needle) !== -1) {
+                var match
+                if (exact) {
+                    match = containsName(low, needle)
+                } else {
+                    match = low.indexOf(needle) !== -1
+                }
+                if (match) {
                     var id = await loadRecordFromDiscToCache(winInfo, filepath)
                     found.push(createFoundItem(winInfo, id, itemId, name, line))
                 }
@@ -814,7 +822,7 @@ async function searchDefinitions(winInfo, body) {
 
 async function searchItems(winInfo, body) { 
     var spaceId = body.spaces[0]
-    startItemsSearch(winInfo, [body.needle])
+    startItemsSearch(winInfo, [body.needle], body.exact)
     return {}
 }  
 
@@ -825,13 +833,13 @@ function stopSearch(winInfo) {
     }
 }
 
-function startItemsSearch(winInfo, needles) {
+function startItemsSearch(winInfo, needles, exact) {
     var needlesChecked = prepareNeedles(needles)  
     stopSearch(winInfo)
     if (needlesChecked.length === 0) {
         return
     }
-    winInfo.search = createItemSearch(winInfo, needlesChecked)
+    winInfo.search = createItemSearch(winInfo, needlesChecked, exact)
     winInfo.search.start()     
 }
 

@@ -713,7 +713,8 @@ function DiagramSearch_Folders_onData(self, data) {
     )
     startSearchItems(
         self.input,
-        self
+        self,
+        false
     )
     self.state = "ItemsPause";
 }
@@ -2204,7 +2205,8 @@ function ReferencesSearch_Start_default(self, data) {
 function ReferencesSearch_Start_onData(self, data) {
     startSearchItems(
         self.input,
-        self
+        self,
+        true
     )
     self.state = "ItemsPause";
 }
@@ -8076,13 +8078,14 @@ function startSearchFolders(needle, target) {
     backend.searchFolders(data).then(target.onData).catch(target.onError)
 }
 
-function startSearchItems(needle, target) {
+function startSearchItems(needle, target, exact) {
     var data, id
     id = parseId(globs.current.id)
     data = {
         spaces : [id.spaceId],
         type : "items",
-        needle : needle
+        needle : needle,
+        exact: exact
     }
     backend.searchItems(data).then(target.onData).catch(target.onError)
 }
