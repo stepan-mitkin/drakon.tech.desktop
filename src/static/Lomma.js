@@ -7147,8 +7147,8 @@ function flowSourceCode(render, node, source) {
     if ((source) && (shouldAutoformat(node.type))) {
         tokens = prettify(tokens, node.type)
         node.text = printTokens(tokens)
-        node.tokens = tokens
     }
+    node.tokens = tokens
     flower = createSourceFlower(
         render,
         source

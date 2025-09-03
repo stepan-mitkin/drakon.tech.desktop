@@ -5391,7 +5391,8 @@ function showContextMenu(x, y, menu, onBackground, item) {
         var body = {
         	space_id: spaceId,
         	lines: item.lines,
-        	tokens: item.tokens
+        	tokens: item.tokens,
+            text: item.text
         }
         var target = {
         	onData: onSuccess,
