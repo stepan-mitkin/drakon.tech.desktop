@@ -771,11 +771,15 @@ function sortByRankThenName(left, right) {
 }
 
 async function searchFolders(winInfo, body) {
-    return await searchFolderCore(winInfo, [body.needle], 10)
+    return await searchFolderCore(winInfo, [body.needle], 10, getMatchRank)
 }
 
 async function searchDefinitions(winInfo, body) {
-    return await searchFolderCore(winInfo, body.tokens, 1)
+    if (winInfo.language === "LANG_HUMAN") {
+        return await searchFolderCore(winInfo, body.lines, 1, getLinesMatchRank)
+    } else {
+        return await searchFolderCore(winInfo, body.tokens, 1, getMatchRank)
+    }
 }
 
 async function searchItems(winInfo, body) { 
@@ -817,15 +821,26 @@ function getMatchRank(name, needles) {
     return rank
 }
 
+function getLinesMatchRank(name, needles) {
+    var rank = 10000
+    for (var needle of needles) {
+        if (needle.indexOf(name) !== -1) {
+            return 1
+        }
+    }
+    return rank
+}
+
 async function folderSearchVisitor(
     winInfo,
     needlesChecked,
     filepath,
     maxRank,
-    results) {
+    results,
+    match) {
     var parsed = path.parse(filepath)
     var name = parsed.name.toLowerCase()
-    var rank = getMatchRank(name, needlesChecked)
+    var rank = match(name, needlesChecked)
     if (rank <= maxRank) {
         const id = await loadRecordFromDiscToCache(winInfo, filepath)
         var record = getRecordById(winInfo, id)
@@ -841,7 +856,12 @@ async function folderSearchVisitor(
     return false
 }
 
-async function searchFolderCore(winInfo, needles, maxRank) {
+
+
+async function searchFolderCore(winInfo, needles, maxRank, match) {
+    if (!needles || needles.length === 0) {
+        return {folders:[]}
+    }
     var results = []
     var needlesChecked = prepareNeedles(needles)        
     await scanFolders(
@@ -852,7 +872,8 @@ async function searchFolderCore(winInfo, needles, maxRank) {
             needlesChecked,
             filepath,
             maxRank,
-            results
+            results,
+            match
         )
     )
     results.sort(sortByRankThenName)

@@ -1,6 +1,6 @@
 (function () {
     async function getAppVersion() {
-        return "v2025.08.28"
+        return "v2025.09.03"
     }
 
     var gLanguage = undefined

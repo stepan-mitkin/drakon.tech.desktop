@@ -5372,7 +5372,7 @@ function showContextMenu(x, y, menu, onBackground, item) {
     )
     var extended = {}
     globs.extended = extended
-    if ((((item) && (!(globs.tryMe))) && (canDefQueryFrom(item))) && (item.tokens)) {
+    if ((((item) && (!(globs.tryMe))) && (canDefQueryFrom(item)))) {
         var queryId = Utils.randomString(10)
         extended.urls = getItemUrls(item.text)
         extended.queryId = queryId
