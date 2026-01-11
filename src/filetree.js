@@ -1,1259 +1,1260 @@
-const { shell } = require('electron');
-const fs = require('fs').promises;
-const path = require('path');
-const config = require("./config")
+const { shell } = require("electron");
+const fs = require("fs").promises;
+const path = require("path");
+const config = require("./config");
 
 let globalIdCounter = 2;
 
 var gPunctuation = {
-	"{" : true,
-	"}" : true,
-	"-" : true,
-	"_" : true,
-	"/" : true,
-	"+" : true,
-	"*" : true,
-	"\\" : true,
-	"%" : true,
-	"&" : true,
-	"^" : true,
-	"=" : true,
-	"?" : true,
-	"!" : true,
-	"\"" : true,
-	"\'" : true,
-	"." : true,
-	"," : true,
-	";" : true,
-	":" : true,
-	"(" : true,
-	")" : true,
-	"[" : true,
-	"]" : true,
-	"<" : true,
-	">" : true,
-	"|" : true
-}
+  "{": true,
+  "}": true,
+  "-": true,
+  _: true,
+  "/": true,
+  "+": true,
+  "*": true,
+  "\\": true,
+  "%": true,
+  "&": true,
+  "^": true,
+  "=": true,
+  "?": true,
+  "!": true,
+  '"': true,
+  "\'": true,
+  ".": true,
+  ",": true,
+  ";": true,
+  ":": true,
+  "(": true,
+  ")": true,
+  "[": true,
+  "]": true,
+  "<": true,
+  ">": true,
+  "|": true,
+};
 
 function createItemSearch(winInfo, needles, exact) {
-    var found = []
-    var completed = false
-    async function start() {
-        if (completed) {throw new Error("Search has completed")}
-        await scanFolders(
-            winInfo,
-            winInfo.path,
-            filepath => itemSearchVisitor(
-                winInfo,
-                filepath,
-                exact
-            )
-        )
-        completed = true
+  var found = [];
+  var completed = false;
+  async function start() {
+    if (completed) {
+      throw new Error("Search has completed");
     }
+    await scanFolders(winInfo, winInfo.path, (filepath) =>
+      itemSearchVisitor(winInfo, filepath, exact),
+    );
+    completed = true;
+  }
 
-    function stop() {
-        completed = true
+  function stop() {
+    completed = true;
+  }
+
+  async function itemSearchVisitor(winInfo, filepath, exact) {
+    if (completed) {
+      return true;
     }
+    if (await isDirectory(filepath)) {
+      return false;
+    }
+    var diagram = await readJson(filepath);
+    await searchItem(winInfo, filepath, "params", diagram.params);
+    var items = diagram.items || {};
+    for (var itemId in items) {
+      var item = items[itemId];
+      await searchItem(winInfo, filepath, itemId, item.content, exact);
+    }
+    return false;
+  }
 
-    async function itemSearchVisitor(
-        winInfo,
-        filepath,
-        exact) {
-        if (completed) {
-            return true
+  function getLines(content) {
+    content = content || "";
+    var parts = content
+      .split("\n")
+      .map((part) => part.trim())
+      .filter((part) => !!part);
+    return parts;
+  }
+
+  async function searchItem(winInfo, filepath, itemId, content, exact) {
+    var lines = getLines(content);
+    var name = path.parse(filepath).name;
+    for (var line of lines) {
+      var low = line.toLowerCase();
+      for (var needle of needles) {
+        var match;
+        if (exact) {
+          match = containsName(low, needle);
+        } else {
+          match = low.indexOf(needle) !== -1;
         }
-        if (await isDirectory(filepath)) {
-            return false
+        if (match) {
+          var id = await loadRecordFromDiscToCache(winInfo, filepath);
+          found.push(createFoundItem(winInfo, id, itemId, name, line));
         }
-        var diagram = await readJson(filepath)
-        await searchItem(winInfo, filepath, "params", diagram.params)
-        var items = diagram.items || {}
-        for (var itemId in items) {
-            var item = items[itemId]
-            await searchItem(winInfo, filepath, itemId, item.content, exact)
-        }
-        return false
+      }
     }
+  }
 
-    function getLines(content) {
-        content = content || ""
-        var parts = content
-        .split("\n")
-        .map(part => part.trim())
-        .filter(part => !!part)    
-        return parts  
-    }
-    
-    async function searchItem(winInfo, filepath, itemId, content, exact) {
-        var lines = getLines(content)
-        var name = path.parse(filepath).name
-        for (var line of lines) {
-            var low = line.toLowerCase()
-            for (var needle of needles) {
-                var match
-                if (exact) {
-                    match = containsName(low, needle)
-                } else {
-                    match = low.indexOf(needle) !== -1
-                }
-                if (match) {
-                    var id = await loadRecordFromDiscToCache(winInfo, filepath)
-                    found.push(createFoundItem(winInfo, id, itemId, name, line))
-                }
-            }
-        }  
-    }
-
-    function createFoundItem(winInfo, id, itemId, name, text) {
-        var record = getRecordById(winInfo, id)
-        return {
-            space_id: winInfo.spaceId,
-            folder_id: id,
-            name: name,
-            path: buildPathForSearch(winInfo, id),
-            type: record.type,
-            item_id: itemId,
-            text: text
-        }
-    }
-
-    function getResults() {
-        var result = {
-            completed: completed,
-            items: found
-        }
-        found = []
-        return result
-    }
-
+  function createFoundItem(winInfo, id, itemId, name, text) {
+    var record = getRecordById(winInfo, id);
     return {
-        start: start,
-        getResults: getResults,
-        stop: stop
-    }
+      space_id: winInfo.spaceId,
+      folder_id: id,
+      name: name,
+      path: buildPathForSearch(winInfo, id),
+      type: record.type,
+      item_id: itemId,
+      text: text,
+    };
+  }
+
+  function getResults() {
+    var result = {
+      completed: completed,
+      items: found,
+    };
+    found = [];
+    return result;
+  }
+
+  return {
+    start: start,
+    getResults: getResults,
+    stop: stop,
+  };
 }
 
 function objFor(obj, callback, target) {
-    for (var key in obj) {
-        var value = obj[key]
-        callback(key, value, target)
-    }
+  for (var key in obj) {
+    var value = obj[key];
+    callback(key, value, target);
+  }
 }
-
 
 function forEach(array, callback, target) {
-    var length = array.length
-    for (var i = 0; i < length; i++) {
-        var value = array[i]
-        callback(value, target, i)
-    }
+  var length = array.length;
+  for (var i = 0; i < length; i++) {
+    var value = array[i];
+    callback(value, target, i);
+  }
 }
-
 
 function addToCache(winInfo, filepath, id, body) {
-    winInfo.records[id] = body;
-    winInfo.idToPath[id] = filepath;
-    winInfo.pathToId[filepath] = id;
+  winInfo.records[id] = body;
+  winInfo.idToPath[id] = filepath;
+  winInfo.pathToId[filepath] = id;
 }
 
-
-
 async function addToHistory(winInfo, folderId) {
-    if (isReadonly(winInfo)) { return }
-    // Remove items with the same folderId
-    winInfo.history = winInfo.history.filter(item => item.id !== folderId);
+  if (isReadonly(winInfo)) {
+    return;
+  }
+  // Remove items with the same folderId
+  winInfo.history = winInfo.history.filter((item) => item.id !== folderId);
 
-    // Insert the new item at the start
-    winInfo.history.unshift({
-        id: folderId,
-        whenOpened: new Date().toISOString(),
-    });
+  // Insert the new item at the start
+  winInfo.history.unshift({
+    id: folderId,
+    whenOpened: new Date().toISOString(),
+  });
 
-    // Trim the history to a max length of 30
-    while (winInfo.history.length > 30) {
-        winInfo.history.pop();
-    }
+  // Trim the history to a max length of 30
+  while (winInfo.history.length > 30) {
+    winInfo.history.pop();
+  }
 
-    // Rewrite history
-    await rewriteHistory(winInfo);
+  // Rewrite history
+  await rewriteHistory(winInfo);
 }
 
 function getFolderName(winInfo, id) {
-    var filepath = getFilePathById(winInfo, id)
-    var parsed = path.parse(filepath)
-    return parsed.name
+  var filepath = getFilePathById(winInfo, id);
+  var parsed = path.parse(filepath);
+  return parsed.name;
 }
 
-
 async function rewriteHistory(winInfo) {
-    const pathList = winInfo.history.map(item => ({
-        path: getFilePathById(winInfo, item.id),
-        whenOpened: item.whenOpened,
-    }));
+  const pathList = winInfo.history.map((item) => ({
+    path: getFilePathById(winInfo, item.id),
+    whenOpened: item.whenOpened,
+  }));
 
-    const obj = { history: pathList };
-    const filename = buildHistoryFilename(winInfo);  // Get the path for the history file
-    await writeJson(filename, obj);
+  const obj = { history: pathList };
+  const filename = buildHistoryFilename(winInfo); // Get the path for the history file
+  await writeJson(filename, obj);
 }
 
 function applyEdits(body, target) {
-    createItems(body, target);
-    addedEdits(body, target);
-    updatedEdits(body, target);
-    removedEdits(body, target);
+  createItems(body, target);
+  addedEdits(body, target);
+  updatedEdits(body, target);
+  removedEdits(body, target);
 }
 
 function createItems(body, target) {
-    if (!target.items) {
-        target.items = {};
-    }
+  if (!target.items) {
+    target.items = {};
+  }
 }
 
 function addedEdits(body, target) {
-    if (body.added) {
-        for (const edit of body.added) {
-            const item = { ...edit };
-            delete item.id;
-            target.items[edit.id] = item;
-        }
+  if (body.added) {
+    for (const edit of body.added) {
+      const item = { ...edit };
+      delete item.id;
+      target.items[edit.id] = item;
     }
+  }
 }
 
 function updatedEdits(body, target) {
-    if (body.updated) {
-        for (const edit of body.updated) {
-            const item = { ...edit };
-            delete item.id;
-            const existing = target.items[edit.id];
-            Object.assign(existing, item);
-        }
+  if (body.updated) {
+    for (const edit of body.updated) {
+      const item = { ...edit };
+      delete item.id;
+      const existing = target.items[edit.id];
+      Object.assign(existing, item);
     }
+  }
 }
 
 function removedEdits(body, target) {
-    if (body.removed) {
-        for (const id of body.removed) {
-            delete target.items[id];
-        }
+  if (body.removed) {
+    for (const id of body.removed) {
+      delete target.items[id];
     }
+  }
 }
 
 function buildHistoryFilename(winInfo) {
-    return path.join(getShadowFolderPath(winInfo.path), "history.json");
+  return path.join(getShadowFolderPath(winInfo.path), "history.json");
 }
 
 function getFilePathById(winInfo, id) {
-    return winInfo.idToPath[id]
+  return winInfo.idToPath[id];
 }
 
 function getRecordById(winInfo, id) {
-    return winInfo.records[id]
+  return winInfo.records[id];
 }
 
 function buildFolderPath(winInfo, folderId) {
-    let folderIdCurrent = folderId;
-    const result = [];
+  let folderIdCurrent = folderId;
+  const result = [];
 
-    while (folderIdCurrent) {
-        const filename = getFilePathById(winInfo, folderIdCurrent);
-        const name = path.parse(filename).name;
-        const record = getRecordById(winInfo, folderIdCurrent);
+  while (folderIdCurrent) {
+    const filename = getFilePathById(winInfo, folderIdCurrent);
+    const name = path.parse(filename).name;
+    const record = getRecordById(winInfo, folderIdCurrent);
 
-        result.push({
-            space_id: winInfo.spaceId,
-            id: folderIdCurrent,
-            name,
-        });
+    result.push({
+      space_id: winInfo.spaceId,
+      id: folderIdCurrent,
+      name,
+    });
 
-        folderIdCurrent = record.parent;
-    }
+    folderIdCurrent = record.parent;
+  }
 
-    return result.reverse();
+  return result.reverse();
 }
 
 function generateUniqueId() {
-    const id = globalIdCounter.toString();
-    globalIdCounter++;
-    return id;
+  const id = globalIdCounter.toString();
+  globalIdCounter++;
+  return id;
 }
 
 async function createFolder(winInfo, spaceId, body) {
-    const parentFolder = getFilePathById(winInfo, body.parent);
-    let newPath, record, id;
-    if (body.type === 'folder') {
-        const newFilename = body.name;
-        newPath = path.join(parentFolder, newFilename);
+  const parentFolder = getFilePathById(winInfo, body.parent);
+  let newPath, record, id;
+  if (body.type === "folder") {
+    const newFilename = body.name;
+    newPath = path.join(parentFolder, newFilename);
 
-        if (await fileOrFolderExists(newPath)) {
-            return {error:'ERR_NAME_NOT_UNIQUE'};
-        } else {
-            record = { type: 'folder', parent: body.parent };
-            id = generateUniqueId();
-            addToCache(winInfo, newPath, id, record);
-            await createFolderOnDisk(newPath);
-            return { folder_id: id };
-        }
+    if (await fileOrFolderExists(newPath)) {
+      return { error: "ERR_NAME_NOT_UNIQUE" };
     } else {
-        const newFilename = `${body.name}.${body.type}`;
-        newPath = path.join(parentFolder, newFilename);
-
-        if (await fileOrFolderExists(newPath)) {
-            return {error:'ERR_NAME_NOT_UNIQUE'};
-        } else {
-            record = {};
-            copyDiagramData(body, record);
-            applyEdits(body, record);
-            await writeJson(newPath, record);
-            record.parent = body.parent;
-            id = generateUniqueId();
-            addToCache(winInfo, newPath, id, record);
-            return { folder_id: id };
-        }
+      record = { type: "folder", parent: body.parent };
+      id = generateUniqueId();
+      addToCache(winInfo, newPath, id, record);
+      await createFolderOnDisk(newPath);
+      return { folder_id: id };
     }
+  } else {
+    const newFilename = `${body.name}.${body.type}`;
+    newPath = path.join(parentFolder, newFilename);
+
+    if (await fileOrFolderExists(newPath)) {
+      return { error: "ERR_NAME_NOT_UNIQUE" };
+    } else {
+      record = {};
+      copyDiagramData(body, record);
+      applyEdits(body, record);
+      await writeJson(newPath, record);
+      record.parent = body.parent;
+      id = generateUniqueId();
+      addToCache(winInfo, newPath, id, record);
+      return { folder_id: id };
+    }
+  }
 }
 
 async function getFolder(winInfo, spaceId, folderId) {
-    if (spaceId !== winInfo.spaceId) throw new Error('Invalid spaceId=' + spaceId);
-    const existing = getRecordById(winInfo, folderId);
-    const filepath = getFilePathById(winInfo, folderId);
+  if (spaceId !== winInfo.spaceId)
+    throw new Error("Invalid spaceId=" + spaceId);
+  const existing = getRecordById(winInfo, folderId);
+  const filepath = getFilePathById(winInfo, folderId);
 
-    const body = {
-        id: folderId,
-        space_id: winInfo.spaceId,
-        access: winInfo.access,
-        parent: existing.parent,
-        name: getFolderName(winInfo, folderId),
-        path: buildFolderPath(winInfo, folderId),
-        language: winInfo.language,
-        items: {},
-        children: [],
-    };
+  const body = {
+    id: folderId,
+    space_id: winInfo.spaceId,
+    access: winInfo.access,
+    parent: existing.parent,
+    name: getFolderName(winInfo, folderId),
+    path: buildFolderPath(winInfo, folderId),
+    language: winInfo.language,
+    format: winInfo.format,
+    items: {},
+    children: [],
+  };
 
-    if (await isDirectory(filepath)) {
-        body.type = 'folder';
-        body.children = await readChildren(winInfo, filepath, folderId);
-    } else {
-        const record = await readJson(filepath);
-        copyDiagramData(record, body);
-        copyDiagramData(record, existing);
-        await addToHistory(winInfo, folderId);
-    }
+  if (await isDirectory(filepath)) {
+    body.type = "folder";
+    body.children = await readChildren(winInfo, filepath, folderId);
+  } else {
+    const record = await readJson(filepath);
+    copyDiagramData(record, body);
+    copyDiagramData(record, existing);
+    await addToHistory(winInfo, folderId);
+  }
 
-    return body;
+  return body;
 }
 
 function createHistoryItem(winInfo, item) {
-    // Get the record for the given item ID from winInfo
-    const record = getRecordById(winInfo, item.id);
-    const name = getFolderName(winInfo, item.id)
-    var result = {
-        folder_id: item.id,
-        space_id: winInfo.spaceId,
-        name: name,  // Get the name of the record by its ID
-        type: record.type,
-        whenOpened: item.whenOpened,  // The time the folder was opened
-    };
-    return result
+  // Get the record for the given item ID from winInfo
+  const record = getRecordById(winInfo, item.id);
+  const name = getFolderName(winInfo, item.id);
+  var result = {
+    folder_id: item.id,
+    space_id: winInfo.spaceId,
+    name: name, // Get the name of the record by its ID
+    type: record.type,
+    whenOpened: item.whenOpened, // The time the folder was opened
+  };
+  return result;
 }
 
-
 async function readChildren(winInfo, folderPath, parent) {
-    const files = await fs.readdir(folderPath);
-    const children = [];
+  const files = await fs.readdir(folderPath);
+  const children = [];
 
-    for (const filename of files) {
-        const fullpath = path.join(folderPath, filename);
-        const name = path.parse(fullpath).name;
+  for (const filename of files) {
+    const fullpath = path.join(folderPath, filename);
+    const name = path.parse(fullpath).name;
 
-        if (name.startsWith(".")) { continue }
-
-        if (await isDirectory(fullpath)) {
-            let id;
-            if (winInfo.pathToId[fullpath]) {
-                id = winInfo.pathToId[fullpath];
-            } else {
-                id = generateUniqueId();
-            }
-
-            const record = {
-                parent: parent,
-                type: 'folder',
-            };
-
-            addToCache(winInfo, fullpath, id, record);
-
-            children.push({
-                id: id,
-                space_id: winInfo.spaceId,
-                type: 'folder',
-                name: name,
-            });
-        } else {
-            const ext = path.parse(fullpath).ext;
-
-            if (ext === '.drakon') {
-                let id = await loadRecordFromDiscToCache(winInfo, fullpath)
-                children.push({
-                    id: id,
-                    space_id: winInfo.spaceId,
-                    type: 'drakon',
-                    name: name,
-                });
-            }
-        }
+    if (name.startsWith(".")) {
+      continue;
     }
 
-    return children;
+    if (await isDirectory(fullpath)) {
+      let id;
+      if (winInfo.pathToId[fullpath]) {
+        id = winInfo.pathToId[fullpath];
+      } else {
+        id = generateUniqueId();
+      }
+
+      const record = {
+        parent: parent,
+        type: "folder",
+      };
+
+      addToCache(winInfo, fullpath, id, record);
+
+      children.push({
+        id: id,
+        space_id: winInfo.spaceId,
+        type: "folder",
+        name: name,
+      });
+    } else {
+      const ext = path.parse(fullpath).ext;
+
+      if (ext === ".drakon") {
+        let id = await loadRecordFromDiscToCache(winInfo, fullpath);
+        children.push({
+          id: id,
+          space_id: winInfo.spaceId,
+          type: "drakon",
+          name: name,
+        });
+      }
+    }
+  }
+
+  return children;
 }
 
 async function getIdFromCacheOrLoad(winInfo, fullpath, parent) {
-    let id;
-    if (winInfo.pathToId[fullpath]) {
-        id = winInfo.pathToId[fullpath];
-    } else {
-        id = generateUniqueId();
-    }
+  let id;
+  if (winInfo.pathToId[fullpath]) {
+    id = winInfo.pathToId[fullpath];
+  } else {
+    id = generateUniqueId();
+  }
 
-    const fromDisc = await readJson(fullpath);
-    const record = {
-        parent: parent,
-    };
+  const fromDisc = await readJson(fullpath);
+  const record = {
+    parent: parent,
+  };
 
-    copyDiagramData(fromDisc, record);
+  copyDiagramData(fromDisc, record);
 
-    addToCache(winInfo, fullpath, id, record);
-    return id    
+  addToCache(winInfo, fullpath, id, record);
+  return id;
 }
 
 async function getHistory(winInfo) {
-    return {
-        recent: winInfo.history.map(item => createHistoryItem(winInfo, item)),
-    };
+  return {
+    recent: winInfo.history.map((item) => createHistoryItem(winInfo, item)),
+  };
 }
 
 function isSubfolder(upperFolder, deeperFolder) {
-    var upper = path.resolve(upperFolder)
-    var deeper = path.resolve(deeperFolder)
-    var parsed = path.parse(deeper)
-    while (parsed.dir && parsed.dir !== parsed.root) {
-        if (parsed.dir === upper) { return true }
-        parsed = path.parse(parsed.dir)
+  var upper = path.resolve(upperFolder);
+  var deeper = path.resolve(deeperFolder);
+  var parsed = path.parse(deeper);
+  while (parsed.dir && parsed.dir !== parsed.root) {
+    if (parsed.dir === upper) {
+      return true;
     }
-    return false
+    parsed = path.parse(parsed.dir);
+  }
+  return false;
 }
 
 async function historyBelongsToFolder(winInfo, history) {
-    for (var item of history) {
-        if (!isSubfolder(winInfo.path, item.path)) {
-            return false
-        }
-        try {
-            await fs.stat(item.path)
-        } catch (ex) {
-            return false
-        }
+  for (var item of history) {
+    if (!isSubfolder(winInfo.path, item.path)) {
+      return false;
     }
-    return true
+    try {
+      await fs.stat(item.path);
+    } catch (ex) {
+      return false;
+    }
+  }
+  return true;
 }
 
 async function loadHistory(winInfo) {
-    const filename = buildHistoryFilename(winInfo);
-    const obj = await readJson(filename);  // Read history from the shadow folder
+  const filename = buildHistoryFilename(winInfo);
+  const obj = await readJson(filename); // Read history from the shadow folder
 
-    winInfo.history = []
-    // If there are any issues reading the file or no history exists, return an empty array
-    if (!obj.history) {
-        return [];
-    }
+  winInfo.history = [];
+  // If there are any issues reading the file or no history exists, return an empty array
+  if (!obj.history) {
+    return [];
+  }
 
-    var historyOk = await historyBelongsToFolder(winInfo, obj.history)
-    if (!historyOk) {
-        return []
-    }
+  var historyOk = await historyBelongsToFolder(winInfo, obj.history);
+  if (!historyOk) {
+    return [];
+  }
 
+  // Iterate through the history and load the records into memory
+  const history = [];
+  for (const item of obj.history) {
+    const id = await loadRecordFromDiscToCache(winInfo, item.path); // Load each record by its path
+    history.push({
+      id: id,
+      whenOpened: item.whenOpened, // Preserve the "whenOpened" field from the file
+    });
+  }
 
-    // Iterate through the history and load the records into memory
-    const history = [];
-    for (const item of obj.history) {
-        const id = await loadRecordFromDiscToCache(winInfo, item.path);  // Load each record by its path
-        history.push({
-            id: id,
-            whenOpened: item.whenOpened,  // Preserve the "whenOpened" field from the file
-        });
-    }
-
-    // Set the loaded history into winInfo
-    winInfo.history = history;
+  // Set the loaded history into winInfo
+  winInfo.history = history;
 }
 
 function getParentPath(filepath) {
-    return path.dirname(filepath);  // Returns the parent directory of the given filepath
+  return path.dirname(filepath); // Returns the parent directory of the given filepath
 }
-
 
 async function loadRecordFromDiscToCache(winInfo, filepath) {
-    // If the file path is already in the cache, return the corresponding ID
-    if (winInfo.pathToId[filepath]) {
-        return winInfo.pathToId[filepath];
-    }
+  // If the file path is already in the cache, return the corresponding ID
+  if (winInfo.pathToId[filepath]) {
+    return winInfo.pathToId[filepath];
+  }
 
-    // Otherwise, we need to load the record from the parent directory
-    const parentPath = getParentPath(filepath);
-    const parent = await loadRecordFromDiscToCache(winInfo, parentPath);
+  // Otherwise, we need to load the record from the parent directory
+  const parentPath = getParentPath(filepath);
+  const parent = await loadRecordFromDiscToCache(winInfo, parentPath);
 
-    let body;
-    if (await isDirectory(filepath)) {
-        body = { type: 'folder' };  // If it's a directory, create a folder record
-    } else {
-        body = await readJson(filepath);  // Otherwise, read the file as JSON
-    }
+  let body;
+  if (await isDirectory(filepath)) {
+    body = { type: "folder" }; // If it's a directory, create a folder record
+  } else {
+    body = await readJson(filepath); // Otherwise, read the file as JSON
+  }
 
-    // Set the parent ID for the record
-    body.parent = parent;
+  // Set the parent ID for the record
+  body.parent = parent;
 
-    // Generate a new unique ID for this record
-    const id = generateUniqueId();
+  // Generate a new unique ID for this record
+  const id = generateUniqueId();
 
-    // Add the record to the cache
-    addToCache(winInfo, filepath, id, body);
+  // Add the record to the cache
+  addToCache(winInfo, filepath, id, body);
 
-    return id;
+  return id;
 }
 
-
-
 async function openFolderCore(winInfo, folderPath) {
-    await determineAccess(winInfo, folderPath);
-    createMemoryStructures(winInfo, folderPath);
-    await loadHistory(winInfo, folderPath);
-    await loadProjectSettings(winInfo)
-    return winInfo.spaceId
+  await determineAccess(winInfo, folderPath);
+  createMemoryStructures(winInfo, folderPath);
+  await loadHistory(winInfo, folderPath);
+  await loadProjectSettings(winInfo);
+  return winInfo.spaceId;
 }
 
 async function loadProjectSettings(winInfo) {
-    var language = "JS"
-    var solution = await readJson(path.join(winInfo.path, "solution.json"))
-    if (solution.language) {
-        language = solution.language
-    }
-    console.log(solution, language)
-    winInfo.language = language
-    winInfo.outputFolder = solution.outputFolder
-    winInfo.outputFile = solution.outputFile
-    winInfo.mainFun = solution.mainFun
+  var language = "JS";
+  var format = "CommonJS";
+  var solution = await readJson(path.join(winInfo.path, "solution.json"));
+  if (solution.language) {
+    language = solution.language;
+  }
+  if (solution.format) {
+    format = solution.format;
+  }
+  console.log(solution, language, format);
+  winInfo.language = language;
+  winInfo.format = format;
+  winInfo.outputFolder = solution.outputFolder;
+  winInfo.outputFile = solution.outputFile;
+  winInfo.mainFun = solution.mainFun;
 }
 
 async function determineAccess(winInfo, folderPath) {
-    folderPath = path.resolve(folderPath);
-    if (!(await isDirectory(folderPath))) {
-        throw new Error('Invalid folder path');
-    }
-    var access
-    try {
-        await createShadowFolder(folderPath);
-        await writeAccessFile(folderPath);
-        access = 'write';
-    } catch (ex) {
-        console.log("determineAccess", ex.message)
-        access = "read"
-    }
-    winInfo.name = path.parse(folderPath).name
-    winInfo.path = folderPath;
-    winInfo.access = access;
+  folderPath = path.resolve(folderPath);
+  if (!(await isDirectory(folderPath))) {
+    throw new Error("Invalid folder path");
+  }
+  var access;
+  try {
+    await createShadowFolder(folderPath);
+    await writeAccessFile(folderPath);
+    access = "write";
+  } catch (ex) {
+    console.log("determineAccess", ex.message);
+    access = "read";
+  }
+  winInfo.name = path.parse(folderPath).name;
+  winInfo.path = folderPath;
+  winInfo.access = access;
 }
 
 async function getProjectName(winInfo) {
-    return winInfo.name
+  return winInfo.name;
 }
 
 async function updateFolder(winInfo, spaceId, folderId, body) {
-    // Check that the spaceId matches
-    if (spaceId !== winInfo.spaceId) throw new Error('Invalid spaceId');
+  // Check that the spaceId matches
+  if (spaceId !== winInfo.spaceId) throw new Error("Invalid spaceId");
 
-    // Get the existing record for the folder
-    const existing = await getRecordById(winInfo, folderId);
-    const filepath = await getFilePathById(winInfo, folderId);
-    const oldName = path.parse(filepath).name;
+  // Get the existing record for the folder
+  const existing = await getRecordById(winInfo, folderId);
+  const filepath = await getFilePathById(winInfo, folderId);
+  const oldName = path.parse(filepath).name;
 
-    if (await isDirectory(filepath)) {
-        // If it's a directory and the name is being updated
-        if (body.name && body.name !== oldName) {
-            const parentFolder = getParentPath(filepath);
-            const newFilename = body.name;
-            const newPath = path.join(parentFolder, newFilename);
+  if (await isDirectory(filepath)) {
+    // If it's a directory and the name is being updated
+    if (body.name && body.name !== oldName) {
+      const parentFolder = getParentPath(filepath);
+      const newFilename = body.name;
+      const newPath = path.join(parentFolder, newFilename);
 
-            if (await fileOrFolderExists(newPath)) {
-                return {error:'ERR_NAME_NOT_UNIQUE'};
-            } else {
-                // Rename the folder
-                await renameFolder(filepath, newPath);
+      if (await fileOrFolderExists(newPath)) {
+        return { error: "ERR_NAME_NOT_UNIQUE" };
+      } else {
+        // Rename the folder
+        await renameFolder(filepath, newPath);
 
-                // Replace the file path in the children
-                replaceFilePathInChildren(winInfo, newPath, folderId);
-                // Rewrite the history after updating the folder
-                await rewriteHistory(winInfo);
-            }
-        }
-    } else {
-        // If it's a file
-        if (!body.name || body.name === oldName) {
-            // If the name hasn't changed, apply edits and write to file
-            copyDiagramData(body, existing);
-            applyEdits(body, existing);
-            await saveDiagramToDisc(filepath, existing);
-        } else {
-            // If the name has changed
-            const parentFolder = getParentPath(filepath);
-            const newFilename = `${body.name}.${existing.type}`;
-            const newPath = path.join(parentFolder, newFilename);
-
-            if (await fileOrFolderExists(newPath)) {
-                return {error:'ERR_NAME_NOT_UNIQUE'};
-            } else {
-                // Delete the old file and rename it
-                await deleteFile(filepath);
-
-                copyDiagramData(body, existing);
-                applyEdits(body, existing);
-                await saveDiagramToDisc(newPath, existing);
-
-                replaceFilePathInChildren(winInfo, newPath, folderId);
-                // Rewrite the history after renaming the file
-                await rewriteHistory(winInfo);
-            }
-        }
+        // Replace the file path in the children
+        replaceFilePathInChildren(winInfo, newPath, folderId);
+        // Rewrite the history after updating the folder
+        await rewriteHistory(winInfo);
+      }
     }
+  } else {
+    // If it's a file
+    if (!body.name || body.name === oldName) {
+      // If the name hasn't changed, apply edits and write to file
+      copyDiagramData(body, existing);
+      applyEdits(body, existing);
+      await saveDiagramToDisc(filepath, existing);
+    } else {
+      // If the name has changed
+      const parentFolder = getParentPath(filepath);
+      const newFilename = `${body.name}.${existing.type}`;
+      const newPath = path.join(parentFolder, newFilename);
+
+      if (await fileOrFolderExists(newPath)) {
+        return { error: "ERR_NAME_NOT_UNIQUE" };
+      } else {
+        // Delete the old file and rename it
+        await deleteFile(filepath);
+
+        copyDiagramData(body, existing);
+        applyEdits(body, existing);
+        await saveDiagramToDisc(newPath, existing);
+
+        replaceFilePathInChildren(winInfo, newPath, folderId);
+        // Rewrite the history after renaming the file
+        await rewriteHistory(winInfo);
+      }
+    }
+  }
 }
 
 async function saveDiagramToDisc(filepath, obj) {
-    var copy = clone(obj)
-    delete copy.parent
-    await writeJson(filepath, copy);
+  var copy = clone(obj);
+  delete copy.parent;
+  await writeJson(filepath, copy);
 }
 
 function clone(obj) {
-    var copy = {}
-    Object.assign(copy, obj)
-    return copy
+  var copy = {};
+  Object.assign(copy, obj);
+  return copy;
 }
 
 async function deleteFile(filepath) {
-    try {
-        await fs.rm(filepath, { recursive: true, force: true })
-    } catch (err) {
-        throw new Error(`Failed to delete file: ${filepath} ${err.message}`);
-    }
+  try {
+    await fs.rm(filepath, { recursive: true, force: true });
+  } catch (err) {
+    throw new Error(`Failed to delete file: ${filepath} ${err.message}`);
+  }
 }
 
-
 function copyDiagramData(source, target) {
-    const properties = ['items', 'keywords', 'params', 'description', 'type'];
+  const properties = ["items", "keywords", "params", "description", "type"];
 
-    for (const property of properties) {
-        if (property in source) {
-            target[property] = source[property];  // Copy the property if it exists
-        }
+  for (const property of properties) {
+    if (property in source) {
+      target[property] = source[property]; // Copy the property if it exists
     }
+  }
 }
 
 function getChildIds(winInfo, parentId) {
-    const result = [];
+  const result = [];
 
-    // Loop through all records in winInfo.records
-    for (const id in winInfo.records) {
-        const record = winInfo.records[id];
+  // Loop through all records in winInfo.records
+  for (const id in winInfo.records) {
+    const record = winInfo.records[id];
 
-        // If the record's parent matches the given parentId, add its ID to the result
-        if (record.parent === parentId) {
-            result.push(id);
-        }
+    // If the record's parent matches the given parentId, add its ID to the result
+    if (record.parent === parentId) {
+      result.push(id);
     }
+  }
 
-    return result;
+  return result;
 }
-
 
 function replaceFilePathInChildren(winInfo, newPath, folderId) {
-    var oldPath = getFilePathById(winInfo, folderId)
-    // Update the path mappings in memory
-    delete winInfo.pathToId[oldPath];  // Remove the old path mapping
-    winInfo.pathToId[newPath] = folderId;  // Add the new path mapping
-    winInfo.idToPath[folderId] = newPath;  // Update the id-to-path mapping    
-    const childIds = getChildIds(winInfo, folderId);  // Get child IDs of the folder
+  var oldPath = getFilePathById(winInfo, folderId);
+  // Update the path mappings in memory
+  delete winInfo.pathToId[oldPath]; // Remove the old path mapping
+  winInfo.pathToId[newPath] = folderId; // Add the new path mapping
+  winInfo.idToPath[folderId] = newPath; // Update the id-to-path mapping
+  const childIds = getChildIds(winInfo, folderId); // Get child IDs of the folder
 
-    for (const id of childIds) {
-        const record = getRecordById(winInfo, id);
-        const oldPath = getFilePathById(winInfo, id);
-        const oldName = path.parse(oldPath).base;
-        const newPathForChild = path.join(newPath, oldName);  // New path for child based on the new folder path
-        replaceFilePathInChildren(winInfo, newPathForChild, id);
-    }
+  for (const id of childIds) {
+    const record = getRecordById(winInfo, id);
+    const oldPath = getFilePathById(winInfo, id);
+    const oldName = path.parse(oldPath).base;
+    const newPathForChild = path.join(newPath, oldName); // New path for child based on the new folder path
+    replaceFilePathInChildren(winInfo, newPathForChild, id);
+  }
 }
-
 
 async function renameFolder(oldPath, newPath) {
-    try {
-        await fs.rename(oldPath, newPath);  // Rename the folder (or file)
-    } catch (err) {
-        throw new Error(`Failed to rename folder: ${err.message}`);
-    }
+  try {
+    await fs.rename(oldPath, newPath); // Rename the folder (or file)
+  } catch (err) {
+    throw new Error(`Failed to rename folder: ${err.message}`);
+  }
 }
-
 
 function createMemoryStructures(winInfo, folderPath) {
-    winInfo.spaceId = generateUniqueId();  // Generate a new unique spaceId
+  winInfo.spaceId = generateUniqueId(); // Generate a new unique spaceId
 
-    // Initialize the memory cache structures
-    winInfo.records = {};   // A map from ID to record content (for files or folders)
-    winInfo.idToPath = {};  // A map from ID to full file path
-    winInfo.pathToId = {};  // A map from file path to ID
-    winInfo.history = [];   // A list to track previously opened files (by ID)
+  // Initialize the memory cache structures
+  winInfo.records = {}; // A map from ID to record content (for files or folders)
+  winInfo.idToPath = {}; // A map from ID to full file path
+  winInfo.pathToId = {}; // A map from file path to ID
+  winInfo.history = []; // A list to track previously opened files (by ID)
 
-    // Create the root record for the folder (assuming "1" as the root folder ID)
-    const rootId = "1";
-    addToCache(winInfo, folderPath, rootId, { type: "folder" });
+  // Create the root record for the folder (assuming "1" as the root folder ID)
+  const rootId = "1";
+  addToCache(winInfo, folderPath, rootId, { type: "folder" });
 }
 
-
 async function writeAccessFile(folderPath) {
-    const filename = path.join(getShadowFolderPath(folderPath), 'opened.txt');
-    const content = new Date().toISOString();
-    await fs.writeFile(filename, content, 'utf-8');
+  const filename = path.join(getShadowFolderPath(folderPath), "opened.txt");
+  const content = new Date().toISOString();
+  await fs.writeFile(filename, content, "utf-8");
 }
 
 function getShadowFolderPath(folderPath) {
-    return path.join(folderPath, `.${config.exe}`);
+  return path.join(folderPath, `.${config.exe}`);
 }
 
 async function createShadowFolder(folderPath) {
-    var fullpath = getShadowFolderPath(folderPath)
-    await createFolderOnDisk(fullpath)
+  var fullpath = getShadowFolderPath(folderPath);
+  await createFolderOnDisk(fullpath);
 }
 
 function collectIdTree(winInfo, folderId, output) {
-    output.push(folderId)
-    const childIds = getChildIds(winInfo, folderId);
-    for (const id of childIds) {
-        collectIdTree(winInfo, id, output);
-    }
+  output.push(folderId);
+  const childIds = getChildIds(winInfo, folderId);
+  for (const id of childIds) {
+    collectIdTree(winInfo, id, output);
+  }
 }
 
 async function deleteOneFolder(winInfo, item, deleted) {
-    collectIdTree(winInfo, item.id, deleted)
-    var filepath = getFilePathById(winInfo, item.id)
-    await deleteFile(filepath)
+  collectIdTree(winInfo, item.id, deleted);
+  var filepath = getFilePathById(winInfo, item.id);
+  await deleteFile(filepath);
 }
 
 async function deleteFromEverywhere(winInfo, deleted) {
-    for (var id of deleted) {
-        var filepath = getFilePathById(winInfo, id)
-        delete winInfo.idToPath[id]
-        delete winInfo.pathToId[filepath]
-        delete winInfo.records[id]
-    }
-    winInfo.history = winInfo.history.filter(item => deleted.indexOf(item.id) === -1)
-    await rewriteHistory(winInfo)
+  for (var id of deleted) {
+    var filepath = getFilePathById(winInfo, id);
+    delete winInfo.idToPath[id];
+    delete winInfo.pathToId[filepath];
+    delete winInfo.records[id];
+  }
+  winInfo.history = winInfo.history.filter(
+    (item) => deleted.indexOf(item.id) === -1,
+  );
+  await rewriteHistory(winInfo);
 }
 
 async function changeManyCore(winInfo, body) {
-    var deleted = []
-    try {
-        if (body.operation === "delete") {
-            for (var item of body.items) {
-                await deleteOneFolder(winInfo, item, deleted)
-            }
-            await deleteFromEverywhere(winInfo, deleted)
-        } else if (body.operation === "copy") {
-            for (var item of body.items) {
-                await copyOneFolder(winInfo, item, body.target)
-            }
-        } else if (body.operation === "move") {
-            if (moveAcrossProjects(body)) {
-                for (var item of body.items) {
-                    await copyOneFolder(winInfo, item, body.target)
-                }
-            } else {                
-                for (var item of body.items) {                    
-                    await moveOneFolder(winInfo, item, body.target)
-                }
-                await rewriteHistory(winInfo)
-            }
+  var deleted = [];
+  try {
+    if (body.operation === "delete") {
+      for (var item of body.items) {
+        await deleteOneFolder(winInfo, item, deleted);
+      }
+      await deleteFromEverywhere(winInfo, deleted);
+    } else if (body.operation === "copy") {
+      for (var item of body.items) {
+        await copyOneFolder(winInfo, item, body.target);
+      }
+    } else if (body.operation === "move") {
+      if (moveAcrossProjects(body)) {
+        for (var item of body.items) {
+          await copyOneFolder(winInfo, item, body.target);
         }
-    } catch (ex) {
-        console.log(ex)
-        return { ok: false, error: ex.message }
+      } else {
+        for (var item of body.items) {
+          await moveOneFolder(winInfo, item, body.target);
+        }
+        await rewriteHistory(winInfo);
+      }
     }
+  } catch (ex) {
+    console.log(ex);
+    return { ok: false, error: ex.message };
+  }
 
-    return { ok: true, deleted: deleted }
+  return { ok: true, deleted: deleted };
 }
 
 function prepareNeedles(needles) {
-    return needles
-        .map(prepareNeedle)
-        .filter(nee => !!nee)          
+  return needles.map(prepareNeedle).filter((nee) => !!nee);
 }
 
 function prepareNeedle(text) {
-    text = text || ""
-    text = text.trim()
-    return text.toLowerCase()
+  text = text || "";
+  text = text.trim();
+  return text.toLowerCase();
 }
 
 function sortByRankThenName(left, right) {
-    if (left.rank < right.rank) {return -1}
-    if (left.rank > right.rank) {return 1}
-    if (left.name < right.name) {return -1}
-    if (left.name > right.name) {return 1}  
-    return 0
+  if (left.rank < right.rank) {
+    return -1;
+  }
+  if (left.rank > right.rank) {
+    return 1;
+  }
+  if (left.name < right.name) {
+    return -1;
+  }
+  if (left.name > right.name) {
+    return 1;
+  }
+  return 0;
 }
 
 async function searchFolders(winInfo, body) {
-    return await searchFolderCore(winInfo, [body.needle], 10, getMatchRank)
+  return await searchFolderCore(winInfo, [body.needle], 10, getMatchRank);
 }
 
 async function searchDefinitions(winInfo, body) {
-    if (winInfo.language === "LANG_HUMAN") {
-        return await searchFolderCore(winInfo, body.lines, 1, getLinesMatchRank)
-    } else {
-        return await searchFolderCore(winInfo, body.tokens, 1, getMatchRank)
-    }
+  if (winInfo.language === "LANG_HUMAN") {
+    return await searchFolderCore(winInfo, body.lines, 1, getLinesMatchRank);
+  } else {
+    return await searchFolderCore(winInfo, body.tokens, 1, getMatchRank);
+  }
 }
 
-async function searchItems(winInfo, body) { 
-    var spaceId = body.spaces[0]
-    startItemsSearch(winInfo, [body.needle], body.exact)
-    return {}
-}  
+async function searchItems(winInfo, body) {
+  var spaceId = body.spaces[0];
+  startItemsSearch(winInfo, [body.needle], body.exact);
+  return {};
+}
 
 function stopSearch(winInfo) {
-    if (winInfo.search) {
-        winInfo.search.stop()
-        winInfo.search = undefined
-    }
+  if (winInfo.search) {
+    winInfo.search.stop();
+    winInfo.search = undefined;
+  }
 }
 
 function startItemsSearch(winInfo, needles, exact) {
-    var needlesChecked = prepareNeedles(needles)  
-    stopSearch(winInfo)
-    if (needlesChecked.length === 0) {
-        return
-    }
-    winInfo.search = createItemSearch(winInfo, needlesChecked, exact)
-    winInfo.search.start()     
+  var needlesChecked = prepareNeedles(needles);
+  stopSearch(winInfo);
+  if (needlesChecked.length === 0) {
+    return;
+  }
+  winInfo.search = createItemSearch(winInfo, needlesChecked, exact);
+  winInfo.search.start();
 }
 
 function getMatchRank(name, needles) {
-    var rank = 10000
-    for (var needle of needles) {
-        var nrank
-        if (name === needle) {
-            nrank = 1
-        } else if (name.indexOf(needle) !== -1) {
-            nrank = 10
-        } else {
-            continue
-        }
-        rank = Math.min(rank, nrank)
+  var rank = 10000;
+  for (var needle of needles) {
+    var nrank;
+    if (name === needle) {
+      nrank = 1;
+    } else if (name.indexOf(needle) !== -1) {
+      nrank = 10;
+    } else {
+      continue;
     }
-    return rank
+    rank = Math.min(rank, nrank);
+  }
+  return rank;
 }
 
 function getLinesMatchRank(name, needles) {
-    var rank = 10000
-    for (var needle of needles) {
-        if (containsName(needle, name)) {
-            return 1
-        }
+  var rank = 10000;
+  for (var needle of needles) {
+    if (containsName(needle, name)) {
+      return 1;
     }
-    return rank
+  }
+  return rank;
 }
 
 function containsName(line, name) {
-    var index = line.indexOf(name)
-    if (index === -1) {
-        return false
-    }
-    var before = ""
-    var after = ""
-    if (index > 0) {
-        before = line[index - 1]
-    }
-    var indexAfter = index + name.length
-    if (indexAfter < line.length) {
-        after = line[indexAfter]
-    }
-    if (isEmptyOrPunctuation(before) && isEmptyOrPunctuation(after)) {
-        return true
-    }
+  var index = line.indexOf(name);
+  if (index === -1) {
+    return false;
+  }
+  var before = "";
+  var after = "";
+  if (index > 0) {
+    before = line[index - 1];
+  }
+  var indexAfter = index + name.length;
+  if (indexAfter < line.length) {
+    after = line[indexAfter];
+  }
+  if (isEmptyOrPunctuation(before) && isEmptyOrPunctuation(after)) {
+    return true;
+  }
 
-    return false
+  return false;
 }
 
 function isEmptyOrPunctuation(char) {
-    if (!char) { return true }
-    if (char === " " || char === "\t" || char === "\r" || char === "\n") {
-        return true
-    }
-    return char in gPunctuation
+  if (!char) {
+    return true;
+  }
+  if (char === " " || char === "\t" || char === "\r" || char === "\n") {
+    return true;
+  }
+  return char in gPunctuation;
 }
-
 
 async function folderSearchVisitor(
-    winInfo,
-    needlesChecked,
-    filepath,
-    maxRank,
-    results,
-    match) {
-    var parsed = path.parse(filepath)
-    var name = parsed.name.toLowerCase()
-    var rank = match(name, needlesChecked)
-    if (rank <= maxRank) {
-        const id = await loadRecordFromDiscToCache(winInfo, filepath)
-        var record = getRecordById(winInfo, id)
-        if (record.parent) {
-            results.push({
-                id: id,
-                name: parsed.name,
-                type: record.type,
-                rank: rank
-            })
-        }
-    } 
-    return false
+  winInfo,
+  needlesChecked,
+  filepath,
+  maxRank,
+  results,
+  match,
+) {
+  var parsed = path.parse(filepath);
+  var name = parsed.name.toLowerCase();
+  var rank = match(name, needlesChecked);
+  if (rank <= maxRank) {
+    const id = await loadRecordFromDiscToCache(winInfo, filepath);
+    var record = getRecordById(winInfo, id);
+    if (record.parent) {
+      results.push({
+        id: id,
+        name: parsed.name,
+        type: record.type,
+        rank: rank,
+      });
+    }
+  }
+  return false;
 }
 
-
-
 async function searchFolderCore(winInfo, needles, maxRank, match) {
-    if (!needles || needles.length === 0) {
-        return {folders:[]}
-    }
-    var results = []
-    var needlesChecked = prepareNeedles(needles)        
-    await scanFolders(
-        winInfo,
-        winInfo.path,
-        filepath => folderSearchVisitor(
-            winInfo,
-            needlesChecked,
-            filepath,
-            maxRank,
-            results,
-            match
-        )
-    )
-    results.sort(sortByRankThenName)
-    return {
-        folders: results.map(item => transformSearchResultFolder(winInfo, item))
-    }        
+  if (!needles || needles.length === 0) {
+    return { folders: [] };
+  }
+  var results = [];
+  var needlesChecked = prepareNeedles(needles);
+  await scanFolders(winInfo, winInfo.path, (filepath) =>
+    folderSearchVisitor(
+      winInfo,
+      needlesChecked,
+      filepath,
+      maxRank,
+      results,
+      match,
+    ),
+  );
+  results.sort(sortByRankThenName);
+  return {
+    folders: results.map((item) => transformSearchResultFolder(winInfo, item)),
+  };
 }
 
 function transformSearchResultFolder(winInfo, item) {
-    return {
-        folder_id: item.id,
-        space_id: winInfo.spaceId,
-        name: item.name,
-        type: item.type,
-        path: buildPathForSearch(winInfo, item.id)
-    }
+  return {
+    folder_id: item.id,
+    space_id: winInfo.spaceId,
+    name: item.name,
+    type: item.type,
+    path: buildPathForSearch(winInfo, item.id),
+  };
 }
 
 function buildPathForSearch(winInfo, id) {
-    return buildFolderPath(winInfo, id).map(step => step.name)
+  return buildFolderPath(winInfo, id).map((step) => step.name);
 }
 
 async function clearProject(winInfo) {
-    if (winInfo.access !== "write") { 
-        throw new Error("The folder is read-only")
+  if (winInfo.access !== "write") {
+    throw new Error("The folder is read-only");
+  }
+  var files = await fs.readdir(winInfo.path);
+  for (var file of files) {
+    var childPath = path.join(winInfo.path, file);
+    var parsed = path.parse(childPath);
+    if (!parsed.name.startsWith(".")) {
+      await deleteFile(childPath);
     }
-    var files = await fs.readdir(winInfo.path) 
-    for (var file of files ) {
-        var childPath = path.join(winInfo.path, file)
-        var parsed = path.parse(childPath)
-        if (!parsed.name.startsWith(".")) {
-            await deleteFile(childPath)
-        }        
-    }
-    winInfo.history = []
-    await rewriteHistory(winInfo)
+  }
+  winInfo.history = [];
+  await rewriteHistory(winInfo);
 }
 
 async function exportProjectCore(winInfo) {
-    var context = {
-        nextId: 2,
-        output: [],
-        pathToId: {}
-    }
-    context.pathToId[winInfo.path] = "root"
-    await scanFolders(
-        winInfo, 
-        winInfo.path,
-        filepath => exportOneFolder(filepath, context)
-    )
-    return context.output
+  var context = {
+    nextId: 2,
+    output: [],
+    pathToId: {},
+  };
+  context.pathToId[winInfo.path] = "root";
+  await scanFolders(winInfo, winInfo.path, (filepath) =>
+    exportOneFolder(filepath, context),
+  );
+  return context.output;
 }
 
 async function exportOneFolder(filepath, context) {
-    var parsed = path.parse(filepath)
-    var parent = context.pathToId[parsed.dir]
-    if (!parent) { return }
-    var id = context.nextId.toString()
-    context.nextId++
-    context.pathToId[filepath] = id
-    var body
-    if (await isDirectory(filepath)) {
-        body = {type:"folder", name:parsed.name}
-    } else {
-        body = await readJson(filepath)
-        body.type = "drakon"
-        body.name = parsed.name
-    }
-    body.id = id
-    body.parent = parent
-    context.output.push(JSON.stringify(body))
+  var parsed = path.parse(filepath);
+  var parent = context.pathToId[parsed.dir];
+  if (!parent) {
+    return;
+  }
+  var id = context.nextId.toString();
+  context.nextId++;
+  context.pathToId[filepath] = id;
+  var body;
+  if (await isDirectory(filepath)) {
+    body = { type: "folder", name: parsed.name };
+  } else {
+    body = await readJson(filepath);
+    body.type = "drakon";
+    body.name = parsed.name;
+  }
+  body.id = id;
+  body.parent = parent;
+  context.output.push(JSON.stringify(body));
 }
 
 async function scanFolders(winInfo, folderPath, visitor) {
-    var parsed = path.parse(folderPath)
-    if (parsed.name.startsWith(".")) {
-        return
+  var parsed = path.parse(folderPath);
+  if (parsed.name.startsWith(".")) {
+    return;
+  }
+  var isDir = await isDirectory(folderPath);
+  if (isDir || parsed.ext === ".drakon") {
+    var mustStop = await visitor(folderPath);
+    if (mustStop) {
+      return;
     }
-    var isDir = await isDirectory(folderPath)
-    if (isDir || parsed.ext === ".drakon") {
-        var mustStop = await visitor(folderPath)
-        if (mustStop) {
-            return
-        }
-    }
+  }
 
-    if (isDir) {
-        var files = await fs.readdir(folderPath) 
-        for (var file of files ) {
-            var childPath = path.join(folderPath, file)
-            await scanFolders(winInfo, childPath, visitor)
-        }
+  if (isDir) {
+    var files = await fs.readdir(folderPath);
+    for (var file of files) {
+      var childPath = path.join(folderPath, file);
+      await scanFolders(winInfo, childPath, visitor);
     }
+  }
 }
 
 async function pollSearch(winInfo) {
-    var result = {
-        completed: true,
-        items: []
-    }
-    if (!winInfo.search) {
-        return result
-    }
-    result = winInfo.search.getResults()
-    if (result.completed) {
-        winInfo.search = undefined
-    }
-    return result
+  var result = {
+    completed: true,
+    items: [],
+  };
+  if (!winInfo.search) {
+    return result;
+  }
+  result = winInfo.search.getResults();
+  if (result.completed) {
+    winInfo.search = undefined;
+  }
+  return result;
 }
 
 async function copyOneFolder(winInfo, item, target) {
-    var targetFolder = getFilePathById(winInfo, target.folder_id)
-    var filename = path.parse(item.filepath).base
-    var targetPath = await buildUniqueFilename(targetFolder, filename)
-    await copyFileOrFolder(item.filepath, targetPath)
+  var targetFolder = getFilePathById(winInfo, target.folder_id);
+  var filename = path.parse(item.filepath).base;
+  var targetPath = await buildUniqueFilename(targetFolder, filename);
+  await copyFileOrFolder(item.filepath, targetPath);
 }
 
 async function moveOneFolder(winInfo, item, target) {
-    var record = getRecordById(winInfo, item.id)
-    if (record.parent === target.folder_id) {
-        return
-    }
-    var targetFolder = getFilePathById(winInfo, target.folder_id)
-    var filename = path.parse(item.filepath).base
-    var targetPath = await buildUniqueFilename(targetFolder, filename)
-    await fs.rename(item.filepath, targetPath)
-    record.parent = target.folder_id
-    replaceFilePathInChildren(winInfo, targetPath, item.id)
+  var record = getRecordById(winInfo, item.id);
+  if (record.parent === target.folder_id) {
+    return;
+  }
+  var targetFolder = getFilePathById(winInfo, target.folder_id);
+  var filename = path.parse(item.filepath).base;
+  var targetPath = await buildUniqueFilename(targetFolder, filename);
+  await fs.rename(item.filepath, targetPath);
+  record.parent = target.folder_id;
+  replaceFilePathInChildren(winInfo, targetPath, item.id);
 }
 
 async function buildUniqueFilename(targetFolder, filename) {
-    var parsed = path.parse(filename)
-    var ext = parsed.ext
-    var name = parsed.name
-    while (true) {
-        var fullPath = path.join(targetFolder, name + ext)
-        var exists = await fileOrFolderExists(fullPath)
-        if (exists) {
-            name = name + "-x2"
-        } else {
-            return fullPath
-        }
+  var parsed = path.parse(filename);
+  var ext = parsed.ext;
+  var name = parsed.name;
+  while (true) {
+    var fullPath = path.join(targetFolder, name + ext);
+    var exists = await fileOrFolderExists(fullPath);
+    if (exists) {
+      name = name + "-x2";
+    } else {
+      return fullPath;
     }
+  }
 }
 
 async function copyFileOrFolder(src, dest) {
-    const stat = await fs.stat(src);
-    if (stat.isDirectory()) {
-        await fs.mkdir(dest, { recursive: true });
-        const files = await fs.readdir(src);
-        for (const file of files) {
-            const srcPath = path.join(src, file);
-            const destPath = path.join(dest, file);
-            await copyFileOrFolder(srcPath, destPath)
-        }
-    } else {
-        await fs.copyFile(src, dest);
+  const stat = await fs.stat(src);
+  if (stat.isDirectory()) {
+    await fs.mkdir(dest, { recursive: true });
+    const files = await fs.readdir(src);
+    for (const file of files) {
+      const srcPath = path.join(src, file);
+      const destPath = path.join(dest, file);
+      await copyFileOrFolder(srcPath, destPath);
     }
+  } else {
+    await fs.copyFile(src, dest);
+  }
 }
 
 function moveAcrossProjects(body) {
-    return body.target.space_id !== body.items[0].space_id
+  return body.target.space_id !== body.items[0].space_id;
 }
 
 // Helper functions for file checks, reading/writing, etc.
 
 async function fileOrFolderExists(filepath) {
-    try {
-        await fs.access(filepath);
-        return true;
-    } catch {
-        return false;
-    }
+  try {
+    await fs.access(filepath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function isReadonly(winInfo) {
-    if (winInfo.access === "write") {
-        return false
-    }
+  if (winInfo.access === "write") {
+    return false;
+  }
 
-    return true
+  return true;
 }
 
 async function isDirectory(filepath) {
-    const stats = await fs.stat(filepath);
-    return stats.isDirectory();
+  const stats = await fs.stat(filepath);
+  return stats.isDirectory();
 }
 
 async function createFolderOnDisk(newPath) {
-    await fs.mkdir(newPath, { recursive: true });
+  await fs.mkdir(newPath, { recursive: true });
 }
 
 async function readJson(filepath) {
-    try {
-        const content = await fs.readFile(filepath, 'utf-8');
-        return JSON.parse(content);
-    } catch (ex) {
-        return {};
-    }
+  try {
+    const content = await fs.readFile(filepath, "utf-8");
+    return JSON.parse(content);
+  } catch (ex) {
+    return {};
+  }
 }
 
 async function writeJson(filepath, object) {
-    const content = JSON.stringify(object, null, 4);
-    await fs.writeFile(filepath, content, 'utf-8');
+  const content = JSON.stringify(object, null, 4);
+  await fs.writeFile(filepath, content, "utf-8");
 }
 
 function getGeneratedFilename(winInfo) {
-    var extension = ".js"
-    if (winInfo.language === "clojure") {
-        extension = ".clj"
-    }
-    
-    if (winInfo.outputFile) {
-        if (winInfo.outputFile.startsWith(".")) {
-            return path.normalize(path.join(winInfo.path, winInfo.outputFile))
-        }
-        return winInfo.outputFile
-    }
-    
-    if (winInfo.outputFolder) {
-        if (winInfo.outputFolder.startsWith(".")) {
-            return path.normalize(path.join(winInfo.path, winInfo.outputFolder, winInfo.name + extension))
-        }
-        return path.normalize(path.join(winInfo.outputFolder, winInfo.name + extension))
-    }
+  var extension = ".js";
+  if (winInfo.language === "clojure") {
+    extension = ".clj";
+  }
 
-    return path.join(winInfo.path, winInfo.name + extension)
+  if (winInfo.outputFile) {
+    if (winInfo.outputFile.startsWith(".")) {
+      return path.normalize(path.join(winInfo.path, winInfo.outputFile));
+    }
+    return winInfo.outputFile;
+  }
+
+  if (winInfo.outputFolder) {
+    if (winInfo.outputFolder.startsWith(".")) {
+      return path.normalize(
+        path.join(winInfo.path, winInfo.outputFolder, winInfo.name + extension),
+      );
+    }
+    return path.normalize(
+      path.join(winInfo.outputFolder, winInfo.name + extension),
+    );
+  }
+
+  return path.join(winInfo.path, winInfo.name + extension);
 }
 
-
-
 async function getRootHandle(winInfo) {
-    return winInfo.path
+  return winInfo.path;
 }
 
 async function saveGeneratedFile(winInfo, content) {
-    var filename = getGeneratedFilename(winInfo)
-    await fs.writeFile(filename, content, 'utf-8')
+  var filename = getGeneratedFilename(winInfo);
+  await fs.writeFile(filename, content, "utf-8");
 }
 
 function isGoodName(filename) {
-    if (filename.startsWith(".")) {return false}
-    return true
+  if (filename.startsWith(".")) {
+    return false;
+  }
+  return true;
 }
 
 async function getObjectByHandle(winInfo, filepath) {
-    var stats = await fs.stat(filepath)
-    var parsed = path.parse(filepath)
-    if (stats.isDirectory()) {
-        var files = await fs.readdir(filepath)
-        var goodNames = files.filter(isGoodName)
-        return {
-            path: filepath,
-            type: "folder",
-            name: parsed.base,
-            children: goodNames.map(file => path.join(filepath, file))
-        }
-    } else {
-        if (parsed.ext === ".drakon" || parsed.ext === ".json") {
-            var content = await fs.readFile(filepath, "utf-8")
-            var obj = JSON.parse(content)
-            obj.path = filepath
-            obj.name = parsed.name
-            return obj
-        }
-        return undefined
-    }    
+  var stats = await fs.stat(filepath);
+  var parsed = path.parse(filepath);
+  if (stats.isDirectory()) {
+    var files = await fs.readdir(filepath);
+    var goodNames = files.filter(isGoodName);
+    return {
+      path: filepath,
+      type: "folder",
+      name: parsed.base,
+      children: goodNames.map((file) => path.join(filepath, file)),
+    };
+  } else {
+    if (parsed.ext === ".drakon" || parsed.ext === ".json") {
+      var content = await fs.readFile(filepath, "utf-8");
+      var obj = JSON.parse(content);
+      obj.path = filepath;
+      obj.name = parsed.name;
+      return obj;
+    }
+    return undefined;
+  }
 }
 
 async function getFolderInfoByHandle(winInfo, filepath) {
-    var name = path.parse(filepath).name
-    var id = await loadRecordFromDiscToCache(winInfo, filepath)
-    return {
-        id: winInfo.spaceId + " " + id,
-        name: name
-    }
+  var name = path.parse(filepath).name;
+  var id = await loadRecordFromDiscToCache(winInfo, filepath);
+  return {
+    id: winInfo.spaceId + " " + id,
+    name: name,
+  };
 }
 
 async function showGeneratedFile(winInfo) {
-    var filename = getGeneratedFilename(winInfo)
-    shell.showItemInFolder(filename)
+  var filename = getGeneratedFilename(winInfo);
+  shell.showItemInFolder(filename);
 }
 
 async function getSolution(winInfo) {
-    return JSON.stringify({
-        language: winInfo.language,
-        outputFile: winInfo.outputFile || "",
-        mainFun: winInfo.mainFun || ""
-    })
+  return JSON.stringify({
+    language: winInfo.language,
+    outputFile: winInfo.outputFile || "",
+    mainFun: winInfo.mainFun || "",
+  });
 }
 
 // Exported functions
 module.exports = {
-    createFolder,
-    getFolder,
-    updateFolder,
-    getHistory,
-    openFolderCore,
-    changeManyCore,
-    getFilePathById,
-    searchFolders,
-    searchDefinitions,
-    searchItems,
-    pollSearch,
-    stopSearch,
-    clearProject,
-    exportProjectCore,
-    getProjectName,
-    getRootHandle,
-    saveGeneratedFile,
-    getObjectByHandle,
-    getFolderInfoByHandle,
-    showGeneratedFile,
-    getSolution
+  createFolder,
+  getFolder,
+  updateFolder,
+  getHistory,
+  openFolderCore,
+  changeManyCore,
+  getFilePathById,
+  searchFolders,
+  searchDefinitions,
+  searchItems,
+  pollSearch,
+  stopSearch,
+  clearProject,
+  exportProjectCore,
+  getProjectName,
+  getRootHandle,
+  saveGeneratedFile,
+  getObjectByHandle,
+  getFolderInfoByHandle,
+  showGeneratedFile,
+  getSolution,
 };
