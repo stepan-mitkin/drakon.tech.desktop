@@ -10277,12 +10277,14 @@ function mouseClick(x, y, button) {
         if (prim.id) {
             printPrim(prim)
             if (isSelected(prim.id)) {
-                
+                if ((openOnClick) && (button === 0)) {
+                    startEdit()
+                }
             } else {
                 deselectAll()
                 selectPrim(prim.id)
                 if (((openOnClick) && (button === 0)) || (prim.type == Const.TEXT)) {
-                    startEditText(prim.id)
+                    startEdit()
                 } else {
                     showLianaSockets(prim)
                 }
