@@ -2654,6 +2654,7 @@ function EditorCtrl(window, document, elementId, userId) {
         "cloud",
         "white1",
         "white2",
+        "zed",
         "dark1",
         "night",
         "red",
