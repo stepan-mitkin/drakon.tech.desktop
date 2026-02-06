@@ -5,6 +5,8 @@ function Lomma(
 	userId
 ) {
 
+var openOnClick = true
+
 var INSERTION = 6
 var MaxLineLength = 800
 var TabSize = 4
@@ -10263,9 +10265,9 @@ function mild(action, node) {
     }
 }
 
-function mouseClick(x, y) {
+function mouseClick(x, y, button) {
     var prim
-    addTrace("mouseClick", [x, y])
+    addTrace("mouseClick", [x, y, button])
     prim = findVisualItem(
         x,
         y
@@ -10279,7 +10281,7 @@ function mouseClick(x, y) {
             } else {
                 deselectAll()
                 selectPrim(prim.id)
-                if (prim.type == Const.TEXT) {
+                if (((openOnClick) && (button === 0)) || (prim.type == Const.TEXT)) {
                     startEditText(prim.id)
                 } else {
                     showLianaSockets(prim)
