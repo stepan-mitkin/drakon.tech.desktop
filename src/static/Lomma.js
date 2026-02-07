@@ -10266,7 +10266,7 @@ function mild(action, node) {
 }
 
 function mouseClick(x, y, button) {
-    var prim
+    var prim, started
     addTrace("mouseClick", [x, y, button])
     prim = findVisualItem(
         x,
@@ -10284,7 +10284,12 @@ function mouseClick(x, y, button) {
                 deselectAll()
                 selectPrim(prim.id)
                 if (((openOnClick) && (button === 0)) || (prim.type == Const.TEXT)) {
-                    startEdit()
+                    started =startEdit()
+                    if (started) {
+                        
+                    } else {
+                        showLianaSockets(prim)
+                    }
                 } else {
                     showLianaSockets(prim)
                 }
@@ -13749,7 +13754,12 @@ function startEdit() {
         node = nodes[0]
         if (canEditNodeText(node)) {
             startEditText(node.id)
+            return true
+        } else {
+            return false
         }
+    } else {
+        return false
     }
 }
 
