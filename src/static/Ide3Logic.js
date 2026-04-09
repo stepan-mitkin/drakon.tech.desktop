@@ -3729,6 +3729,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
     return {
       id: current.id,
       type: current.type,
+      parent: current.parent,
       screen: current.screen,
       spaceId: ids.spaceId,
       folderId: ids.folderId,
@@ -8833,6 +8834,22 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
     };
   }
 
+  async function createFunctionStub(call) {
+    var current = getCurrent();
+    var spaceId = current.spaceId;
+    var parentId = parseId(current.parent).folderId;
+    var body = {
+      parent: parentId,
+      type: "drakon",
+      name: call.name,
+      params: call.args.join("\n"),
+      keywords: { function: true },
+    };
+    var result = await backend.createFolder(spaceId, body);
+    var newId = makeId(spaceId, result.folder_id);
+    goToFolder(newId, function () {});
+  }
+
   function AllBuilder() {
     var _self = this;
     _self.type_name = "AllBuilder";
@@ -8904,4 +8921,5 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
   this.goToFolder = goToFolder;
   this.startBuildAll = startBuildAll;
   this.shutdown = shutdown;
+  this.createFunctionStub = createFunctionStub;
 }
