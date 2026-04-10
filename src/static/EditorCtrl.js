@@ -3587,6 +3587,9 @@ function EditorCtrl(window, document, elementId, userId) {
   }
 
   function normalizeDiagram(data) {
+    if (data.language.startsWith("JS")) {
+      data.language = "JS";
+    }
     if (data.items) {
     } else {
       if (data.nodes) {
