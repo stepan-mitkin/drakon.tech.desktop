@@ -2296,8 +2296,15 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
     label.appendChild(tnode);
   }
 
+  function getProgrammingLanguage() {
+    var current = self.logic.getCurrent();
+    var root = self.logic.getFromCache(current.spaceId + " 1")
+    return root.language
+  }
+
   function makeFunTypeList(div, node, widget) {
-    if (node.language === "JS") {
+    var language = getProgrammingLanguage();
+    if (language === "JS") {
       addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
       var s2 = make(div, "div");
       s2.style.height = "10px";
@@ -2332,7 +2339,7 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
         "MES_LAZY_ALGOPROP",
         node.algoprop && node.lazy,
       );
-    } else if (node.language === "JS2604") {
+    } else if (language === "JS2604") {
       addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
       var s2 = make(div, "div");
       s2.style.height = "10px";

@@ -8922,4 +8922,5 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
   this.startBuildAll = startBuildAll;
   this.shutdown = shutdown;
   this.createFunctionStub = createFunctionStub;
+  this.getFromCache = getFromCache;
 }
