@@ -2298,8 +2298,8 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
 
   function getProgrammingLanguage() {
     var current = self.logic.getCurrent();
-    var root = self.logic.getFromCache(current.spaceId + " 1")
-    return root.language
+    var root = self.logic.getFromCache(current.spaceId + " 1");
+    return root.language;
   }
 
   function makeFunTypeList(div, node, widget) {
@@ -5209,6 +5209,9 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
 
   function extractCallRecursive(node, output) {
     var result;
+    if (!node) {
+      return;
+    }
     if (Array.isArray(node)) {
       for (var item of node) {
         extractCallRecursive(item, output);
