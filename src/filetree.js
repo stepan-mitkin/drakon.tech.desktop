@@ -1193,8 +1193,7 @@ async function getRootHandle(winInfo) {
 }
 
 async function saveGeneratedFile(winInfo, content) {
-  var filename = getGeneratedFilename(winInfo);
-  console.log(content);
+  var filename = getGeneratedFilename(winInfo);  
   await fs.writeFile(filename, content, "utf-8");
 }
 
@@ -1218,7 +1217,7 @@ async function getObjectByHandle(winInfo, filepath) {
       children: goodNames.map((file) => path.join(filepath, file)),
     };
   } else {
-    if (parsed.ext === ".drakon" || parsed.ext === ".json") {
+    if (parsed.ext === ".drakon") {
       var content = await fs.readFile(filepath, "utf-8");
       var obj = JSON.parse(content);
       obj.path = filepath;
