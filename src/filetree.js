@@ -525,7 +525,13 @@ async function openFolderCore(winInfo, folderPath) {
 async function loadProjectSettings(winInfo) {
   var language = "JS";
   var format = "CommonJS";
-  var solution = await readJson(path.join(winInfo.path, "solution.json"));
+  var solution = await tryReadJson(path.join(winInfo.path, "module.json"));
+  if (!solution) {
+    solution = await tryReadJson(path.join(winInfo.path, "solution.json"));
+  }
+  if (!solution) {
+    solution = {};
+  }
   if (solution.language) {
     language = solution.language;
   }
@@ -538,6 +544,7 @@ async function loadProjectSettings(winInfo) {
   winInfo.outputFolder = solution.outputFolder;
   winInfo.outputFile = solution.outputFile;
   winInfo.mainFun = solution.mainFun;
+  winInfo.dependencies = solution.dependencies;
 }
 
 async function determineAccess(winInfo, folderPath) {
@@ -1140,6 +1147,15 @@ async function readJson(filepath) {
   }
 }
 
+async function tryReadJson(filepath) {
+  try {
+    const content = await fs.readFile(filepath, "utf-8");
+    return JSON.parse(content);
+  } catch (ex) {
+    return undefined;
+  }
+}
+
 async function writeJson(filepath, object) {
   const content = JSON.stringify(object, null, 4);
   await fs.writeFile(filepath, content, "utf-8");
@@ -1178,6 +1194,7 @@ async function getRootHandle(winInfo) {
 
 async function saveGeneratedFile(winInfo, content) {
   var filename = getGeneratedFilename(winInfo);
+  console.log(content);
   await fs.writeFile(filename, content, "utf-8");
 }
 
@@ -1227,11 +1244,13 @@ async function showGeneratedFile(winInfo) {
 }
 
 async function getSolution(winInfo) {
-  return JSON.stringify({
+  var solution = JSON.stringify({
+    dependencies: winInfo.dependencies || "",
     language: winInfo.language,
     outputFile: winInfo.outputFile || "",
     mainFun: winInfo.mainFun || "",
   });
+  return solution;
 }
 
 // Exported functions

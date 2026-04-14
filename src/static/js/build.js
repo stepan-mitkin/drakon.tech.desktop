@@ -134,7 +134,6 @@
     errors = [];
     failed = false;
     generatedPseudocode = undefined;
-    var settings = { iife: folder.format === "IIFE" };
 
     var root, onData;
     if (folder.language === "LANG_HUMAN") {
@@ -145,7 +144,14 @@
     } else {
       var solutionStr = await backend.getSolution();
       var solution = JSON.parse(solutionStr);
-      console.log(solutionStr);
+      var settings = {
+        iife: folder.format === "IIFE",
+        unit: folder.format === "unit",
+        dependencies: solution.dependencies,
+        outputFile: solution.outputFile,
+      };
+      console.log(solution, settings);
+
       name = await backend.getProjectName();
       root = await backend.getRootHandle();
       onData = backend.saveGeneratedFile;
