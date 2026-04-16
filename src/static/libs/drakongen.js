@@ -1180,7 +1180,7 @@ function structFlow(nodes, branches, filename, translate) {
         var stub = nodes[algonode.stub]
         for (var id of stub.stack) {
             var snode = nodes[id]
-            if (id != algonode) {
+            if (id !== algonode.id) {
                 if (id in dictionary) {
                     snode.branching--
                 }
