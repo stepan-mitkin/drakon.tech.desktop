@@ -2344,6 +2344,10 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
       var s2 = make(div, "div");
       s2.style.height = "10px";
       addCheckbox(div, "async_checkbox", "MES_ASYNC", node.async);
+    } else if (language === "LUA2604") {
+      addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
+      var s2 = make(div, "div");
+      s2.style.height = "10px";
     }
   }
 

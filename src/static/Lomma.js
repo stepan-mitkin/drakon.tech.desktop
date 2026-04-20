@@ -7912,8 +7912,16 @@ function getTabPosition(self, x) {
 function getTokenColor(token, source) {
     var type
     if (source) {
-        if ((token.type == "identifier") && (isKeyword(token.text))) {
-            type = "keyword"
+        if (token.type == "identifier") {
+            if (isKeyword(token.text)) {
+                type = "keyword"
+            } else {
+                if (isValueKeyword(token.text)) {
+                    type = "keyword"
+                } else {
+                    type = token.type
+                }
+            }
         } else {
             type = token.type
         }
@@ -8793,11 +8801,13 @@ function isHuman() {
 
 function isKeyword(text) {
     if (module.language === "JS") {
-        return text in module.keywords ||(
-            text in module.keyValues
-        )
+        return text in module.keywords
     } else {
-        return text in module.cljkeywords
+        if (module.language === "LUA") {
+            return text in module.luakeywords
+        } else {
+            return text in module.cljkeywords
+        }
     }
 }
 
@@ -9032,6 +9042,18 @@ function isUpstreamStep(lower, upper, context) {
                     _ind7129++;
                 }
             }
+        }
+    }
+}
+
+function isValueKeyword(text) {
+    if (module.language === "JS") {
+        return text in module.keyValues
+    } else {
+        if (module.language === "LUA") {
+            return text in module.luakeyvalues
+        } else {
+            return false
         }
     }
 }
@@ -9351,6 +9373,10 @@ function lexInit() {
     addLongOp("**")
     addLongOp("??")
     addLongOp("??=")
+    module.luakeywords = arrayToSet(["and", "break", "do", "else",
+    "elseif", "end", "for", "function", "goto",
+    "if", "in", "local", "not", "or",
+    "repeat", "return", "then", "until", "while"])
     module.cljkeywords = arrayToSet([
       "first", "rest", "cons", "conj", "map", "filter", "reduce", "into", "take", "drop", 
       "nth", "get", "assoc", "dissoc", "keys", "vals", "merge", "select-keys",
@@ -9393,6 +9419,7 @@ function lexInit() {
     module.noSpaces["{"] = true
     module.noSpaces["!"] = true
     module.keyValues = arrayToSet(["true", "false", "null", "undefined", "this"])
+    module.luakeyvalues = arrayToSet(["true", "false", "nil"])
 }
 
 function lexSearch(text) {
@@ -13794,7 +13821,11 @@ function startEditText(nodeId) {
                 if (module.language === "JS") {
                     mode = "javascript"
                 } else {
-                    mode = "clojure"
+                    if (module.language === "LUA") {
+                        mode = "lua"
+                    } else {
+                        mode = "clojure"
+                    }
                 }
                 cmOptions = {
                 	mode: mode,

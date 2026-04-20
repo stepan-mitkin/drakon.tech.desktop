@@ -3589,6 +3589,8 @@ function EditorCtrl(window, document, elementId, userId) {
   function normalizeDiagram(data) {
     if (data.language.startsWith("JS")) {
       data.language = "JS";
+    } else if (data.language.startsWith("LUA")) {
+      data.language = "LUA";
     }
     if (data.items) {
     } else {
