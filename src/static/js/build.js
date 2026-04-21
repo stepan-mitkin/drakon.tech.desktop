@@ -58,6 +58,7 @@
     } else {
       state = "success";
     }
+    console.log("Build finished. Errors: " + errors.length, state);
   }
 
   function onDataHuman(data) {
@@ -182,7 +183,7 @@
   };
 
   window.build_check = async function () {
-    console.log("build_check");
+    console.log("build_check", errors.length, state);
     var errorsCopy = [];
     for (var err of errors) {
       var errorInfo = await convertError(err);

@@ -290,10 +290,15 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
   }
 
   function Builder_Checking_onData(self, msg) {
+      if (!self.errors) {
+        self.errors = [];
+      }
+      self.errors = self.errors.concat(msg.errors || []);
     if (msg.state == "working") {
       scheduleBuildCheck(self);
       self.state = "Working";
     } else {
+      msg.errors = self.errors;
       self.target.onData(msg);
       self.state = null;
     }
