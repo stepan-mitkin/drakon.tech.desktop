@@ -2616,14 +2616,25 @@ function addSpacesToStatement(statement) {
             } else {
                 _sw128220000_ = item.text;
                 if (_sw128220000_ === ":") {
-                    addItemWithLength(
-                        result,
-                        item
-                    )
-                    addItemWithLength(
-                        result,
-                        createSpace()
-                    )
+                    if (isLua()) {
+                        addItemWithLength(
+                            result,
+                            createBreak()
+                        )
+                        addItemWithLength(
+                            result,
+                            item
+                        )
+                    } else {
+                        addItemWithLength(
+                            result,
+                            item
+                        )
+                        addItemWithLength(
+                            result,
+                            createSpace()
+                        )
+                    }
                 } else {
                     if (_sw128220000_ === ".") {
                         addItemWithLength(
@@ -2635,7 +2646,7 @@ function addSpacesToStatement(statement) {
                             item
                         )
                     } else {
-                        if ((_sw128220000_ === "++") || (_sw128220000_ === "--")) {
+                        if (((_sw128220000_ === "++") || (_sw128220000_ === "#")) || (_sw128220000_ === "--")) {
                             addItemWithLength(
                                 result,
                                 item
@@ -8803,7 +8814,7 @@ function isKeyword(text) {
     if (module.language === "JS") {
         return text in module.keywords
     } else {
-        if (module.language === "LUA") {
+        if (isLua()) {
             return text in module.luakeywords
         } else {
             return text in module.cljkeywords
@@ -8837,6 +8848,10 @@ function isLower(record, source) {
     } else {
         return record.element.tail.y > source.tail.y
     }
+}
+
+function isLua() {
+    return module.language === "LUA"
 }
 
 function isMachine() {
@@ -9050,7 +9065,7 @@ function isValueKeyword(text) {
     if (module.language === "JS") {
         return text in module.keyValues
     } else {
-        if (module.language === "LUA") {
+        if (isLua()) {
             return text in module.luakeyvalues
         } else {
             return false
@@ -13821,7 +13836,7 @@ function startEditText(nodeId) {
                 if (module.language === "JS") {
                     mode = "javascript"
                 } else {
-                    if (module.language === "LUA") {
+                    if (isLua()) {
                         mode = "lua"
                     } else {
                         mode = "clojure"
