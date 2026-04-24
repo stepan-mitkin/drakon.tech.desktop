@@ -3372,7 +3372,7 @@ function Js2604Generator(options) {
         var expr;
         if (item.content && item.content.length === 1) {
             expr = item.content[0];
-            if (expr.type === 'ExpressionStatement' && expr.expression.type !== 'AssignmentExpression' && expr.expression.type !== 'SequenceExpression') {
+            if (expr.type === 'ExpressionStatement' && !(expr.expression.type === 'AssignmentExpression') && !(expr.expression.type === 'SequenceExpression')) {
                 return expr.expression;
             } else {
                 return undefined;
@@ -3471,7 +3471,7 @@ function Js2604Generator(options) {
             body.push(parseStatement('_topResolve_()'));
         } else {
             last = body[body.length - 1];
-            if (last.type !== 'ReturnStatement') {
+            if (!(last.type === 'ReturnStatement')) {
                 body.push(parseStatement('_topResolve_()'));
             }
         }
@@ -3491,7 +3491,7 @@ function Js2604Generator(options) {
         end = hasEnd(fun);
         _collection_143 = tree.branches;
         for (branch of _collection_143) {
-            if (branch.name !== 'catch') {
+            if (!(branch.name === 'catch')) {
                 caseClause = createCase(createStringLiteral(branch.name));
                 select.cases.push(caseClause);
                 caseBody = caseClause.consequent;
@@ -3530,7 +3530,7 @@ function Js2604Generator(options) {
         }
         tree = JSON.parse(treeStr);
         _selectValue_145 = tree.branches.length;
-        if (_selectValue_145 !== 0) {
+        if (!(_selectValue_145 === 0)) {
             if (_selectValue_145 === 1) {
                 convertNodesToAst(tree.branches[0].body, functionBody);
             } else {
@@ -3635,14 +3635,15 @@ function Js2604Generator(options) {
         }
     }
     function combineClassAst(folder) {
-        var _collection_152, child, exported, initBody, name, stm;
+        var child, exported, initBody, name, names, stm;
         initBody = getFunBody(folder.ast);
         stm = 'var self = {_type:"' + folder.name + '"}';
         initBody.unshift(parseStatement(stm));
         exported = [];
-        _collection_152 = folder.children;
-        for (name in _collection_152) {
-            child = _collection_152[name];
+        names = Object.keys(folder.children);
+        names.sort();
+        for (name of names) {
+            child = folder.children[name];
             initBody.push(child.ast);
             if (child.keywords.export) {
                 child.ast.id.name = makeMethodName(folder.name, name);
@@ -3657,15 +3658,16 @@ function Js2604Generator(options) {
         return folder.ast;
     }
     function combineModuleAst(module) {
-        var _collection_155, child, childAst, initBody, name, program, step;
+        var child, childAst, initBody, name, names, program, step;
         program = createProgram();
         initBody = getFunBody(module.ast);
         for (step of initBody) {
             program.body.push(step);
         }
-        _collection_155 = module.children;
-        for (name in _collection_155) {
-            child = _collection_155[name];
+        names = Object.keys(module.children);
+        names.sort();
+        for (name of names) {
+            child = module.children[name];
             if (child.type === 'class') {
                 childAst = combineClassAst(child);
             } else {
@@ -3676,27 +3678,27 @@ function Js2604Generator(options) {
         return program;
     }
     function convertNodesToAst(steps, body) {
-        var _selectValue_158, step;
+        var _selectValue_152, step;
         for (step of steps) {
-            _selectValue_158 = step.type;
-            if (_selectValue_158 === 'action') {
+            _selectValue_152 = step.type;
+            if (_selectValue_152 === 'action') {
                 addActionToAst(step, body);
             } else {
-                if (_selectValue_158 === 'question') {
+                if (_selectValue_152 === 'question') {
                     addQuestionToAst(step, body);
                 } else {
-                    if (_selectValue_158 === 'loop') {
+                    if (_selectValue_152 === 'loop') {
                         addLoopToAst(step, body);
                     } else {
-                        if (_selectValue_158 === 'error') {
+                        if (_selectValue_152 === 'error') {
                             addErrorToAst(step, body);
                         } else {
-                            if (_selectValue_158 === 'break') {
+                            if (_selectValue_152 === 'break') {
                                 if (!endsWithReturn(body)) {
                                     body.push(createBreak());
                                 }
                             } else {
-                                if (_selectValue_158 === 'address') {
+                                if (_selectValue_152 === 'address') {
                                     if (!endsWithReturn(body)) {
                                         addAddressToAst(step, body);
                                     }
@@ -3725,10 +3727,10 @@ function Js2604Generator(options) {
         };
     }
     function convertSilhouetteToAst(fun, tree, functionBody) {
-        var _collection_160, branch, catchBranch, catchNode;
+        var _collection_154, branch, catchBranch, catchNode;
         gBranches = {};
-        _collection_160 = tree.branches;
-        for (branch of _collection_160) {
+        _collection_154 = tree.branches;
+        for (branch of _collection_154) {
             if (!branch.name) {
                 reportError('Branch name cannot be empty', fun.path, branch.id);
                 return;
@@ -3757,7 +3759,7 @@ function Js2604Generator(options) {
         }
     }
     function createEventMethod(fun, eventName, functionBody) {
-        var _collection_162, body, cs, def, event, eventItem, funAst, itemId, sw;
+        var _collection_156, body, cs, def, event, eventItem, funAst, itemId, sw;
         event = fun.events[eventName];
         funAst = createFunction(eventName, event.args);
         delete funAst.id;
@@ -3766,10 +3768,10 @@ function Js2604Generator(options) {
         body.push(parseStatement('if (me._busy) {throw new Error("Synchronous reentry is not allowed");}'));
         sw = createSwitch(createMember(createIdentifier('me'), 'state'));
         body.push(sw);
-        _collection_162 = fun.eventItems;
-        for (itemId of _collection_162) {
+        _collection_156 = fun.eventItems;
+        for (itemId of _collection_156) {
             eventItem = fun.items[itemId];
-            if (eventItem.eventNames.indexOf(eventName) !== -1) {
+            if (!(eventItem.eventNames.indexOf(eventName) === -1)) {
                 cs = createCase(createStringLiteral(itemId));
                 sw.cases.push(cs);
             }
@@ -3781,23 +3783,23 @@ function Js2604Generator(options) {
         functionBody.push(createExpression(createAssignment(createMember(createIdentifier('me'), eventName), funAst)));
     }
     function decodeQuestionContent(content) {
-        var _selectValue_164, decoded, left, right;
-        _selectValue_164 = content.operator;
-        if (_selectValue_164 === 'not') {
+        var _selectValue_158, decoded, left, right;
+        _selectValue_158 = content.operator;
+        if (_selectValue_158 === 'not') {
             decoded = decodeQuestionContent(content.operand);
             return createNot(decoded);
         } else {
-            if (_selectValue_164 === 'and') {
+            if (_selectValue_158 === 'and') {
                 left = decodeQuestionContent(content.left);
                 right = decodeQuestionContent(content.right);
                 return createAnd(left, right);
             } else {
-                if (_selectValue_164 === 'or') {
+                if (_selectValue_158 === 'or') {
                     left = decodeQuestionContent(content.left);
                     right = decodeQuestionContent(content.right);
                     return createOr(left, right);
                 } else {
-                    if (_selectValue_164 === 'equal') {
+                    if (_selectValue_158 === 'equal') {
                         left = decodeQuestionContent(content.left);
                         right = decodeQuestionContent(content.right);
                         return createEqual(left, right);
@@ -3825,10 +3827,10 @@ function Js2604Generator(options) {
         return fun.body.body;
     }
     function hasEnd(fun) {
-        var _collection_166, id, item;
-        _collection_166 = fun.items;
-        for (id in _collection_166) {
-            item = _collection_166[id];
+        var _collection_160, id, item;
+        _collection_160 = fun.items;
+        for (id in _collection_160) {
+            item = _collection_160[id];
             if (item.type === 'end') {
                 return true;
             }
@@ -3868,18 +3870,18 @@ function Js2604Generator(options) {
         return parsed.body[0].body.body[0];
     }
     function replaceReturnInAction(item) {
-        var _collection_169, _selectValue_171, index, stm;
+        var _collection_163, _selectValue_165, index, stm;
         if (item.type === 'action' && item.content) {
             index = 0;
-            _collection_169 = item.content;
-            for (stm of _collection_169) {
-                _selectValue_171 = stm.type;
-                if (_selectValue_171 === 'ReturnStatement') {
+            _collection_163 = item.content;
+            for (stm of _collection_163) {
+                _selectValue_165 = stm.type;
+                if (_selectValue_165 === 'ReturnStatement') {
                     convertReturnToResolve(stm, '_topResolve_');
                     item.content.splice(index + 1, 0, createReturn(null));
                     return;
                 } else {
-                    if (_selectValue_171 === 'ThrowStatement') {
+                    if (_selectValue_165 === 'ThrowStatement') {
                         convertReturnToResolve(stm, '_topReject_');
                         item.content.splice(index + 1, 0, createReturn(null));
                         return;
@@ -3890,10 +3892,10 @@ function Js2604Generator(options) {
         }
     }
     function replaceReturnInMachine(fun) {
-        var _collection_173, id, item;
-        _collection_173 = fun.items;
-        for (id in _collection_173) {
-            item = _collection_173[id];
+        var _collection_167, id, item;
+        _collection_167 = fun.items;
+        for (id in _collection_167) {
+            item = _collection_167[id];
             replaceReturnInAction(item);
         }
     }
@@ -3913,11 +3915,11 @@ function Js2604Generator(options) {
         addDeclaratonsToBody(step);
     }
     function addDeclarationsRecursive(step, folder) {
-        var _collection_176, canDeclare, child, childStep, name;
+        var _collection_170, canDeclare, child, childStep, name;
         addDeclarationsInFunction(step);
-        _collection_176 = folder.children;
-        for (name in _collection_176) {
-            child = _collection_176[name];
+        _collection_170 = folder.children;
+        for (name in _collection_170) {
+            child = _collection_170[name];
             canDeclare = child.type === 'class';
             childStep = createScopeStep(step, name, child.path, child.scope, getFunBody(child.ast), true, canDeclare);
             childStep.canAwait = child.keywords.async;
@@ -3929,7 +3931,7 @@ function Js2604Generator(options) {
         locals = Object.keys(step.scope.locals);
         loop = Object.keys(step.scope.loop);
         allVars = locals.concat(loop);
-        if (allVars.length !== 0) {
+        if (!(allVars.length === 0)) {
             allVars.sort();
             step.body.unshift(createDeclaration(allVars));
         }
@@ -3951,10 +3953,10 @@ function Js2604Generator(options) {
         };
     }
     function createScopeStepForLambda(step, node) {
-        var _collection_179, nextScope, nextStep, param;
+        var _collection_173, nextScope, nextStep, param;
         nextScope = createScope('lambda', 'lambda');
-        _collection_179 = node.params;
-        for (param of _collection_179) {
+        _collection_173 = node.params;
+        for (param of _collection_173) {
             if (param.type === 'Identifier') {
                 addDeclaration(nextScope, param.name);
             }
@@ -3964,20 +3966,20 @@ function Js2604Generator(options) {
         return nextStep;
     }
     function extractVariablesFromDeclaration(node, scope) {
-        var _collection_181, _collection_185, _collection_187, _selectValue_183, decl, item, prop;
-        _collection_181 = node.declarations;
-        for (decl of _collection_181) {
+        var _collection_175, _collection_179, _collection_181, _selectValue_177, decl, item, prop;
+        _collection_175 = node.declarations;
+        for (decl of _collection_175) {
             if (decl.type === 'VariableDeclarator') {
-                _selectValue_183 = decl.id.type;
-                if (_selectValue_183 === 'ObjectPattern') {
-                    _collection_187 = decl.id.properties;
-                    for (prop of _collection_187) {
+                _selectValue_177 = decl.id.type;
+                if (_selectValue_177 === 'ObjectPattern') {
+                    _collection_181 = decl.id.properties;
+                    for (prop of _collection_181) {
                         tryAddIdentifier(scope, prop.key);
                     }
                 } else {
-                    if (_selectValue_183 === 'ArrayPattern') {
-                        _collection_185 = decl.id.elements;
-                        for (item of _collection_185) {
+                    if (_selectValue_177 === 'ArrayPattern') {
+                        _collection_179 = decl.id.elements;
+                        for (item of _collection_179) {
                             tryAddIdentifier(scope, item);
                         }
                     } else {
@@ -4003,12 +4005,12 @@ function Js2604Generator(options) {
         }
     }
     function scanForAssignments(step, node) {
-        var _selectValue_189, nextStep, varName;
+        var _selectValue_183, nextStep, varName;
         if (node.itemId) {
             step.itemId = node.itemId;
         }
-        _selectValue_189 = node.type;
-        if (_selectValue_189 === 'AssignmentExpression') {
+        _selectValue_183 = node.type;
+        if (_selectValue_183 === 'AssignmentExpression') {
             if (node.left.type === 'Identifier') {
                 varName = node.left.name;
                 if (!isDeclared(step, varName)) {
@@ -4017,7 +4019,7 @@ function Js2604Generator(options) {
             }
             return true;
         } else {
-            if (_selectValue_189 === 'CallExpression') {
+            if (_selectValue_183 === 'CallExpression') {
                 if (node.callee.type === 'Identifier' && node.callee.name === 'getHandlerData') {
                     node.type = 'Identifier';
                     node.name = '_handlerData_';
@@ -4028,7 +4030,7 @@ function Js2604Generator(options) {
                     return true;
                 }
             } else {
-                if (_selectValue_189 === 'VariableDeclaration') {
+                if (_selectValue_183 === 'VariableDeclaration') {
                     if (step.canDeclare) {
                         extractVariablesFromDeclaration(node, step.scope);
                     } else {
@@ -4036,13 +4038,13 @@ function Js2604Generator(options) {
                     }
                     return true;
                 } else {
-                    if (_selectValue_189 === 'AwaitExpression') {
+                    if (_selectValue_183 === 'AwaitExpression') {
                         if (!step.canAwait) {
                             reportError('await is allowed only in async functions', step.path, step.itemId);
                         }
                         return true;
                     } else {
-                        if ((_selectValue_189 === 'FunctionExpression' || _selectValue_189 === 'ArrowFunctionExpression' || _selectValue_189 === 'FunctionDeclaration') && node.body.type === 'BlockStatement') {
+                        if ((_selectValue_183 === 'FunctionExpression' || _selectValue_183 === 'ArrowFunctionExpression' || _selectValue_183 === 'FunctionDeclaration') && node.body.type === 'BlockStatement') {
                             nextStep = createScopeStepForLambda(step, node);
                             nextStep.canAwait = node.async;
                             addDeclarationsInFunction(nextStep);
@@ -4115,7 +4117,7 @@ function Js2604Generator(options) {
         }
     }
     function addSelectEvent(folder, item, id) {
-        var _collection_192, caseId, caseItem, content, lines, name;
+        var _collection_186, caseId, caseItem, content, lines, name;
         addLocal(folder.scope, '_eventType_');
         addLocal(folder.scope, '_event_');
         item.content = createIdentifier('_eventType_');
@@ -4128,8 +4130,8 @@ function Js2604Generator(options) {
         content = linesToContent(folder, id, lines);
         insertActionBefore(folder, id, content);
         item.eventNames = [];
-        _collection_192 = item.cases;
-        for (caseId of _collection_192) {
+        _collection_186 = item.cases;
+        for (caseId of _collection_186) {
             caseItem = folder.items[caseId];
             if (ensureCall(folder, caseId, caseItem)) {
                 name = addEventSignature(folder, caseId, caseItem);
@@ -4141,11 +4143,11 @@ function Js2604Generator(options) {
         }
     }
     function assignEventArguments(folder, name, lines) {
-        var _collection_194, arg, counter, eventInfo;
+        var _collection_188, arg, counter, eventInfo;
         eventInfo = folder.events[name];
         counter = 1;
-        _collection_194 = eventInfo.args;
-        for (arg of _collection_194) {
+        _collection_188 = eventInfo.args;
+        for (arg of _collection_188) {
             lines.push(arg + ' = _event_[' + counter + ']');
             counter++;
         }
@@ -4165,11 +4167,11 @@ function Js2604Generator(options) {
         }
     }
     function ensureCall(folder, id, item) {
-        var _collection_196, arg;
+        var _collection_190, arg;
         if (item.content && (item.content.type === 'CallExpression' && item.content.callee.type === 'Identifier')) {
-            _collection_196 = item.content.arguments;
-            for (arg of _collection_196) {
-                if (arg.type !== 'Identifier') {
+            _collection_190 = item.content.arguments;
+            for (arg of _collection_190) {
+                if (!(arg.type === 'Identifier')) {
                     reportError('This call expression expects variables', folder.path, id);
                     return false;
                 }
@@ -4230,7 +4232,7 @@ function Js2604Generator(options) {
         if (expr1.type === 'ExpressionStatement' && expr2.type === 'ExpressionStatement') {
             first = expr1.expression;
             second = expr2.expression;
-            if (second.type !== 'Identifier') {
+            if (!(second.type === 'Identifier')) {
                 varName = generateId('_collection');
                 addLocal(folder.scope, varName);
                 oldContent = second;
@@ -4269,30 +4271,30 @@ function Js2604Generator(options) {
         }
     }
     function parseItem(folder, id, item) {
-        var _selectValue_198;
-        _selectValue_198 = item.type;
-        if (_selectValue_198 === 'action') {
+        var _selectValue_192;
+        _selectValue_192 = item.type;
+        if (_selectValue_192 === 'action') {
             parseAction(folder, id, item);
         } else {
-            if (_selectValue_198 === 'question') {
+            if (_selectValue_192 === 'question') {
                 parseQuestion(folder, id, item);
             } else {
-                if (_selectValue_198 === 'select') {
+                if (_selectValue_192 === 'select') {
                     parseSelect(folder, id, item);
                 } else {
-                    if (_selectValue_198 === 'case') {
+                    if (_selectValue_192 === 'case') {
                         parseCase(folder, id, item);
                     } else {
-                        if (_selectValue_198 === 'loopbegin') {
+                        if (_selectValue_192 === 'loopbegin') {
                             parseLoop(folder, id, item);
                         } else {
-                            if (_selectValue_198 === 'soutput') {
+                            if (_selectValue_192 === 'soutput') {
                                 parseOutput(folder, id, item);
                             } else {
-                                if (_selectValue_198 === 'sinput') {
+                                if (_selectValue_192 === 'sinput') {
                                     parseSInput(folder, id, item);
                                 } else {
-                                    if (_selectValue_198 === 'pause') {
+                                    if (_selectValue_192 === 'pause') {
                                         parsePause(folder, id, item);
                                     }
                                 }
@@ -4319,11 +4321,11 @@ function Js2604Generator(options) {
         }
     }
     function parseItems(folder) {
-        var _collection_200, child, name;
+        var _collection_194, child, name;
         parseItemsInFunction(folder);
-        _collection_200 = folder.children;
-        for (name in _collection_200) {
-            child = _collection_200[name];
+        _collection_194 = folder.children;
+        for (name in _collection_194) {
+            child = _collection_194[name];
             parseItems(child);
         }
     }
@@ -4340,14 +4342,14 @@ function Js2604Generator(options) {
         setUpMachine(folder);
     }
     function parseLoop(folder, id, item) {
-        var _selectValue_203, init, test, update;
+        var _selectValue_197, init, test, update;
         parseItemContent(folder, id, item);
         if (ensureHasContent(folder, id, item)) {
-            _selectValue_203 = item.content.length;
-            if (_selectValue_203 === 2) {
+            _selectValue_197 = item.content.length;
+            if (_selectValue_197 === 2) {
                 parseForEachLoop(folder, id, item);
             } else {
-                if (_selectValue_203 === 3) {
+                if (_selectValue_197 === 3) {
                     init = stripExpression(item.content[0]);
                     test = stripExpression(item.content[1]);
                     update = stripExpression(item.content[2]);
@@ -4439,15 +4441,15 @@ function Js2604Generator(options) {
         item.type = 'action';
     }
     function setUpMachine(folder) {
-        var _collection_205, id, item;
+        var _collection_199, id, item;
         if (folder.keywords.async) {
-            if (folder.eventItems.length !== 0) {
+            if (!(folder.eventItems.length === 0)) {
                 reportError('events are not allowed in async functions', folder.path, folder.eventItems[0]);
             }
         } else {
             folder.events = {};
-            _collection_205 = folder.eventItems;
-            for (id of _collection_205) {
+            _collection_199 = folder.eventItems;
+            for (id of _collection_199) {
                 item = folder.items[id];
                 if (item.type === 'select') {
                     addSelectEvent(folder, item, id);
@@ -4455,7 +4457,7 @@ function Js2604Generator(options) {
                     addInputEvent(folder, item, id);
                 }
             }
-            if (folder.eventItems.length !== 0) {
+            if (!(folder.eventItems.length === 0)) {
                 folder.isMachine = true;
                 folder.originalName = folder.name;
             }
@@ -4503,7 +4505,7 @@ function Js2604Generator(options) {
         folder.items[id] = item;
     }
     function insertActionBefore(folder, beforeId, expression) {
-        var _collection_207, content, existingItem, id, item, itemId;
+        var _collection_201, content, existingItem, id, item, itemId;
         id = generateId('_item_');
         if (Array.isArray(expression)) {
             content = expression;
@@ -4516,9 +4518,9 @@ function Js2604Generator(options) {
             content: content,
             one: beforeId
         };
-        _collection_207 = folder.items;
-        for (itemId in _collection_207) {
-            existingItem = _collection_207[itemId];
+        _collection_201 = folder.items;
+        for (itemId in _collection_201) {
+            existingItem = _collection_201[itemId];
             if (existingItem.one === beforeId) {
                 existingItem.one = id;
             }
@@ -4556,11 +4558,11 @@ function Js2604Generator(options) {
         }
     }
     function addExports(module, src) {
-        var _collection_210, child, code, dep, deps, exportSrc, exported, line, lines, name, parsed;
+        var _collection_204, child, code, dep, deps, exportSrc, exported, line, lines, name, parsed;
         exported = [];
-        _collection_210 = module.children;
-        for (name in _collection_210) {
-            child = _collection_210[name];
+        _collection_204 = module.children;
+        for (name in _collection_204) {
+            child = _collection_204[name];
             if (child.keywords.export) {
                 exported.push(child.name);
             }
@@ -4568,6 +4570,7 @@ function Js2604Generator(options) {
         if (exported.length === 0) {
             return src;
         } else {
+            exported.sort();
             if (isIife()) {
                 code = exported.map(name => 'window.' + name + '=' + name).join('\n');
             } else {
@@ -4658,13 +4661,13 @@ function Js2604Generator(options) {
         }
     }
     async function readChildren(folder) {
-        var _collection_213, child, childPath, result;
+        var _collection_207, child, childPath, result;
         result = [];
-        _collection_213 = folder.children;
-        for (childPath of _collection_213) {
+        _collection_207 = folder.children;
+        for (childPath of _collection_207) {
             child = await options.getObjectByHandle(childPath);
             if (child) {
-                if (child.type !== 'folder') {
+                if (!(child.type === 'folder')) {
                     enrichFolder(child);
                 }
                 result.push(child);
@@ -4756,7 +4759,7 @@ function Js2604Generator(options) {
                     if (child.type === 'folder') {
                         await readModuleFolder(cls, child);
                     } else {
-                        if (child.name !== className) {
+                        if (!(child.name === className)) {
                             addChild(cls, child);
                         }
                     }
@@ -4837,7 +4840,7 @@ function Js2604Generator(options) {
     }
     async function run() {
         var ast, deps, module, src;
-        if (state !== 'idle') {
+        if (!(state === 'idle')) {
             throw new Error('Invalid state');
         }
         state = 'started';
