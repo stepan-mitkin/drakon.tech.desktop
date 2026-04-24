@@ -3785,12 +3785,7 @@ function Js2604Generator(options) {
         _selectValue_164 = content.operator;
         if (_selectValue_164 === 'not') {
             decoded = decodeQuestionContent(content.operand);
-            if (decoded.type === 'BinaryExpression' && decoded.operator === '===') {
-                decoded.operator = '!==';
-                return decoded;
-            } else {
-                return createNot(decodeQuestionContent(content.operand));
-            }
+            return createNot(decoded);
         } else {
             if (_selectValue_164 === 'and') {
                 left = decodeQuestionContent(content.left);
