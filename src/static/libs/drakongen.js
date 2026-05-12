@@ -39,8 +39,8 @@ const {drakonToStruct} = require("./drakonToStruct");
 const {printPseudo, printWithIndent, makeIndent} = require('./printPseudo');
 const {addRange, sortByProperty} = require("./tools")
 
-function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate) {    
-    var diagram = drakonToStruct(drakonJson, name, filename, translate, htmlToString)
+function drakonToPseudocode(drakonJson, name, filename, htmlToString, translate, options) {    
+    var diagram = drakonToStruct(drakonJson, name, filename, translate, htmlToString, options)
     var lines = []
 
     lines.push("## " + translate("Procedure") + " \"" + diagram.name + "\"")
@@ -154,7 +154,7 @@ function createMindNode(name) {
 }
 
 module.exports = { drakonToPseudocode, mindToTree };
-},{"./drakonToStruct":3,"./printPseudo":6,"./tools":9}],3:[function(require,module,exports){
+},{"./drakonToStruct":3,"./printPseudo":7,"./tools":10}],3:[function(require,module,exports){
 const { structFlow, redirectNode } = require("./structFlow");
 const { createError, remove } = require("./tools");
 
@@ -210,7 +210,7 @@ function drakonToStruct(
   );
   rewireShortcircuit(nodes, filename);
   branches.forEach((branch) => cutOffBranch(nodes, branch));
-  var branchTrees = structFlow(nodes, branches, filename, translate);
+  var branchTrees = structFlow(nodes, branches, filename, translate, options);
   return {
     name: name,
     params: drakonGraph.params || "",
@@ -500,6 +500,9 @@ function findStartNode(nodes, filename, branches) {
           id,
         );
       }
+    } else if (node.final) {
+      delete node.one
+      delete node.two
     }
   }
 
@@ -794,7 +797,7 @@ function markLoopBody(nodes, start, filename) {
 
 module.exports = { drakonToStruct, drakonToGraph };
 
-},{"./structFlow":7,"./tools":9}],4:[function(require,module,exports){
+},{"./structFlow":8,"./tools":10}],4:[function(require,module,exports){
 const { drakonToPseudocode, mindToTree } = require("./drakonToPromptStruct");
 const { htmlToString } = require("./browserTools");
 const { setUpLanguage, translate } = require("./translate");
@@ -845,7 +848,7 @@ window.drakongen = {
   },
 };
 
-},{"./browserTools":1,"./drakonToPromptStruct":2,"./drakonToStruct":3,"./free":5,"./translate":10}],5:[function(require,module,exports){
+},{"./browserTools":1,"./drakonToPromptStruct":2,"./drakonToStruct":3,"./free":5,"./translate":11}],5:[function(require,module,exports){
 var {addRange} = require("./tools")
 const { createError } = require("./tools");
 
@@ -915,7 +918,189 @@ function freeDiagramToText(freeJson, name, filename, translateFunction, htmlToSt
 }
 
 module.exports = {freeDiagramToText}
-},{"./tools":9}],6:[function(require,module,exports){
+},{"./tools":10}],6:[function(require,module,exports){
+"use strict";
+
+function decrement_if_count(context, node) {
+    var i;
+    var if_id;
+    var if_node;
+
+    for (i = 0; i < node.stack.length; i++) {
+        if_id = node.stack[i];
+        if_node = context.nodes[if_id];
+        if_node.branching--;
+    }
+}
+
+function flow_no_loop(nodes, start_node_id) {
+    var context;
+
+    context = {
+        nodes: nodes
+    };
+
+    traverse_node(
+        context,
+        start_node_id,
+        []
+    );
+}
+
+function group_stack_by_id(stack) {
+    var counts_by_id;
+    var i;
+    var element;
+    var existing;
+
+    counts_by_id = {};
+
+    for (i = 0; i < stack.length; i++) {
+        element = stack[i];
+
+        if (element in counts_by_id) {
+            existing = counts_by_id[element];
+        } else {
+            existing = 0;
+        }
+
+        counts_by_id[element] = existing + 1;
+    }
+
+    return counts_by_id;
+}
+
+function increment_if_count(context, node) {
+    var i;
+    var if_id;
+    var if_node;
+
+    for (i = 0; i < node.stack.length; i++) {
+        if_id = node.stack[i];
+        if_node = context.nodes[if_id];
+        if_node.branching++;
+    }
+}
+
+function merge_incoming_branches(context, node_id, node, stack) {
+    var common;
+    var counts_by_id;
+    var processed_stack;
+    var ids;
+    var i;
+    var id;
+    var count;
+    var if_node;
+
+    common = node.stack.concat(stack);
+    counts_by_id = group_stack_by_id(common);
+    processed_stack = [];
+
+    ids = Object.keys(counts_by_id);
+
+    for (i = 0; i < ids.length; i++) {
+        id = ids[i];
+        count = counts_by_id[id];
+
+        if_node = context.nodes[id];
+
+        if (!if_node.next) {
+            if (if_node.branching === 1) {
+                if_node.next = node_id;
+            } else {
+                if_node.branching -= count - 1;
+
+                if (if_node.branching === 1) {
+                    if_node.next = node_id;
+                } else {
+                    processed_stack.push(id);
+                }
+            }
+        }
+    }
+
+    node.stack = processed_stack;
+}
+
+function recurse_traversal(context, node_id, node) {
+    var stack1;
+    var stack2;
+
+    if (node.type === "question") {
+        increment_if_count(
+            context,
+            node
+        );
+
+        stack1 = node.stack.slice();
+        stack1.push(node_id);
+
+        stack2 = node.stack.slice();
+        stack2.push(node_id);
+
+        traverse_node(
+            context,
+            node.one,
+            stack1
+        );
+
+        traverse_node(
+            context,
+            node.two,
+            stack2
+        );
+    } else {
+        if (node.final) {
+            decrement_if_count(
+                context,
+                node
+            );
+        } else {
+            stack1 = node.stack.slice();
+
+            traverse_node(
+                context,
+                node.one,
+                stack1
+            );
+        }
+    }
+}
+
+function traverse_node(context, node_id, stack) {
+    var node;
+
+    if (node_id) {
+        node = context.nodes[node_id];
+
+        if (!node.stack) {
+            node.stack = [];
+            node.refs = node.prev.length;
+        }
+
+        node.refs--;
+
+        merge_incoming_branches(
+            context,
+            node_id,
+            node,
+            stack
+        );
+
+        if (!(node.refs > 0)) {
+            recurse_traversal(
+                context,
+                node_id,
+                node
+            );
+        }
+    }
+}
+
+module.exports = {
+    flow_no_loop: flow_no_loop
+};
+},{}],7:[function(require,module,exports){
 var {addRange} = require("./tools")
 
 function makeIndent(depth) {
@@ -1100,10 +1285,11 @@ function printPseudo(algorithm, translate, output, htmlToString) {
 }
 
 module.exports = {printPseudo, printWithIndent, makeIndent}
-},{"./tools":9}],7:[function(require,module,exports){
+},{"./tools":10}],8:[function(require,module,exports){
 var { buildTree } = require("./technicalTree");
 const { createError, sortByProperty } = require("./tools");
 const { optimizeTree } = require("./treeTools");
+const { flow_no_loop } = require("./noloop")
 
 function redirectNode(nodes, node, from, to) {
   if (node.one === from) {
@@ -1123,7 +1309,7 @@ function redirectNode(nodes, node, from, to) {
   }
 }
 
-function structFlow(nodes, branches, filename, translate) {
+function structFlow(nodes, branches, filename, translate, options) {
   function flowGraph(nodes, nodeId, branchingStack) {
     if (!nodeId) {
       return;
@@ -1502,8 +1688,13 @@ function structFlow(nodes, branches, filename, translate) {
     rewireArrows(nodes, branches);
     prepareQuestions(nodes);
     var result = [];
+
     for (var branch of branches) {
-      flowGraph(nodes, branch.next, []);
+      if (options.noLoop) {
+        flow_no_loop(nodes, branch.next, []);
+      } else {
+        flowGraph(nodes, branch.next, []);
+      }
     }
 
     for (var branch of branches) {
@@ -1527,7 +1718,7 @@ function structFlow(nodes, branches, filename, translate) {
 }
 module.exports = { structFlow, redirectNode };
 
-},{"./technicalTree":8,"./tools":9,"./treeTools":11}],8:[function(require,module,exports){
+},{"./noloop":6,"./technicalTree":9,"./tools":10,"./treeTools":12}],9:[function(require,module,exports){
 function buildTree(nodes, nodeId, body, stopId) {
     while (nodeId) {
         if (nodeId === stopId) {return;}
@@ -1600,6 +1791,9 @@ function buildTree(nodes, nodeId, body, stopId) {
                 ]
             )
             next = node.one;
+            if (node.final) {
+                next = undefined
+            }
         }
         if (node.side) {
             transformed.side = node.side
@@ -1619,6 +1813,9 @@ function copyFields(dst, src, fields) {
 }
 
 function reserveNext(nodes, node) {
+    if (!node.next) {
+        return undefined
+    }
     const target = nodes[node.next];
     if (target.targetTaken) {
         return undefined;
@@ -1630,7 +1827,7 @@ function reserveNext(nodes, node) {
 
 module.exports = {buildTree}
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 function createError(message, filename, nodeId) {
     var error = new Error(message)
@@ -1671,7 +1868,7 @@ function addRange(to, from) {
     }
 }
 module.exports = { createError, sortByProperty, addRange, remove }
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 var translationsRu = {
     "error": "ОШИБКА",
     "not": "не",
@@ -1804,7 +2001,7 @@ function setUpLanguage(language) {
 
 
 module.exports = { setUpLanguage, translate };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 function optimizeTree(steps) {
     var result = []

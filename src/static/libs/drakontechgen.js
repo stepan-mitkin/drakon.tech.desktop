@@ -53,6 +53,7 @@ const {
   createClojureGenerator,
 } = require("./drakontechgen");
 const { Js2604Generator } = require("./js2604");
+const { Lua2604Generator } = require("./lua2604");
 
 window.drakontechgen = {
   buildGenerator: function (
@@ -70,6 +71,7 @@ window.drakontechgen = {
       toTree: window.drakongen.toTree,
       escodegen: window.escodegen,
       esprima: window.esprima,
+      parseLua: function(text) { return window.luaparse.parse(text)},
       name: name,
       main: main,
       root: root,
@@ -81,6 +83,8 @@ window.drakontechgen = {
 
     if (language === "JS") {
       return createDrakonTechGenerator(genOptions);
+    } else if (language === "LUA2604") {
+      return Lua2604Generator(genOptions);    
     } else if (language === "JS2604") {
       return Js2604Generator(genOptions);
     } else {
@@ -89,7 +93,7 @@ window.drakontechgen = {
   },
 };
 
-},{"./drakontechgen":4,"./js2604":5}],3:[function(require,module,exports){
+},{"./drakontechgen":4,"./js2604":5,"./lua2604":6}],3:[function(require,module,exports){
 
 function lexClojure(text) {
     const operators = ["(", ")", "[", "]", "{", "}", "#", ",", "`", "'"];
@@ -3117,7 +3121,7 @@ module.exports = {
     createClojureGenerator,
 };
 
-},{"./astScanner":1,"./clojurelexer":3,"./sort":6,"./tools":7}],5:[function(require,module,exports){
+},{"./astScanner":1,"./clojurelexer":3,"./sort":11,"./tools":12}],5:[function(require,module,exports){
 const {sortBy, findFirst, addRange, clone, replace} = require('./tools');
 function Js2604Generator(options) {
     var self = { _type: 'Js2604Generator' };
@@ -3130,267 +3134,6 @@ function Js2604Generator(options) {
     gBranches = {};
     gDebugAst = false;
     gById = {};
-    function createAnd(left, right) {
-        return {
-            type: 'LogicalExpression',
-            operator: '&&',
-            left: left,
-            right: right
-        };
-    }
-    function createAssignment(identifier, expression) {
-        return {
-            type: 'AssignmentExpression',
-            operator: '=',
-            left: identifier,
-            right: expression
-        };
-    }
-    function createBlock() {
-        return {
-            type: 'BlockStatement',
-            body: []
-        };
-    }
-    function createBreak() {
-        return {
-            type: 'BreakStatement',
-            label: null
-        };
-    }
-    function createCase(value) {
-        return {
-            type: 'SwitchCase',
-            test: value,
-            consequent: []
-        };
-    }
-    function createComputedMember(obj, prop) {
-        return {
-            type: 'MemberExpression',
-            computed: true,
-            object: obj,
-            property: createIdentifier(prop)
-        };
-    }
-    function createDeclaration(vars) {
-        return {
-            type: 'VariableDeclaration',
-            declarations: vars.map(createVariableDeclaration),
-            kind: 'var'
-        };
-    }
-    function createEqual(left, right) {
-        return {
-            type: 'BinaryExpression',
-            operator: '===',
-            left: left,
-            right: right
-        };
-    }
-    function createExpression(expression) {
-        return {
-            type: 'ExpressionStatement',
-            expression: expression
-        };
-    }
-    function createFor(init, test, update) {
-        return {
-            type: 'ForStatement',
-            init: init,
-            test: test,
-            update: update,
-            body: createBlock()
-        };
-    }
-    function createForIn(variable, collectionExpr) {
-        return {
-            type: 'ForInStatement',
-            left: createIdentifier(variable),
-            right: collectionExpr,
-            body: createBlock(),
-            each: false
-        };
-    }
-    function createForOf(variable, collectionExpr) {
-        return {
-            type: 'ForOfStatement',
-            left: createIdentifier(variable),
-            right: collectionExpr,
-            body: createBlock()
-        };
-    }
-    function createFunction(name, args) {
-        args = args || [];
-        return {
-            type: 'FunctionDeclaration',
-            id: createIdentifier(name),
-            params: args.map(createIdentifier),
-            body: createBlock(),
-            generator: false,
-            expression: false,
-            async: false
-        };
-    }
-    function createGetValue(valueVar, keyVar, collection) {
-        var expr;
-        expr = createAssignment(createIdentifier(valueVar), createComputedMember(collection, keyVar));
-        expr.loopInternal = true;
-        return expr;
-    }
-    function createIdentifier(name) {
-        return {
-            type: 'Identifier',
-            name: name
-        };
-    }
-    function createIfNode(content) {
-        return {
-            type: 'IfStatement',
-            test: content,
-            consequent: createBlock()
-        };
-    }
-    function createMember(obj, prop) {
-        return {
-            type: 'MemberExpression',
-            computed: false,
-            object: obj,
-            property: createIdentifier(prop)
-        };
-    }
-    function createNot(operand) {
-        return {
-            type: 'UnaryExpression',
-            operator: '!',
-            argument: operand
-        };
-    }
-    function createOr(left, right) {
-        return {
-            type: 'LogicalExpression',
-            operator: '||',
-            left: left,
-            right: right
-        };
-    }
-    function createPlus(left, right) {
-        return {
-            type: 'BinaryExpression',
-            operator: '+',
-            left: left,
-            right: right
-        };
-    }
-    function createProgram() {
-        return {
-            type: 'Program',
-            body: []
-        };
-    }
-    function createReturn(value) {
-        return {
-            type: 'ReturnStatement',
-            argument: value
-        };
-    }
-    function createStringLiteral(value) {
-        return {
-            type: 'Literal',
-            value: value,
-            raw: JSON.stringify(value)
-        };
-    }
-    function createSwitch(value) {
-        return {
-            type: 'SwitchStatement',
-            discriminant: value,
-            cases: []
-        };
-    }
-    function createThrow(message) {
-        return {
-            type: 'ThrowStatement',
-            argument: {
-                type: 'NewExpression',
-                callee: createIdentifier('Error'),
-                arguments: [message]
-            }
-        };
-    }
-    function createTryCatch(variableName) {
-        return {
-            'type': 'TryStatement',
-            'block': {
-                'type': 'BlockStatement',
-                'body': []
-            },
-            'handler': {
-                'type': 'CatchClause',
-                'param': {
-                    'type': 'Identifier',
-                    'name': variableName
-                },
-                'body': {
-                    'type': 'BlockStatement',
-                    'body': []
-                }
-            },
-            'finalizer': null
-        };
-    }
-    function createVariableDeclaration(variable) {
-        return {
-            type: 'VariableDeclarator',
-            id: createIdentifier(variable),
-            init: null
-        };
-    }
-    function createWhileTrue() {
-        return {
-            type: 'WhileStatement',
-            test: {
-                type: 'Literal',
-                value: true,
-                raw: 'true'
-            },
-            body: createBlock()
-        };
-    }
-    function ensureExpression(folder, id, item) {
-        var expression;
-        expression = getExpression(item);
-        if (expression) {
-            item.content = expression;
-            return true;
-        } else {
-            reportError('A value expression is expected here', folder.path, id);
-            return false;
-        }
-    }
-    function getExpression(item) {
-        var expr;
-        if (item.content && item.content.length === 1) {
-            expr = item.content[0];
-            if (expr.type === 'ExpressionStatement' && !(expr.expression.type === 'AssignmentExpression') && !(expr.expression.type === 'SequenceExpression')) {
-                return expr.expression;
-            } else {
-                return undefined;
-            }
-        } else {
-            return undefined;
-        }
-    }
-    function pushAssi(variable, value, body) {
-        body.push(createExpression(createAssignment(createIdentifier(variable), value)));
-    }
-    function stripExpression(node) {
-        if (node.type === 'ExpressionStatement') {
-            return node.expression;
-        } else {
-            return node;
-        }
-    }
     function addActionToAst(step, body) {
         var _collection_139, expr;
         if (step.content) {
@@ -3411,6 +3154,52 @@ function Js2604Generator(options) {
                 statement = createExpression(assi);
                 body.push(statement);
             }
+        }
+    }
+    function addChild(parent, folder) {
+        var scope;
+        if (isFunctionNameUnique(parent, folder.name)) {
+            enrichFolder(folder);
+            scope = createScope('function', folder.name);
+            folder.scope = scope;
+            parent.children[folder.name] = folder;
+            folder.parent = parent.id;
+            generateFunctionId(folder);
+        } else {
+            reportError('Name is not unique: ' + folder.name, folder.path, undefined);
+        }
+    }
+    function addDeclaration(scope, name) {
+        scope.declarations[name] = true;
+    }
+    function addDeclarationsInFunction(step) {
+        var visitor;
+        visitor = function (node) {
+            return scanForAssignments(step, node);
+        };
+        traverseAst(step.body, visitor);
+        addDeclaratonsToBody(step);
+    }
+    function addDeclarationsRecursive(step, folder) {
+        var _collection_170, canDeclare, child, childStep, name;
+        addDeclarationsInFunction(step);
+        _collection_170 = folder.children;
+        for (name in _collection_170) {
+            child = _collection_170[name];
+            canDeclare = child.type === 'class';
+            childStep = createScopeStep(step, name, child.path, child.scope, getFunBody(child.ast), true, canDeclare);
+            childStep.canAwait = child.keywords.async;
+            addDeclarationsRecursive(childStep, child);
+        }
+    }
+    function addDeclaratonsToBody(step) {
+        var allVars, locals, loop;
+        locals = Object.keys(step.scope.locals);
+        loop = Object.keys(step.scope.loop);
+        allVars = locals.concat(loop);
+        if (!(allVars.length === 0)) {
+            allVars.sort();
+            step.body.unshift(createDeclaration(allVars));
         }
     }
     function addDefaultReturnNull(sw) {
@@ -3441,6 +3230,78 @@ function Js2604Generator(options) {
         cs.consequent.push(parseStatement('_topGen_.next(_args_)'));
         cs.consequent.push(createBreak());
     }
+    function addEventSignature(folder, caseId, caseItem) {
+        var args, eventInfo, existing, name, signature;
+        name = caseItem.content.callee.name;
+        args = caseItem.content.arguments.map(arg => arg.name);
+        signature = args.join(',');
+        existing = folder.events[name];
+        if (existing) {
+            if (signature === existing.signature) {
+                return name;
+            } else {
+                reportError('Incompatible signature', folder.path, caseId);
+                return undefined;
+            }
+        } else {
+            eventInfo = {
+                name: name,
+                signature: signature,
+                args: args
+            };
+            folder.events[name] = eventInfo;
+            return name;
+        }
+    }
+    function addExports(module, src) {
+        var _collection_204, child, code, dep, deps, exportSrc, exported, line, lines, name, parsed;
+        exported = [];
+        _collection_204 = module.children;
+        for (name in _collection_204) {
+            child = _collection_204[name];
+            if (child.keywords.export) {
+                exported.push(child.name);
+            }
+        }
+        if (exported.length === 0) {
+            return src;
+        } else {
+            exported.sort();
+            if (isIife()) {
+                code = exported.map(name => 'window.' + name + '=' + name).join('\n');
+            } else {
+                if (isUnit()) {
+                    lines = exported.map(name => 'unit.' + name + '=' + name);
+                    deps = getDependencies();
+                    for (dep of deps) {
+                        line = 'Object.defineProperty(unit,\'' + dep + '\',{get:function(){return ' + dep + ';},set:function(newValue){' + dep + '=newValue;},enumerable:true,configurable:true});';
+                        lines.push(line);
+                    }
+                    code = lines.join('\n');
+                } else {
+                    code = 'module.exports = {' + exported.join(', ') + '}';
+                }
+            }
+            parsed = options.esprima.parseScript(code, { loc: false });
+            exportSrc = options.escodegen.generate(parsed);
+            return src + '\n' + exportSrc;
+        }
+    }
+    function addInputEvent(folder, item, id) {
+        var name;
+        item.eventNames = [];
+        if (ensureCall(folder, id, item)) {
+            name = addEventSignature(folder, id, item);
+            if (name) {
+                item.eventNames.push(name);
+                rewriteEventInput(folder, id, item, name);
+            }
+        }
+    }
+    function addLocal(scope, variable) {
+        scope.locals[variable] = true;
+        addDeclaration(scope, variable);
+    }
     function addLoopToAst(step, body) {
         var node;
         if (step.content) {
@@ -3452,6 +3313,10 @@ function Js2604Generator(options) {
         }
         convertNodesToAst(step.body, node.body.body);
         body.push(node);
+    }
+    function addLoopVar(scope, variable) {
+        scope.loop[variable] = true;
+        addDeclaration(scope, variable);
     }
     function addQuestionToAst(step, body) {
         var content, node;
@@ -3474,6 +3339,47 @@ function Js2604Generator(options) {
             if (!(last.type === 'ReturnStatement')) {
                 body.push(parseStatement('_topResolve_()'));
             }
+        }
+    }
+    function addSelectEvent(folder, item, id) {
+        var _collection_186, caseId, caseItem, content, lines, name;
+        addLocal(folder.scope, '_eventType_');
+        addLocal(folder.scope, '_event_');
+        item.content = createIdentifier('_eventType_');
+        lines = [
+            'me.state = "' + id + '"',
+            'me._busy = false',
+            '_event_ = yield',
+            '_eventType_ = _event_[0]'
+        ];
+        content = linesToContent(folder, id, lines);
+        insertActionBefore(folder, id, content);
+        item.eventNames = [];
+        _collection_186 = item.cases;
+        for (caseId of _collection_186) {
+            caseItem = folder.items[caseId];
+            if (ensureCall(folder, caseId, caseItem)) {
+                name = addEventSignature(folder, caseId, caseItem);
+                if (name) {
+                    item.eventNames.push(name);
+                    rewriteEventCase(folder, caseId, caseItem, name);
+                }
+            }
+        }
+    }
+    function addVariableDeclarations(module) {
+        var rootStep;
+        rootStep = createScopeStep(undefined, 'module', module.path, module.scope, getFunBody(module.ast), true, true);
+        addDeclarationsRecursive(rootStep, module);
+    }
+    function assignEventArguments(folder, name, lines) {
+        var _collection_188, arg, counter, eventInfo;
+        eventInfo = folder.events[name];
+        counter = 1;
+        _collection_188 = eventInfo.args;
+        for (arg of _collection_188) {
+            lines.push(arg + ' = _event_[' + counter + ']');
+            counter++;
         }
     }
     function buildComplexSilhouette(fun, tree, functionBody) {
@@ -3634,6 +3540,28 @@ function Js2604Generator(options) {
             }
         }
     }
+    function checkCancellation() {
+        var error;
+        if (!state) {
+            error = new Error('Cancelled');
+            error.cancelled = true;
+            throw error;
+        }
+    }
+    function collectReceiveCases(folder, item) {
+        var caseItem, current;
+        item.cases = [];
+        current = item.one;
+        while (true) {
+            if (current) {
+                item.cases.push(current);
+                caseItem = folder.items[current];
+                current = caseItem.two;
+            } else {
+                break;
+            }
+        }
+    }
     function combineClassAst(folder) {
         var child, exported, initBody, name, names, stm;
         initBody = getFunBody(folder.ast);
@@ -3758,6 +3686,73 @@ function Js2604Generator(options) {
             buildComplexSilhouette(fun, tree, functionBody);
         }
     }
+    function createAnd(left, right) {
+        return {
+            type: 'LogicalExpression',
+            operator: '&&',
+            left: left,
+            right: right
+        };
+    }
+    function createAssignment(identifier, expression) {
+        return {
+            type: 'AssignmentExpression',
+            operator: '=',
+            left: identifier,
+            right: expression
+        };
+    }
+    function createBlock() {
+        return {
+            type: 'BlockStatement',
+            body: []
+        };
+    }
+    function createBreak() {
+        return {
+            type: 'BreakStatement',
+            label: null
+        };
+    }
+    function createCase(value) {
+        return {
+            type: 'SwitchCase',
+            test: value,
+            consequent: []
+        };
+    }
+    function createComputedMember(obj, prop) {
+        return {
+            type: 'MemberExpression',
+            computed: true,
+            object: obj,
+            property: createIdentifier(prop)
+        };
+    }
+    function createDeclaration(vars) {
+        return {
+            type: 'VariableDeclaration',
+            declarations: vars.map(createVariableDeclaration),
+            kind: 'var'
+        };
+    }
+    function createEmptyFunction(name) {
+        return {
+            type: 'drakon',
+            name: name,
+            items: {},
+            keywords: {},
+            children: {}
+        };
+    }
+    function createEqual(left, right) {
+        return {
+            type: 'BinaryExpression',
+            operator: '===',
+            left: left,
+            right: right
+        };
+    }
     function createEventMethod(fun, eventName, functionBody) {
         var _collection_156, body, cs, def, event, eventItem, funAst, itemId, sw;
         event = fun.events[eventName];
@@ -3781,6 +3776,210 @@ function Js2604Generator(options) {
         sw.cases.push(def);
         def.consequent.push(createBreak());
         functionBody.push(createExpression(createAssignment(createMember(createIdentifier('me'), eventName), funAst)));
+    }
+    function createExpression(expression) {
+        return {
+            type: 'ExpressionStatement',
+            expression: expression
+        };
+    }
+    function createFor(init, test, update) {
+        return {
+            type: 'ForStatement',
+            init: init,
+            test: test,
+            update: update,
+            body: createBlock()
+        };
+    }
+    function createForIn(variable, collectionExpr) {
+        return {
+            type: 'ForInStatement',
+            left: createIdentifier(variable),
+            right: collectionExpr,
+            body: createBlock(),
+            each: false
+        };
+    }
+    function createForOf(variable, collectionExpr) {
+        return {
+            type: 'ForOfStatement',
+            left: createIdentifier(variable),
+            right: collectionExpr,
+            body: createBlock()
+        };
+    }
+    function createFunction(name, args) {
+        args = args || [];
+        return {
+            type: 'FunctionDeclaration',
+            id: createIdentifier(name),
+            params: args.map(createIdentifier),
+            body: createBlock(),
+            generator: false,
+            expression: false,
+            async: false
+        };
+    }
+    function createGetValue(valueVar, keyVar, collection) {
+        var expr;
+        expr = createAssignment(createIdentifier(valueVar), createComputedMember(collection, keyVar));
+        expr.loopInternal = true;
+        return expr;
+    }
+    function createIdentifier(name) {
+        return {
+            type: 'Identifier',
+            name: name
+        };
+    }
+    function createIfNode(content) {
+        return {
+            type: 'IfStatement',
+            test: content,
+            consequent: createBlock()
+        };
+    }
+    function createMember(obj, prop) {
+        return {
+            type: 'MemberExpression',
+            computed: false,
+            object: obj,
+            property: createIdentifier(prop)
+        };
+    }
+    function createNot(operand) {
+        return {
+            type: 'UnaryExpression',
+            operator: '!',
+            argument: operand
+        };
+    }
+    function createOr(left, right) {
+        return {
+            type: 'LogicalExpression',
+            operator: '||',
+            left: left,
+            right: right
+        };
+    }
+    function createPlus(left, right) {
+        return {
+            type: 'BinaryExpression',
+            operator: '+',
+            left: left,
+            right: right
+        };
+    }
+    function createProgram() {
+        return {
+            type: 'Program',
+            body: []
+        };
+    }
+    function createReturn(value) {
+        return {
+            type: 'ReturnStatement',
+            argument: value
+        };
+    }
+    function createScope(type, name) {
+        return {
+            _type: 'scope',
+            type: type,
+            name: name,
+            declarations: {},
+            loop: {},
+            locals: {},
+            children: {}
+        };
+    }
+    function createScopeStep(parent, name, path, scope, body, canAssign, canDeclare) {
+        return {
+            parent: parent,
+            name: name,
+            path: path || '',
+            scope: scope,
+            body: body,
+            canAssign: canAssign || false,
+            canDeclare: canDeclare || false
+        };
+    }
+    function createScopeStepForLambda(step, node) {
+        var _collection_173, nextScope, nextStep, param;
+        nextScope = createScope('lambda', 'lambda');
+        _collection_173 = node.params;
+        for (param of _collection_173) {
+            if (param.type === 'Identifier') {
+                addDeclaration(nextScope, param.name);
+            }
+        }
+        nextStep = createScopeStep(step, 'lambda', step.path, nextScope, node.body.body, true, false);
+        nextStep.itemId = step.itemId;
+        return nextStep;
+    }
+    function createStringLiteral(value) {
+        return {
+            type: 'Literal',
+            value: value,
+            raw: JSON.stringify(value)
+        };
+    }
+    function createSwitch(value) {
+        return {
+            type: 'SwitchStatement',
+            discriminant: value,
+            cases: []
+        };
+    }
+    function createThrow(message) {
+        return {
+            type: 'ThrowStatement',
+            argument: {
+                type: 'NewExpression',
+                callee: createIdentifier('Error'),
+                arguments: [message]
+            }
+        };
+    }
+    function createTryCatch(variableName) {
+        return {
+            'type': 'TryStatement',
+            'block': {
+                'type': 'BlockStatement',
+                'body': []
+            },
+            'handler': {
+                'type': 'CatchClause',
+                'param': {
+                    'type': 'Identifier',
+                    'name': variableName
+                },
+                'body': {
+                    'type': 'BlockStatement',
+                    'body': []
+                }
+            },
+            'finalizer': null
+        };
+    }
+    function createVariableDeclaration(variable) {
+        return {
+            type: 'VariableDeclarator',
+            id: createIdentifier(variable),
+            init: null
+        };
+    }
+    function createWhileTrue() {
+        return {
+            type: 'WhileStatement',
+            test: {
+                type: 'Literal',
+                value: true,
+                raw: 'true'
+            },
+            body: createBlock()
+        };
     }
     function decodeQuestionContent(content) {
         var _selectValue_158, decoded, left, right;
@@ -3823,147 +4022,51 @@ function Js2604Generator(options) {
             }
         }
     }
-    function getFunBody(fun) {
-        return fun.body.body;
-    }
-    function hasEnd(fun) {
-        var _collection_160, id, item;
-        _collection_160 = fun.items;
-        for (id in _collection_160) {
-            item = _collection_160[id];
-            if (item.type === 'end') {
-                return true;
-            }
+    function enrichFolder(folder) {
+        if (!folder.keywords) {
+            folder.keywords = {};
         }
-        return false;
+        if (!folder.items) {
+            folder.items = {};
+        }
+        if (!folder.children) {
+            folder.children = {};
+        }
     }
-    function isSimpleSilhouette(branches) {
-        var branch, i;
-        for (i = 0; i < branches.length; i++) {
-            branch = branches[i];
-            if (branch.refs > 1) {
-                if (i === branches.length - 1) {
-                    return simpleBranch(branch);
-                } else {
+    function ensureCall(folder, id, item) {
+        var _collection_190, arg;
+        if (item.content && (item.content.type === 'CallExpression' && item.content.callee.type === 'Identifier')) {
+            _collection_190 = item.content.arguments;
+            for (arg of _collection_190) {
+                if (!(arg.type === 'Identifier')) {
+                    reportError('This call expression expects variables', folder.path, id);
                     return false;
                 }
             }
-        }
-        return true;
-    }
-    function makeCreateName(name) {
-        return name + '_create';
-    }
-    function makeMainName(name) {
-        return name + '_main';
-    }
-    function makeMethodName(className, name) {
-        return name;
-    }
-    function makeRunName(name) {
-        return name + '_run';
-    }
-    function parseStatement(code) {
-        var parsed, wrapped;
-        wrapped = 'async function wrp() { ' + code + '\n}';
-        parsed = options.esprima.parseScript(wrapped, { loc: false });
-        return parsed.body[0].body.body[0];
-    }
-    function replaceReturnInAction(item) {
-        var _collection_163, _selectValue_165, index, stm;
-        if (item.type === 'action' && item.content) {
-            index = 0;
-            _collection_163 = item.content;
-            for (stm of _collection_163) {
-                _selectValue_165 = stm.type;
-                if (_selectValue_165 === 'ReturnStatement') {
-                    convertReturnToResolve(stm, '_topResolve_');
-                    item.content.splice(index + 1, 0, createReturn(null));
-                    return;
-                } else {
-                    if (_selectValue_165 === 'ThrowStatement') {
-                        convertReturnToResolve(stm, '_topReject_');
-                        item.content.splice(index + 1, 0, createReturn(null));
-                        return;
-                    }
-                }
-                index++;
-            }
-        }
-    }
-    function replaceReturnInMachine(fun) {
-        var _collection_167, id, item;
-        _collection_167 = fun.items;
-        for (id in _collection_167) {
-            item = _collection_167[id];
-            replaceReturnInAction(item);
-        }
-    }
-    function simpleBranch(branch) {
-        if (branch.body.length === 0 || branch.body.length === 1 && branch.body[0].type === 'action') {
             return true;
         } else {
+            reportError('A function call expression expected here', folder.path, id);
             return false;
         }
     }
-    function addDeclarationsInFunction(step) {
-        var visitor;
-        visitor = function (node) {
-            return scanForAssignments(step, node);
-        };
-        traverseAst(step.body, visitor);
-        addDeclaratonsToBody(step);
-    }
-    function addDeclarationsRecursive(step, folder) {
-        var _collection_170, canDeclare, child, childStep, name;
-        addDeclarationsInFunction(step);
-        _collection_170 = folder.children;
-        for (name in _collection_170) {
-            child = _collection_170[name];
-            canDeclare = child.type === 'class';
-            childStep = createScopeStep(step, name, child.path, child.scope, getFunBody(child.ast), true, canDeclare);
-            childStep.canAwait = child.keywords.async;
-            addDeclarationsRecursive(childStep, child);
+    function ensureExpression(folder, id, item) {
+        var expression;
+        expression = getExpression(item);
+        if (expression) {
+            item.content = expression;
+            return true;
+        } else {
+            reportError('A value expression is expected here', folder.path, id);
+            return false;
         }
     }
-    function addDeclaratonsToBody(step) {
-        var allVars, locals, loop;
-        locals = Object.keys(step.scope.locals);
-        loop = Object.keys(step.scope.loop);
-        allVars = locals.concat(loop);
-        if (!(allVars.length === 0)) {
-            allVars.sort();
-            step.body.unshift(createDeclaration(allVars));
+    function ensureHasContent(folder, id, item) {
+        if (item.content && item.content.length > 0) {
+            return true;
+        } else {
+            reportError('Icon cannot be empty', folder.path, id);
+            return false;
         }
-    }
-    function addVariableDeclarations(module) {
-        var rootStep;
-        rootStep = createScopeStep(undefined, 'module', module.path, module.scope, getFunBody(module.ast), true, true);
-        addDeclarationsRecursive(rootStep, module);
-    }
-    function createScopeStep(parent, name, path, scope, body, canAssign, canDeclare) {
-        return {
-            parent: parent,
-            name: name,
-            path: path || '',
-            scope: scope,
-            body: body,
-            canAssign: canAssign || false,
-            canDeclare: canDeclare || false
-        };
-    }
-    function createScopeStepForLambda(step, node) {
-        var _collection_173, nextScope, nextStep, param;
-        nextScope = createScope('lambda', 'lambda');
-        _collection_173 = node.params;
-        for (param of _collection_173) {
-            if (param.type === 'Identifier') {
-                addDeclaration(nextScope, param.name);
-            }
-        }
-        nextStep = createScopeStep(step, 'lambda', step.path, nextScope, node.body.body, true, false);
-        nextStep.itemId = step.itemId;
-        return nextStep;
     }
     function extractVariablesFromDeclaration(node, scope) {
         var _collection_175, _collection_179, _collection_181, _selectValue_177, decl, item, prop;
@@ -3989,6 +4092,112 @@ function Js2604Generator(options) {
             }
         }
     }
+    function findClassDiagram(folders) {
+        var cls, folder;
+        cls = undefined;
+        for (folder of folders) {
+            if (folder.name === 'class') {
+                enrichFolder(folder);
+                cls = folder;
+            } else {
+                if (folder.name === 'module') {
+                    reportError('module is not expected in this folder', folder.path);
+                }
+            }
+        }
+        return cls;
+    }
+    function generateFunctionId(folder) {
+        folder.id = generateId('fun');
+        gById[folder.id] = folder;
+    }
+    function generateId(prefix) {
+        var id;
+        id = prefix + '_' + nextId;
+        nextId++;
+        return id;
+    }
+    function getDepDeclarations() {
+        var dependencies;
+        dependencies = getDependencies();
+        return dependencies.map(dep => 'var ' + dep + ';').join('\n') + '\n';
+    }
+    function getDependencies() {
+        var deps;
+        if (options.settings && options.settings.dependencies) {
+            deps = splitTrim(options.settings.dependencies, '\n');
+            deps.sort();
+            return deps;
+        } else {
+            return [];
+        }
+    }
+    function getExpression(item) {
+        var expr;
+        if (item.content && item.content.length === 1) {
+            expr = item.content[0];
+            if (expr.type === 'ExpressionStatement' && !(expr.expression.type === 'AssignmentExpression') && !(expr.expression.type === 'SequenceExpression')) {
+                return expr.expression;
+            } else {
+                return undefined;
+            }
+        } else {
+            return undefined;
+        }
+    }
+    function getFunBody(fun) {
+        return fun.body.body;
+    }
+    function hasEnd(fun) {
+        var _collection_160, id, item;
+        _collection_160 = fun.items;
+        for (id in _collection_160) {
+            item = _collection_160[id];
+            if (item.type === 'end') {
+                return true;
+            }
+        }
+        return false;
+    }
+    function insertActionAfter(folder, existingId, content) {
+        var before, id, item;
+        id = generateId('_item_');
+        before = folder.items[existingId];
+        item = {
+            id: id,
+            type: 'action',
+            content: content,
+            one: before.one
+        };
+        before.one = id;
+        folder.items[id] = item;
+    }
+    function insertActionBefore(folder, beforeId, expression) {
+        var _collection_201, content, existingItem, id, item, itemId;
+        id = generateId('_item_');
+        if (Array.isArray(expression)) {
+            content = expression;
+        } else {
+            content = [createExpression(expression)];
+        }
+        item = {
+            id: id,
+            type: 'action',
+            content: content,
+            one: beforeId
+        };
+        _collection_201 = folder.items;
+        for (itemId in _collection_201) {
+            existingItem = _collection_201[itemId];
+            if (existingItem.one === beforeId) {
+                existingItem.one = id;
+            }
+            if (existingItem.two === beforeId) {
+                existingItem.two = id;
+            }
+        }
+        folder.items[id] = item;
+    }
     function isDeclared(step, varName) {
         var current;
         current = step;
@@ -4004,189 +4213,46 @@ function Js2604Generator(options) {
             }
         }
     }
-    function scanForAssignments(step, node) {
-        var _selectValue_183, nextStep, varName;
-        if (node.itemId) {
-            step.itemId = node.itemId;
-        }
-        _selectValue_183 = node.type;
-        if (_selectValue_183 === 'AssignmentExpression') {
-            if (node.left.type === 'Identifier') {
-                varName = node.left.name;
-                if (!isDeclared(step, varName)) {
-                    addLocal(step.scope, varName);
-                }
-            }
-            return true;
-        } else {
-            if (_selectValue_183 === 'CallExpression') {
-                if (node.callee.type === 'Identifier' && node.callee.name === 'getHandlerData') {
-                    node.type = 'Identifier';
-                    node.name = '_handlerData_';
-                    delete node.callee;
-                    delete node.arguments;
-                    return false;
-                } else {
-                    return true;
-                }
-            } else {
-                if (_selectValue_183 === 'VariableDeclaration') {
-                    if (step.canDeclare) {
-                        extractVariablesFromDeclaration(node, step.scope);
-                    } else {
-                        reportError('var, const, let are not allowed here', step.path, step.itemId);
-                    }
-                    return true;
-                } else {
-                    if (_selectValue_183 === 'AwaitExpression') {
-                        if (!step.canAwait) {
-                            reportError('await is allowed only in async functions', step.path, step.itemId);
-                        }
-                        return true;
-                    } else {
-                        if ((_selectValue_183 === 'FunctionExpression' || _selectValue_183 === 'ArrowFunctionExpression' || _selectValue_183 === 'FunctionDeclaration') && node.body.type === 'BlockStatement') {
-                            nextStep = createScopeStepForLambda(step, node);
-                            nextStep.canAwait = node.async;
-                            addDeclarationsInFunction(nextStep);
-                            return false;
-                        } else {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    function traverseAst(obj, visitor) {
-        var item, key, recurse, value;
-        if (obj) {
-            if (Array.isArray(obj)) {
-                for (item of obj) {
-                    traverseAst(item, visitor);
-                }
-            } else {
-                if (typeof obj === 'object' && obj.type) {
-                    recurse = visitor(obj);
-                    if (recurse) {
-                        for (key in obj) {
-                            value = obj[key];
-                            traverseAst(value, visitor);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    function tryAddIdentifier(scope, item) {
-        if (item.type === 'Identifier') {
-            addDeclaration(scope, item.name);
-        }
-    }
-    function addEventSignature(folder, caseId, caseItem) {
-        var args, eventInfo, existing, name, signature;
-        name = caseItem.content.callee.name;
-        args = caseItem.content.arguments.map(arg => arg.name);
-        signature = args.join(',');
-        existing = folder.events[name];
-        if (existing) {
-            if (signature === existing.signature) {
-                return name;
-            } else {
-                reportError('Incompatible signature', folder.path, caseId);
-                return undefined;
-            }
-        } else {
-            eventInfo = {
-                name: name,
-                signature: signature,
-                args: args
-            };
-            folder.events[name] = eventInfo;
-            return name;
-        }
-    }
-    function addInputEvent(folder, item, id) {
-        var name;
-        item.eventNames = [];
-        if (ensureCall(folder, id, item)) {
-            name = addEventSignature(folder, id, item);
-            if (name) {
-                item.eventNames.push(name);
-                rewriteEventInput(folder, id, item, name);
-            }
-        }
-    }
-    function addSelectEvent(folder, item, id) {
-        var _collection_186, caseId, caseItem, content, lines, name;
-        addLocal(folder.scope, '_eventType_');
-        addLocal(folder.scope, '_event_');
-        item.content = createIdentifier('_eventType_');
-        lines = [
-            'me.state = "' + id + '"',
-            'me._busy = false',
-            '_event_ = yield',
-            '_eventType_ = _event_[0]'
-        ];
-        content = linesToContent(folder, id, lines);
-        insertActionBefore(folder, id, content);
-        item.eventNames = [];
-        _collection_186 = item.cases;
-        for (caseId of _collection_186) {
-            caseItem = folder.items[caseId];
-            if (ensureCall(folder, caseId, caseItem)) {
-                name = addEventSignature(folder, caseId, caseItem);
-                if (name) {
-                    item.eventNames.push(name);
-                    rewriteEventCase(folder, caseId, caseItem, name);
-                }
-            }
-        }
-    }
-    function assignEventArguments(folder, name, lines) {
-        var _collection_188, arg, counter, eventInfo;
-        eventInfo = folder.events[name];
-        counter = 1;
-        _collection_188 = eventInfo.args;
-        for (arg of _collection_188) {
-            lines.push(arg + ' = _event_[' + counter + ']');
-            counter++;
-        }
-    }
-    function collectReceiveCases(folder, item) {
-        var caseItem, current;
-        item.cases = [];
-        current = item.one;
+    function isFunctionNameUnique(parent, name) {
+        var current;
+        current = parent;
         while (true) {
-            if (current) {
-                item.cases.push(current);
-                caseItem = folder.items[current];
-                current = caseItem.two;
+            if (name in current.children) {
+                return false;
             } else {
-                break;
+                if (current.parent) {
+                    current = gById[current.parent];
+                } else {
+                    return true;
+                }
             }
         }
     }
-    function ensureCall(folder, id, item) {
-        var _collection_190, arg;
-        if (item.content && (item.content.type === 'CallExpression' && item.content.callee.type === 'Identifier')) {
-            _collection_190 = item.content.arguments;
-            for (arg of _collection_190) {
-                if (!(arg.type === 'Identifier')) {
-                    reportError('This call expression expects variables', folder.path, id);
-                    return false;
-                }
-            }
+    function isIife() {
+        if (options.settings && options.settings.iife) {
             return true;
         } else {
-            reportError('A function call expression expected here', folder.path, id);
             return false;
         }
     }
-    function ensureHasContent(folder, id, item) {
-        if (item.content && item.content.length > 0) {
+    function isSimpleSilhouette(branches) {
+        var branch, i;
+        for (i = 0; i < branches.length; i++) {
+            branch = branches[i];
+            if (branch.refs > 1) {
+                if (i === branches.length - 1) {
+                    return simpleBranch(branch);
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    function isUnit() {
+        if (options.settings && options.settings.unit) {
             return true;
         } else {
-            reportError('Icon cannot be empty', folder.path, id);
             return false;
         }
     }
@@ -4196,6 +4262,25 @@ function Js2604Generator(options) {
         dummyItem = { content: src };
         parseItemContent(folder, id, dummyItem);
         return dummyItem.content;
+    }
+    function makeCreateName(name) {
+        return name + '_create';
+    }
+    function makeMainName(name) {
+        return name + '_main';
+    }
+    function makeMethodName(className, name) {
+        return name;
+    }
+    function makeRunName(name) {
+        return name + '_run';
+    }
+    function mustStop() {
+        if (!failed && state) {
+            return false;
+        } else {
+            return true;
+        }
     }
     function normalizeAsync(folder) {
         if (folder.keywords.machine || folder.keywords.async) {
@@ -4416,249 +4501,14 @@ function Js2604Generator(options) {
             }
         }
     }
-    function reportBadLoop(folder, id, item) {
-        reportError('Error in loop icon', folder.path, id);
-        delete item.content;
+    function parseStatement(code) {
+        var parsed, wrapped;
+        wrapped = 'async function wrp() { ' + code + '\n}';
+        parsed = options.esprima.parseScript(wrapped, { loc: false });
+        return parsed.body[0].body.body[0];
     }
-    function rewriteEventCase(folder, caseId, caseItem, name) {
-        var content, lines;
-        caseItem.content = createStringLiteral(name);
-        lines = [];
-        assignEventArguments(folder, name, lines);
-        content = linesToContent(folder, caseId, lines);
-        insertActionAfter(folder, caseId, content);
-    }
-    function rewriteEventInput(folder, id, item, name) {
-        var lines;
-        addLocal(folder.scope, '_event_');
-        lines = [
-            'me.state = "' + id + '"',
-            'me._busy = false',
-            '_event_ = yield'
-        ];
-        assignEventArguments(folder, name, lines);
-        item.content = linesToContent(folder, id, lines);
-        item.type = 'action';
-    }
-    function setUpMachine(folder) {
-        var _collection_199, id, item;
-        if (folder.keywords.async) {
-            if (!(folder.eventItems.length === 0)) {
-                reportError('events are not allowed in async functions', folder.path, folder.eventItems[0]);
-            }
-        } else {
-            folder.events = {};
-            _collection_199 = folder.eventItems;
-            for (id of _collection_199) {
-                item = folder.items[id];
-                if (item.type === 'select') {
-                    addSelectEvent(folder, item, id);
-                } else {
-                    addInputEvent(folder, item, id);
-                }
-            }
-            if (!(folder.eventItems.length === 0)) {
-                folder.isMachine = true;
-                folder.originalName = folder.name;
-            }
-        }
-    }
-    function addDeclaration(scope, name) {
-        scope.declarations[name] = true;
-    }
-    function addLocal(scope, variable) {
-        scope.locals[variable] = true;
-        addDeclaration(scope, variable);
-    }
-    function addLoopVar(scope, variable) {
-        scope.loop[variable] = true;
-        addDeclaration(scope, variable);
-    }
-    function createScope(type, name) {
-        return {
-            _type: 'scope',
-            type: type,
-            name: name,
-            declarations: {},
-            loop: {},
-            locals: {},
-            children: {}
-        };
-    }
-    function generateId(prefix) {
-        var id;
-        id = prefix + '_' + nextId;
-        nextId++;
-        return id;
-    }
-    function insertActionAfter(folder, existingId, content) {
-        var before, id, item;
-        id = generateId('_item_');
-        before = folder.items[existingId];
-        item = {
-            id: id,
-            type: 'action',
-            content: content,
-            one: before.one
-        };
-        before.one = id;
-        folder.items[id] = item;
-    }
-    function insertActionBefore(folder, beforeId, expression) {
-        var _collection_201, content, existingItem, id, item, itemId;
-        id = generateId('_item_');
-        if (Array.isArray(expression)) {
-            content = expression;
-        } else {
-            content = [createExpression(expression)];
-        }
-        item = {
-            id: id,
-            type: 'action',
-            content: content,
-            one: beforeId
-        };
-        _collection_201 = folder.items;
-        for (itemId in _collection_201) {
-            existingItem = _collection_201[itemId];
-            if (existingItem.one === beforeId) {
-                existingItem.one = id;
-            }
-            if (existingItem.two === beforeId) {
-                existingItem.two = id;
-            }
-        }
-        folder.items[id] = item;
-    }
-    function isIife() {
-        if (options.settings && options.settings.iife) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    function isUnit() {
-        if (options.settings && options.settings.unit) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    function addChild(parent, folder) {
-        var scope;
-        if (isFunctionNameUnique(parent, folder.name)) {
-            enrichFolder(folder);
-            scope = createScope('function', folder.name);
-            folder.scope = scope;
-            parent.children[folder.name] = folder;
-            folder.parent = parent.id;
-            generateFunctionId(folder);
-        } else {
-            reportError('Name is not unique: ' + folder.name, folder.path, undefined);
-        }
-    }
-    function addExports(module, src) {
-        var _collection_204, child, code, dep, deps, exportSrc, exported, line, lines, name, parsed;
-        exported = [];
-        _collection_204 = module.children;
-        for (name in _collection_204) {
-            child = _collection_204[name];
-            if (child.keywords.export) {
-                exported.push(child.name);
-            }
-        }
-        if (exported.length === 0) {
-            return src;
-        } else {
-            exported.sort();
-            if (isIife()) {
-                code = exported.map(name => 'window.' + name + '=' + name).join('\n');
-            } else {
-                if (isUnit()) {
-                    lines = exported.map(name => 'unit.' + name + '=' + name);
-                    deps = getDependencies();
-                    for (dep of deps) {
-                        line = 'Object.defineProperty(unit,\'' + dep + '\',{get:function(){return ' + dep + ';},set:function(newValue){' + dep + '=newValue;},enumerable:true,configurable:true});';
-                        lines.push(line);
-                    }
-                    code = lines.join('\n');
-                } else {
-                    code = 'module.exports = {' + exported.join(', ') + '}';
-                }
-            }
-            parsed = options.esprima.parseScript(code, { loc: false });
-            exportSrc = options.escodegen.generate(parsed);
-            return src + '\n' + exportSrc;
-        }
-    }
-    function checkCancellation() {
-        var error;
-        if (!state) {
-            error = new Error('Cancelled');
-            error.cancelled = true;
-            throw error;
-        }
-    }
-    function createEmptyFunction(name) {
-        return {
-            type: 'drakon',
-            name: name,
-            items: {},
-            keywords: {},
-            children: {}
-        };
-    }
-    function enrichFolder(folder) {
-        if (!folder.keywords) {
-            folder.keywords = {};
-        }
-        if (!folder.items) {
-            folder.items = {};
-        }
-        if (!folder.children) {
-            folder.children = {};
-        }
-    }
-    function findClassDiagram(folders) {
-        var cls, folder;
-        cls = undefined;
-        for (folder of folders) {
-            if (folder.name === 'class') {
-                enrichFolder(folder);
-                cls = folder;
-            } else {
-                if (folder.name === 'module') {
-                    reportError('module is not expected in this folder', folder.path);
-                }
-            }
-        }
-        return cls;
-    }
-    function generateFunctionId(folder) {
-        folder.id = generateId('fun');
-        gById[folder.id] = folder;
-    }
-    function isFunctionNameUnique(parent, name) {
-        var current;
-        current = parent;
-        while (true) {
-            if (name in current.children) {
-                return false;
-            } else {
-                if (current.parent) {
-                    current = gById[current.parent];
-                } else {
-                    return true;
-                }
-            }
-        }
-    }
-    function mustStop() {
-        if (!failed && state) {
-            return false;
-        } else {
-            return true;
-        }
+    function pushAssi(variable, value, body) {
+        body.push(createExpression(createAssignment(createIdentifier(variable), value)));
     }
     async function readChildren(folder) {
         var _collection_207, child, childPath, result;
@@ -4806,6 +4656,40 @@ function Js2604Generator(options) {
         }
         return module;
     }
+    function replaceReturnInAction(item) {
+        var _collection_163, _selectValue_165, index, stm;
+        if (item.type === 'action' && item.content) {
+            index = 0;
+            _collection_163 = item.content;
+            for (stm of _collection_163) {
+                _selectValue_165 = stm.type;
+                if (_selectValue_165 === 'ReturnStatement') {
+                    convertReturnToResolve(stm, '_topResolve_');
+                    item.content.splice(index + 1, 0, createReturn(null));
+                    return;
+                } else {
+                    if (_selectValue_165 === 'ThrowStatement') {
+                        convertReturnToResolve(stm, '_topReject_');
+                        item.content.splice(index + 1, 0, createReturn(null));
+                        return;
+                    }
+                }
+                index++;
+            }
+        }
+    }
+    function replaceReturnInMachine(fun) {
+        var _collection_167, id, item;
+        _collection_167 = fun.items;
+        for (id in _collection_167) {
+            item = _collection_167[id];
+            replaceReturnInAction(item);
+        }
+    }
+    function reportBadLoop(folder, id, item) {
+        reportError('Error in loop icon', folder.path, id);
+        delete item.content;
+    }
     function reportError(message, filename, nodeId, data) {
         state = undefined;
         failed = true;
@@ -4816,27 +4700,25 @@ function Js2604Generator(options) {
             data: data
         });
     }
-    function tryGetHoloClassName(name) {
-        if (name.startsWith('class ')) {
-            return name.substring('class '.length);
-        } else {
-            return undefined;
-        }
+    function rewriteEventCase(folder, caseId, caseItem, name) {
+        var content, lines;
+        caseItem.content = createStringLiteral(name);
+        lines = [];
+        assignEventArguments(folder, name, lines);
+        content = linesToContent(folder, caseId, lines);
+        insertActionAfter(folder, caseId, content);
     }
-    function getDepDeclarations() {
-        var dependencies;
-        dependencies = getDependencies();
-        return dependencies.map(dep => 'var ' + dep + ';').join('\n') + '\n';
-    }
-    function getDependencies() {
-        var deps;
-        if (options.settings && options.settings.dependencies) {
-            deps = splitTrim(options.settings.dependencies, '\n');
-            deps.sort();
-            return deps;
-        } else {
-            return [];
-        }
+    function rewriteEventInput(folder, id, item, name) {
+        var lines;
+        addLocal(folder.scope, '_event_');
+        lines = [
+            'me.state = "' + id + '"',
+            'me._busy = false',
+            '_event_ = yield'
+        ];
+        assignEventArguments(folder, name, lines);
+        item.content = linesToContent(folder, id, lines);
+        item.type = 'action';
     }
     async function run() {
         var ast, deps, module, src;
@@ -4876,8 +4758,130 @@ function Js2604Generator(options) {
             }
         }
     }
+    function scanForAssignments(step, node) {
+        var _selectValue_183, nextStep, varName;
+        if (node.itemId) {
+            step.itemId = node.itemId;
+        }
+        _selectValue_183 = node.type;
+        if (_selectValue_183 === 'AssignmentExpression') {
+            if (node.left.type === 'Identifier') {
+                varName = node.left.name;
+                if (!isDeclared(step, varName)) {
+                    addLocal(step.scope, varName);
+                }
+            }
+            return true;
+        } else {
+            if (_selectValue_183 === 'CallExpression') {
+                if (node.callee.type === 'Identifier' && node.callee.name === 'getHandlerData') {
+                    node.type = 'Identifier';
+                    node.name = '_handlerData_';
+                    delete node.callee;
+                    delete node.arguments;
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                if (_selectValue_183 === 'VariableDeclaration') {
+                    if (step.canDeclare) {
+                        extractVariablesFromDeclaration(node, step.scope);
+                    } else {
+                        reportError('var, const, let are not allowed here', step.path, step.itemId);
+                    }
+                    return true;
+                } else {
+                    if (_selectValue_183 === 'AwaitExpression') {
+                        if (!step.canAwait) {
+                            reportError('await is allowed only in async functions', step.path, step.itemId);
+                        }
+                        return true;
+                    } else {
+                        if ((_selectValue_183 === 'FunctionExpression' || _selectValue_183 === 'ArrowFunctionExpression' || _selectValue_183 === 'FunctionDeclaration') && node.body.type === 'BlockStatement') {
+                            nextStep = createScopeStepForLambda(step, node);
+                            nextStep.canAwait = node.async;
+                            addDeclarationsInFunction(nextStep);
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    function setUpMachine(folder) {
+        var _collection_199, id, item;
+        if (folder.keywords.async) {
+            if (!(folder.eventItems.length === 0)) {
+                reportError('events are not allowed in async functions', folder.path, folder.eventItems[0]);
+            }
+        } else {
+            folder.events = {};
+            _collection_199 = folder.eventItems;
+            for (id of _collection_199) {
+                item = folder.items[id];
+                if (item.type === 'select') {
+                    addSelectEvent(folder, item, id);
+                } else {
+                    addInputEvent(folder, item, id);
+                }
+            }
+            if (!(folder.eventItems.length === 0)) {
+                folder.isMachine = true;
+                folder.originalName = folder.name;
+            }
+        }
+    }
+    function simpleBranch(branch) {
+        if (branch.body.length === 0 || branch.body.length === 1 && branch.body[0].type === 'action') {
+            return true;
+        } else {
+            return false;
+        }
+    }
     function stop() {
         state = undefined;
+    }
+    function stripExpression(node) {
+        if (node.type === 'ExpressionStatement') {
+            return node.expression;
+        } else {
+            return node;
+        }
+    }
+    function traverseAst(obj, visitor) {
+        var item, key, recurse, value;
+        if (obj) {
+            if (Array.isArray(obj)) {
+                for (item of obj) {
+                    traverseAst(item, visitor);
+                }
+            } else {
+                if (typeof obj === 'object' && obj.type) {
+                    recurse = visitor(obj);
+                    if (recurse) {
+                        for (key in obj) {
+                            value = obj[key];
+                            traverseAst(value, visitor);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    function tryAddIdentifier(scope, item) {
+        if (item.type === 'Identifier') {
+            addDeclaration(scope, item.name);
+        }
+    }
+    function tryGetHoloClassName(name) {
+        if (name.startsWith('class ')) {
+            return name.substring('class '.length);
+        } else {
+            return undefined;
+        }
     }
     self.run = run;
     self.stop = stop;
@@ -4894,7 +4898,2236 @@ function splitTrim(text, separator) {
     return trimmed.filter(part => Boolean(part));
 }
 module.exports = { Js2604Generator };
-},{"./tools":7}],6:[function(require,module,exports){
+},{"./tools":12}],6:[function(require,module,exports){
+const {read_project} = require("./lua2604/reader")
+const {parse_items} = require("./lua2604/parser")
+const {build_module_tree} = require("./lua2604/tree")
+const {build_module_code} = require("./lua2604/printer")
+
+function pause(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+
+async function generate_lua(options) {
+    var project;
+    var parse_result;
+    var tree;
+    var module_src;
+
+    project = await read_project(options);
+    if (project.errors && project.errors.length) {
+        return {
+            errors: project.errors
+        };
+    }
+
+    await pause(1);
+
+    parse_result = parse_items(
+        project.module,
+        options
+    );
+    if (parse_result.errors && parse_result.errors.length) {
+        return {
+            errors: parse_result.errors
+        };
+    }
+
+
+
+    await pause(1);
+
+    tree = build_module_tree(
+        project.module,
+        options
+    );
+    if (tree.errors && tree.errors.length) {
+        return {
+            errors: tree.errors
+        };
+    }
+
+    await pause(1);
+    module_src = build_module_code(
+        tree.module,
+        options
+    );
+    if (module_src.errors && module_src.errors.length) {
+        return {
+            errors: module_src.errors
+        };
+    }
+
+    return {
+        code: module_src.code
+    };
+}
+
+async function wrapLuaGenerator(options) {
+    var result
+    try {
+        result = await generate_lua(options)
+    } catch (ex) {
+        options.onError({
+            message: ex.message,
+            filename: ex.filename,
+            nodeId: ex.nodeId,
+            data: ex.data
+        })
+        return
+    }
+    if (result.errors && result.errors.length != 0) {
+        for (var error of result.errors) {
+            options.onError(error)
+        }
+    } else {
+        await options.onData(result.code)
+    }
+}
+
+
+function Lua2604Generator(options) {
+    var self = { _type: 'Lua2604Generator' };
+    self.run = () => wrapLuaGenerator(options)
+    self.stop = function() {}
+    return self
+}
+
+module.exports = { Lua2604Generator };
+},{"./lua2604/parser":7,"./lua2604/printer":8,"./lua2604/reader":9,"./lua2604/tree":10}],7:[function(require,module,exports){
+"use strict";
+
+var error_list = [];
+var global_options = undefined;
+var next_id = 1;
+
+function parse_items(doc, options) {
+    error_list = [];
+    global_options = options;
+    next_id = 1;
+
+    traverse_document_tree(doc, parse_items_in_document);
+
+    if (error_list.length === 0) {
+        process_assignments(doc, undefined);
+    }
+
+    return {
+        errors: error_list
+    };
+}
+
+function traverse_document_tree(doc, visitor) {
+    var name = undefined;
+
+    if (!doc) {
+        return;
+    }
+
+    visitor(doc);
+
+    if (!doc.members) {
+        return;
+    }
+
+    for (name in doc.members) {
+        if (name in doc.members) {
+            traverse_document_tree(doc.members[name], visitor);
+        }
+    }
+}
+
+function add_signature(doc, item_id, item, state_id) {
+    var expr = item.value;
+    var message = undefined;
+    var args = [];
+    var argument = undefined;
+    var arg_str = undefined;
+    var message_info = undefined;
+    var i = 0;
+
+    if (
+        !expr ||
+        expr.type !== "CallExpression" ||
+        !expr.base ||
+        expr.base.type !== "Identifier"
+    ) {
+        report_error(
+            "A function call expression is expected here",
+            doc.path,
+            item_id
+        );
+        return undefined;
+    }
+
+    message = expr.base.name;
+
+    for (i = 0; i < expr.arguments.length; i++) {
+        argument = expr.arguments[i];
+
+        if (argument.type === "Identifier") {
+            args.push(argument.name);
+        } else {
+            report_error(
+                "Only identifiers are allowed in incoming messages",
+                doc.path,
+                item_id
+            );
+            return undefined;
+        }
+    }
+
+    arg_str = args.join(",");
+
+    if (message in doc.messages) {
+        message_info = doc.messages[message];
+
+        if (message_info.arg_str === arg_str) {
+            message_info.states.push(state_id);
+            message_info.items.push(item.one);
+        } else {
+            report_error(
+                "Signature mismatch in incoming message",
+                doc.path,
+                item_id
+            );
+            return undefined;
+        }
+    } else {
+        doc.messages[message] = {
+            message: message,
+            args: args,
+            arg_str: arg_str,
+            states: [state_id],
+            items: [item.one]
+        };
+    }
+
+    item.message = message;
+    return message;
+}
+
+function can_declare(doc) {
+    if (doc.type === "module") {
+        return true;
+    } else {
+        if (doc.type === "class") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+function create_identifier(name) {
+    return {
+        type: "Identifier",
+        name: name
+    };
+}
+
+function extract_expression(context) {
+    var doc = context.doc;
+    var item_id = context.item_id;
+    var item = context.item;
+    var var_name = undefined;
+    var statements = undefined;
+
+    if (item.value.type !== "Identifier") {
+        var_name = generate_random_var_name();
+        doc.scope.declarations[var_name] = "local";
+
+        statements = parse_statements({
+            doc: doc,
+            item_id: item_id,
+            item: item,
+            content: var_name + " = " + item.content
+        });
+
+        insert_action_before(
+            doc,
+            item_id,
+            var_name + " = " + item.content,
+            statements
+        );
+
+        item.value = create_identifier(var_name);
+        item.content = var_name;
+    }
+}
+
+function find_cases(context) {
+    var item = context.item;
+    var current_case_id = item.one;
+    var case_item = undefined;
+
+    item.cases = [];
+
+    while (true) {
+        if (current_case_id) {
+            case_item = context.doc.items[current_case_id];
+            item.cases.push(current_case_id);
+            current_case_id = case_item.two;
+        } else {
+            break;
+        }
+    }
+}
+
+function find_declaration(step, name) {
+    var current = step;
+    var role = undefined;
+
+    while (true) {
+        if (current) {
+            role = current.scope.declarations[name];
+
+            if (role) {
+                return role;
+            } else {
+                current = current.parent;
+            }
+        } else {
+            return undefined;
+        }
+    }
+}
+
+function find_loop_end(doc, item_id, item) {
+    var depth = 1;
+    var current_id = item.one;
+    var current_item = undefined;
+
+    while (true) {
+        if (current_id) {
+            current_item = doc.items[current_id];
+
+            if (current_item.type === "loopbegin") {
+                depth++;
+            } else {
+                if (current_item.type === "loopend") {
+                    depth--;
+                }
+            }
+
+            if (depth === 0) {
+                return current_id;
+            } else {
+                current_id = current_item.one;
+            }
+        } else {
+            report_error(
+                "loop end icon not found",
+                doc.path,
+                item_id
+            );
+            return undefined;
+        }
+    }
+}
+
+function generate_random_var_name() {
+    next_id++;
+    return "_var" + next_id;
+}
+
+function get_messages_from_cases(doc, state_id, select) {
+    var i = 0;
+    var case_id = undefined;
+    var item = undefined;
+
+    for (i = 0; i < select.cases.length; i++) {
+        case_id = select.cases[i];
+        item = doc.items[case_id];
+
+        add_signature(
+            doc,
+            case_id,
+            item,
+            state_id
+        );
+    }
+}
+
+function insert_action_before(doc, item_id, content, statements) {
+    var new_item_id = undefined;
+    var id = undefined;
+    var other_item = undefined;
+    var item = undefined;
+
+    next_id++;
+    new_item_id = item_id + "_" + next_id;
+
+    for (id in doc.items) {
+        if (id in doc.items) {
+            other_item = doc.items[id];
+
+            if (other_item.one === item_id) {
+                other_item.one = new_item_id;
+            }
+
+            if (other_item.two === item_id) {
+                other_item.two = new_item_id;
+            }
+        }
+    }
+
+    item = {
+        type: "action",
+        one: item_id,
+        content: content,
+        statements: statements
+    };
+
+    doc.items[new_item_id] = item;
+}
+
+function parse_arguments(doc) {
+    var lines = undefined;
+    var args = [];
+    var i = 0;
+    var arg = undefined;
+
+    if (doc.params) {
+        lines = doc.params.split(/\r?\n/);
+
+        for (i = 0; i < lines.length; i++) {
+            arg = lines[i].trim();
+
+            if (arg !== "") {
+                if (args.indexOf(arg) !== -1) {
+                    report_error(
+                        "Argument is not unique",
+                        doc.path,
+                        "params",
+                        arg
+                    );
+                }
+
+                args.push(arg);
+            }
+        }
+
+        for (i = 0; i < args.length; i++) {
+            doc.scope.declarations[args[i]] = "arg";
+        }
+
+        doc.args = args;
+    } else {
+        doc.args = [];
+    }
+}
+
+function parse_item(doc, item_id, item) {
+    var content = item.content || "";
+    var context = {
+        doc: doc,
+        item_id: item_id,
+        item: item,
+        content: content
+    };
+
+    if (item.type === "action") {
+        if (content !== "") {
+            item.statements = parse_statements(context);
+        }
+    } else {
+        if (item.type === "question") {
+            if (content === "") {
+                report_error(
+                    "Icon cannot be empty",
+                    doc.path,
+                    item_id
+                );
+            } else {
+                item.value = parse_value(context);
+            }
+        } else {
+            if (item.type === "select") {
+                parse_select(context);
+            } else {
+                if (item.type === "case") {
+                    if (content === "") {
+                        if (item.two) {
+                            report_error(
+                                "Icon cannot be empty",
+                                doc.path,
+                                item_id
+                            );
+                        }
+                    } else {
+                        item.value = parse_value(context);
+                    }
+                } else {
+                    if (item.type === "loopbegin") {
+                        if (content === "") {
+                            report_error(
+                                "Icon cannot be empty",
+                                doc.path,
+                                item_id
+                            );
+                        } else {
+                            parse_loop(context);
+                        }
+                    } else {
+                        if (item.type === "sinput") {
+                            if (content === "") {
+                                report_error(
+                                    "Icon cannot be empty",
+                                    doc.path,
+                                    item_id
+                                );
+                            } else {
+                                parse_sinput(context);
+                            }
+                        } else {
+                            if (item.type === "branch") {
+                                doc.branches.push(item_id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+function parse_items_in_document(doc) {
+    var item_ids = undefined;
+    var i = 0;
+    var item_id = undefined;
+    var item = undefined;
+
+    doc.scope = {
+        declarations: {},
+        name: doc.name
+    };
+
+    doc.messages = {};
+    doc.states = [];
+    doc.branches = [];
+
+    if (!doc.items) {
+        doc.items = {};
+    }
+
+    if (!doc.members) {
+        doc.members = {};
+    }
+
+    parse_arguments(doc);
+
+    item_ids = Object.keys(doc.items);
+
+    for (i = 0; i < item_ids.length; i++) {
+        item_id = item_ids[i];
+        item = doc.items[item_id];
+        parse_item(doc, item_id, item);
+    }
+
+    read_cases(doc);
+}
+
+function parse_loop(context) {
+    var doc = context.doc;
+    var item_id = context.item_id;
+    var item = context.item;
+    var content = context.content;
+    var parts = content.split(";");
+    var left = undefined;
+    var vars = undefined;
+    var expression = undefined;
+    var expression_context = undefined;
+    var ast1 = undefined;
+    var ast2 = undefined;
+    var ast3 = undefined;
+    var end_id = undefined;
+
+    if (parts.length === 2) {
+        left = parts[0].trim();
+        expression = parts[1].trim();
+        vars = left.split(",");
+
+        if (vars.length === 1) {
+            item.var1 = vars[0].trim();
+            doc.scope.declarations[item.var1] = "loop";
+            item.content = expression;
+            item.subtype = "array";
+
+            expression_context = {
+                doc: doc,
+                item_id: item_id,
+                item: item,
+                content: expression
+            };
+
+            item.value = parse_value(expression_context);
+            extract_expression(expression_context);
+
+            item.content = "for _, " + item.var1 + " in ipairs(" + item.content + ") do";
+        } else {
+            if (vars.length === 2) {
+                item.var1 = vars[0].trim();
+                doc.scope.declarations[item.var1] = "loop";
+                item.var2 = vars[1].trim();
+                doc.scope.declarations[item.var2] = "loop";
+
+                item.content = expression;
+                item.subtype = "map";
+
+                expression_context = {
+                    doc: doc,
+                    item_id: item_id,
+                    item: item,
+                    content: expression
+                };
+
+                item.value = parse_value(expression_context);
+                extract_expression(expression_context);
+
+                item.content = "for " + item.var1 + ", " + item.var2 + " in pairs(" + item.content + ") do";
+            } else {
+                report_error(
+                    "Bad format",
+                    doc.path,
+                    item_id
+                );
+            }
+        }
+    } else {
+        if (parts.length === 3) {
+            item.subtype = "for";
+
+            ast1 = parse_statements({
+                doc: doc,
+                item_id: item_id,
+                item: item,
+                content: parts[0].trim()
+            });
+
+            ast2 = parse_value({
+                doc: doc,
+                item_id: item_id,
+                item: item,
+                content: parts[1].trim()
+            });
+
+            ast3 = parse_statements({
+                doc: doc,
+                item_id: item_id,
+                item: item,
+                content: parts[2].trim()
+            });
+
+            item.content = "while " + parts[1].trim() + " do";
+
+            insert_action_before(
+                doc,
+                item_id,
+                parts[0].trim(),
+                ast1
+            );
+
+            end_id = find_loop_end(doc, item_id, item);
+
+            if (end_id) {
+                insert_action_before(
+                    doc,
+                    end_id,
+                    parts[2].trim(),
+                    ast3
+                );
+            }
+        } else {
+            report_error(
+                "Bad format",
+                doc.path,
+                item_id
+            );
+        }
+    }
+}
+
+function parse_lua(text) {
+    return global_options.parseLua(text);
+}
+
+function parse_select(context) {
+    var doc = context.doc;
+    var item_id = context.item_id;
+    var item = context.item;
+    var content = context.content;
+
+    if (content === "") {
+        report_error(
+            "Icon cannot be empty",
+            doc.path,
+            item_id
+        );
+    } else {
+        item.value = parse_value(context);
+        extract_expression(context);
+        find_cases(context);
+
+        if (content === "receive") {
+            doc.states.push(item_id);
+        }
+    }
+}
+
+function parse_sinput(context) {
+    var doc = context.doc;
+    var item_id = context.item_id;
+    var item = context.item;
+
+    item.value = parse_value(context);
+
+    if (add_signature(doc, item_id, item, item_id)) {
+        doc.states.push(item_id);
+    }
+}
+
+function parse_statements(context) {
+    var wrapped = "function _wrap_() " + context.content + " end";
+    var ast = undefined;
+
+    try {
+        ast = parse_lua(wrapped);
+    } catch (ex) {
+        report_error(
+            get_error_message(ex),
+            context.doc.path,
+            context.item_id
+        );
+        return undefined;
+    }
+
+    return ast.body[0].body;
+}
+
+function parse_value(context) {
+    var wrapped = undefined;
+    var ast = undefined;
+
+    wrapped = "x=" + context.content;
+
+    try {
+        ast = parse_lua(wrapped);
+    } catch (ex) {
+        report_error(
+            get_error_message(ex),
+            context.doc.path,
+            context.item_id
+        );
+        return undefined;
+    }
+
+    return ast.body[0].init[0];
+}
+
+function process_assignment(step, item_id, assignment) {
+    var i = 0;
+    var item = undefined;
+    var var_type = undefined;
+
+    for (i = 0; i < assignment.variables.length; i++) {
+        item = assignment.variables[i];
+
+        if (item.type === "Identifier") {
+            var_type = find_declaration(step, item.name);
+
+            if (var_type) {
+                if (var_type === "loop") {
+                    report_error(
+                        "Cannot assign to loop variable",
+                        step.path,
+                        item_id
+                    );
+                }
+            } else {
+                step.scope.declarations[item.name] = "local";
+            }
+        }
+    }
+}
+
+function process_assignments(doc, parent) {
+    var step = undefined;
+    var item_id = undefined;
+    var item = undefined;
+    var member_name = undefined;
+    var member = undefined;
+
+    step = {
+        parent: parent,
+        scope: doc.scope,
+        declares: can_declare(doc),
+        path: doc.path
+    };
+
+    for (item_id in doc.items) {
+        if (item_id in doc.items) {
+            item = doc.items[item_id];
+
+            if (item.type === "action" && item.statements) {
+                scan_assignments(step, item_id, item);
+            }
+        }
+    }
+
+    for (member_name in doc.members) {
+        if (member_name in doc.members) {
+            member = doc.members[member_name];
+            process_assignments(member, step);
+        }
+    }
+}
+
+function process_declaration(step, item_id, declaration) {
+    var i = 0;
+    var variable = undefined;
+
+    if (step.declares) {
+        for (i = 0; i < declaration.variables.length; i++) {
+            variable = declaration.variables[i];
+
+            if (variable.type === "Identifier") {
+                step.scope.declarations[variable.name] = "declared";
+            }
+        }
+    } else {
+        report_error(
+            "Variable declarations are not allowed in function body",
+            step.path,
+            item_id
+        );
+    }
+}
+
+function read_cases(doc) {
+    var i = 0;
+    var item_id = undefined;
+    var item = undefined;
+
+    for (i = 0; i < doc.states.length; i++) {
+        item_id = doc.states[i];
+        item = doc.items[item_id];
+
+        if (item.type === "select") {
+            get_messages_from_cases(
+                doc,
+                item_id,
+                item
+            );
+        }
+    }
+}
+
+function report_error(message, handle, item_id, data) {
+    error_list.push({
+        message: message,
+        filename: handle,
+        nodeId: item_id,
+        data: data
+    });
+}
+
+function scan_assignments(step, item_id, item) {
+    var i = 0;
+    var statement = undefined;
+    for (i = 0; i < item.statements.length; i++) {
+        statement = item.statements[i];
+
+        if (statement.type === "AssignmentStatement") {
+            process_assignment(step, item_id, statement);
+        } else {
+            if (statement.type === "LocalStatement") {
+                process_declaration(step, item_id, statement);
+            }
+        }
+    }
+}
+
+function get_error_message(ex) {
+    if (!ex) {
+        return "Parse error";
+    }
+
+    if (ex.message) {
+        return ex.message;
+    }
+
+    return String(ex);
+}
+
+module.exports = {
+    parse_items: parse_items
+};
+
+},{}],8:[function(require,module,exports){
+"use strict";
+
+function add_line(text, depth, lines) {
+    var indent = "";
+    var i = 0;
+
+    for (i = 0; i < depth * 4; i++) {
+        indent += " ";
+    }
+
+    lines.push(indent + text);
+}
+
+function build_module_code(root, options) {
+    var lines = [];
+    var i = 0;
+    var node = undefined;
+
+    if (!root || !root.body) {
+        return { code: "" };
+    }
+
+    for (i = 0; i < root.body.length; i++) {
+        node = root.body[i];
+        print_node(node, 0, lines);
+    }
+
+    return {
+        code: lines.join("\n")
+    };
+}
+
+function print_action(node, depth, lines) {
+    var parts = undefined;
+    var i = 0;
+
+    if (!node || !node.content) {
+        return;
+    }
+
+    parts = node.content.split("\n");
+
+    for (i = 0; i < parts.length; i++) {
+        add_line(parts[i], depth, lines);
+    }
+}
+
+function print_body(body, depth, lines) {
+    var i = 0;
+
+    if (!body) {
+        return;
+    }
+
+    for (i = 0; i < body.length; i++) {
+        print_node(body[i], depth + 1, lines);
+    }
+}
+
+function print_function(node, depth, lines) {
+    var args = "";
+    var header = "";
+
+    add_line("", depth, lines);
+
+    if (!node) {
+        return;
+    }
+
+    if (node.args) {
+        args = node.args.join(", ");
+    }
+
+    if (node.self_name) {
+        header = node.self_name + "." + node.name + " = function(" + args + ")";
+    } else {
+        header = node.name + " = function(" + args + ")";
+    }
+
+    add_line(header, depth, lines);
+
+    print_body(node.body, depth, lines);
+
+    add_line("end", depth, lines);
+}
+
+function print_loop(node, depth, lines) {
+    if (!node) {
+        return;
+    }
+
+    add_line(node.content || "while true do", depth, lines);
+    print_body(node.body, depth, lines);
+    add_line("end", depth, lines);
+}
+
+function print_question(node, depth, lines) {
+    var parts = undefined;
+    var content = "";
+    var i = 0;
+
+    if (!node) {
+        return;
+    }
+
+    if (node.content) {
+        parts = node.content.split("\n");
+        content = parts.join(" ");
+    }
+
+    add_line("if " + content + " then", depth, lines);
+
+    print_body(node.yes, depth, lines);
+
+    if (node.no && node.no.length > 0) {
+        add_line("else", depth, lines);
+        print_body(node.no, depth, lines);
+    }
+
+    add_line("end", depth, lines);
+}
+
+function print_switch(node, depth, lines) {
+    var i = 0;
+    var option = undefined;
+
+    if (!node || !node.options || node.options.length === 0) {
+        return;
+    }
+
+    for (i = 0; i < node.options.length; i++) {
+        option = node.options[i];
+
+        if (i === 0) {
+            add_line("if " + option.condition + " then", depth, lines);
+        } else {
+            add_line("elseif " + option.condition + " then", depth, lines);
+        }
+
+        print_body(option.body, depth, lines);
+    }
+
+    if (node.other && node.other.length > 0) {
+        add_line("else", depth, lines);
+        print_body(node.other, depth, lines);
+    }
+
+    add_line("end", depth, lines);
+}
+
+function print_node(node, depth, lines) {
+    if (!node) {
+        return;
+    }
+
+    if (node.type === "function") {
+        print_function(node, depth, lines);
+    } else if (node.type === "action") {
+        print_action(node, depth, lines);
+    } else if (node.type === "question") {
+        print_question(node, depth, lines);
+    } else if (node.type === "loop") {
+        print_loop(node, depth, lines);
+    } else if (node.type === "if-switch") {
+        print_switch(node, depth, lines);
+    } else if (node.type === "empty-line") {
+        add_line("", depth, lines);
+    } else {
+        throw new Error("Unexpected node type: " + node.type);
+    }
+}
+
+module.exports = {
+    build_module_code: build_module_code
+};
+},{}],9:[function(require,module,exports){
+var error_list = [];
+var global_options = undefined;
+var next_id = 1;
+
+async function read_project(options) {
+    var root_folder;
+    var children;
+    var module;
+    var other_children;
+    var i;
+    var child;
+
+    error_list = [];
+    global_options = options;
+
+    root_folder = await read_object(global_options.root);
+    children = await read_children(root_folder);
+
+    module = find_by_name(children, "module");
+
+    if (!module) {
+        module = create_document("module", "drakon");
+    }
+
+    module.type = "module";
+    initialize_document(module);
+
+    other_children = filter_name_not(children, "module");
+
+    for (i = 0; i < other_children.length; i += 1) {
+        child = other_children[i];
+
+        if (child.name === "class") {
+            report_error(
+                "class is not expected here",
+                child.path,
+                undefined,
+                undefined
+            );
+        } else {
+            if (child.type === "folder") {
+                await read_folder(module, child);
+            } else {
+                add_document(module, child);
+            }
+        }
+    }
+
+    if (error_list.length === 0) {
+        return {
+            module: module
+        };
+    }
+
+    return {
+        errors: error_list
+    };
+}
+
+function create_document(name, type) {
+    var document;
+
+    document = {};
+    document.name = name;
+    document.type = type;
+    document.path = "created-" + next_id;
+    next_id += 1;
+
+    document.items = {};
+    document.keywords = {};
+    document.params = undefined;
+    document.parent = undefined;
+    document.members = {};
+    document.scope = undefined;
+    document.args = [];
+
+    return document;
+}
+
+function initialize_document(document) {
+    if (!document.items) {
+        document.items = {};
+    }
+
+    if (!document.keywords) {
+        document.keywords = {};
+    }
+
+    if (!document.members) {
+        document.members = {};
+    }
+
+    if (!document.args) {
+        document.args = [];
+    }
+}
+
+function add_document(parent, document) {
+    var chain;
+    var i;
+    var element;
+
+    initialize_document(parent);
+    initialize_document(document);
+
+    chain = get_document_chain(parent);
+
+    for (i = 0; i < chain.length; i += 1) {
+        element = chain[i];
+
+        initialize_document(element);
+
+        if (has_own(element.members, document.name)) {
+            report_error(
+                "Name is not unique",
+                document.path,
+                undefined,
+                document.name
+            );
+            return;
+        }
+    }
+
+    parent.members[document.name] = document;
+    document.parent = parent;
+}
+
+function get_document_chain(document) {
+    var result;
+    var current;
+
+    result = [];
+    current = document;
+
+    while (current) {
+        result.push(current);
+        current = current.parent;
+    }
+
+    return result;
+}
+
+async function read_children(node) {
+    var result;
+    var i;
+    var child_path;
+    var child;
+
+    if (!node.children) {
+        return [];
+    }
+
+    result = [];
+
+    for (i = 0; i < node.children.length; i += 1) {
+        child_path = node.children[i];
+        child = await read_object(child_path);
+
+        if (child && (child.type === "drakon" || child.type === "folder")) {
+            result.push(child);
+        }
+    }
+
+    return result;
+}
+
+async function read_folder(parent, folder) {
+    var children;
+    var module;
+    var class_doc;
+    var other_children;
+    var i;
+    var child;
+
+    children = await read_children(folder);
+
+    module = find_by_name(children, "module");
+    class_doc = find_by_name(children, "class");
+    other_children = filter_not_module_or_class(children);
+
+    if (module) {
+        report_error(
+            "module not expected here",
+            module.path,
+            undefined,
+            undefined
+        );
+    }
+
+    if (class_doc) {
+        class_doc.name = folder.name;
+        class_doc.type = "class";
+        add_document(parent, class_doc);
+        parent = class_doc;
+    }
+
+    for (i = 0; i < other_children.length; i += 1) {
+        child = other_children[i];
+
+        if (child.type === "folder") {
+            await read_folder(parent, child);
+        } else {
+            add_document(parent, child);
+        }
+    }
+}
+
+async function read_object(handle) {
+    var node;
+
+    node = await global_options.getObjectByHandle(handle);
+
+    if (node && node.type === "drakon") {
+        if (!node.keywords) {
+            node.keywords = {};
+        }
+
+        if (!node.items) {
+            node.items = {};
+        }
+    }
+
+    return node;
+}
+
+function report_error(message, handle, item_id, data) {
+    error_list.push({
+        message: message,
+        filename: handle,
+        nodeId: item_id,
+        data: data
+    });
+}
+
+function find_by_name(list, name) {
+    var i;
+    var item;
+
+    for (i = 0; i < list.length; i += 1) {
+        item = list[i];
+
+        if (item.name === name) {
+            return item;
+        }
+    }
+
+    return undefined;
+}
+
+function filter_name_not(list, name) {
+    var result;
+    var i;
+    var item;
+
+    result = [];
+
+    for (i = 0; i < list.length; i += 1) {
+        item = list[i];
+
+        if (item.name !== name) {
+            result.push(item);
+        }
+    }
+
+    return result;
+}
+
+function filter_not_module_or_class(list) {
+    var result;
+    var i;
+    var item;
+
+    result = [];
+
+    for (i = 0; i < list.length; i += 1) {
+        item = list[i];
+
+        if (item.name !== "module" && item.name !== "class") {
+            result.push(item);
+        }
+    }
+
+    return result;
+}
+
+function has_own(map, key) {
+    return Object.prototype.hasOwnProperty.call(map, key);
+}
+
+module.exports = {
+    read_project: read_project
+};
+},{}],10:[function(require,module,exports){
+"use strict";
+
+var global_options = undefined;
+var error_list = [];
+
+function add_action(content, body, final) {
+    var item;
+
+    item = {
+        type: "action",
+        content: content,
+        final: final || false
+    };
+
+    body.push(item);
+}
+
+function add_class_exports(exported, body) {
+    var name;
+
+    add_empty_line(body);
+
+    for (name of exported) {
+        add_action(
+            "self." + name + " = " + name,
+            body
+        );
+    }
+
+    add_action(
+        "return self",
+        body
+    );
+}
+
+function add_empty_line(body) {
+    var item;
+
+    item = {
+        type: "empty-line"
+    };
+
+    body.push(item);
+}
+
+function add_module_exports(exported, body) {
+    var lines;
+    var name;
+    var export_body;
+    var content;
+
+    add_empty_line(body);
+
+    lines = [];
+    for (name of exported) {
+        lines.push("    " + name + " = " + name);
+    }
+
+    export_body = lines.join(",\n");
+    content = "return {\n" + export_body + "\n}";
+
+    add_action(
+        content,
+        body
+    );
+}
+
+function add_self(doc, fun_node) {
+    var content;
+
+    content = "local self = {_type=\"" + doc.name + "\"}";
+    add_action(content, fun_node.body);
+}
+
+function add_subfunction(doc, entry_id, body, start_state) {
+    var sub;
+    var raw_tree;
+    var first;
+    var context;
+
+    sub = build_subfunction(
+        doc,
+        entry_id,
+        start_state
+    );
+
+    if (!(error_list.length === 0)) {
+        return;
+    }
+
+    raw_tree = drakon_to_tree(
+        sub,
+        true
+    );
+
+    if (raw_tree.branches.length === 1) {
+        first = raw_tree.branches[0];
+
+        context = {
+            doc: sub,
+            simple: true,
+            branches: raw_tree.branches,
+            state_var: "me.state"
+        };
+
+        convert_tree(
+            context,
+            first.body,
+            body
+        );
+    } else {
+        context = {
+            doc: sub,
+            simple: false,
+            branches: raw_tree.branches,
+            state_var: "me.state"
+        };
+
+        complex_silhouette_to_tree(
+            context,
+            body
+        );
+    }
+}
+
+function build_function_tree(doc) {
+    var fun_node;
+    var names;
+    var name;
+    var exported;
+    var member;
+    var member_node;
+
+    fun_node = create_function_node(doc);
+
+    names = Object.keys(doc.members);
+    names.sort();
+
+    for (name of names) {
+        add_action("local " + name, fun_node.body);
+    }
+
+    if (is_machine(doc)) {
+        build_machine(
+            doc,
+            fun_node
+        );
+    } else {
+        build_normal_function(
+            doc,
+            fun_node
+        );
+    }
+
+    exported = [];
+
+    for (name of names) {
+        member = doc.members[name];
+
+        if (member.keywords.export) {
+            exported.push(name);
+        }
+
+        member_node = build_function_tree(member);
+        fun_node.body.push(member_node);
+    }
+
+    if (doc.type === "class") {
+        add_class_exports(exported, fun_node.body);
+    } else {
+        if (doc.type === "module") {
+            add_module_exports(exported, fun_node.body);
+        }
+    }
+
+    return fun_node;
+}
+
+function build_machine(doc, fun_node) {
+    var first_id;
+    var me_node;
+    var run;
+    var error_node;
+    var state_check;
+    var set_state_node;
+    var messages;
+    var message;
+    var message_method;
+    var stop_node;
+    var return_node;
+
+    first_id = find_first_node(doc);
+
+    declare_variables(
+        doc.scope,
+        fun_node.body
+    );
+
+    me_node = {
+        type: "action",
+        content: "local me = {state = \"created\", _buzy = true}"
+    };
+
+    fun_node.body.push(me_node);
+
+    run = create_function(
+        "run",
+        [],
+        "me"
+    );
+
+    error_node = {
+        type: "action",
+        content: "error(\"run() can be called only once\")"
+    };
+
+    state_check = {
+        type: "question",
+        content: "me.state ~= \"created\"",
+        yes: [error_node],
+        no: []
+    };
+
+    run.body.push(state_check);
+
+    set_state_node = {
+        type: "action",
+        content: "me.state = \"" + first_id + "\""
+    };
+
+    run.body.push(set_state_node);
+
+    add_subfunction(
+        doc,
+        first_id,
+        run.body,
+        first_id
+    );
+
+    fun_node.body.push(run);
+
+    messages = Object.keys(doc.messages);
+    messages.sort();
+
+    for (message of messages) {
+        message_method = build_message_method(
+            doc,
+            message
+        );
+
+        fun_node.body.push(message_method);
+    }
+
+    stop_node = {
+        type: "action",
+        content: "me.stop = function() me.state = nil end"
+    };
+
+    fun_node.body.push(stop_node);
+
+    return_node = {
+        type: "action",
+        content: "return me"
+    };
+
+    fun_node.body.push(return_node);
+}
+
+function build_message_method(doc, message) {
+    var message_info;
+    var method;
+    var error_node;
+    var state_check;
+    var switch_node;
+    var index;
+    var state_id;
+    var entry_id;
+    var option;
+    var reset_state;
+
+    message_info = doc.messages[message];
+
+    method = create_function(
+        message,
+        message_info.args,
+        "me"
+    );
+
+    error_node = {
+        type: "action",
+        content: "error(\"Synchronous reentry is not allowed\")"
+    };
+
+    state_check = {
+        type: "question",
+        content: "me._buzy",
+        yes: [error_node],
+        no: []
+    };
+
+    method.body.push(state_check);
+
+    switch_node = {
+        type: "if-switch",
+        options: [],
+        other: []
+    };
+
+    method.body.push(switch_node);
+
+    for (index = 0; index < message_info.states.length; index++) {
+        state_id = message_info.states[index];
+        entry_id = message_info.items[index];
+
+        option = {
+            type: "option",
+            condition: "me.state == \"" + state_id + "\"",
+            body: []
+        };
+
+        reset_state = {
+            type: "action",
+            content: "me._buzy = true"
+        };
+
+        option.body.push(reset_state);
+
+        add_subfunction(
+            doc,
+            entry_id,
+            option.body,
+            state_id
+        );
+
+        switch_node.options.push(option);
+    }
+
+    return method;
+}
+
+function build_module_tree(module, options) {
+    var tree;
+
+    global_options = options;
+    error_list = [];
+
+    tree = build_function_tree(module);
+
+    if (error_list.length === 0) {
+        return {
+            module: tree
+        };
+    } else {
+        return {
+            errors: error_list
+        };
+    }
+}
+
+function build_normal_function(doc, fun_node) {
+    var raw_tree;
+    var first;
+    var context;
+
+    raw_tree = drakon_to_tree(
+        doc,
+        false
+    );
+
+    if (doc.type === "class") {
+        add_self(doc, fun_node);
+    }
+
+    if (raw_tree.branches.length === 0) {
+        return;
+    }
+
+    first = raw_tree.branches[0];
+
+    if (raw_tree.branches.length === 1) {
+        declare_variables(
+            doc.scope,
+            fun_node.body
+        );
+
+        context = {
+            doc: doc,
+            simple: true
+        };
+
+        convert_tree(
+            context,
+            first.body,
+            fun_node.body
+        );
+    } else {
+        if (is_simple_silhouette(raw_tree)) {
+            declare_variables(
+                doc.scope,
+                fun_node.body
+            );
+
+            context = {
+                doc: doc,
+                simple: true,
+                branches: raw_tree.branches
+            };
+
+            convert_tree(
+                context,
+                first.body,
+                fun_node.body
+            );
+        } else {
+            doc.scope.declarations["_branch_"] = "local";
+
+            declare_variables(
+                doc.scope,
+                fun_node.body
+            );
+
+            add_action("_branch_ = \"" + first.name + "\"", fun_node.body);
+
+            context = {
+                doc: doc,
+                simple: false,
+                branches: raw_tree.branches,
+                state_var: "_branch_"
+            };
+
+            complex_silhouette_to_tree(context, fun_node.body);
+        }
+    }
+}
+
+function build_subfunction(doc, entry_id, start_state) {
+    var subfunction;
+    var context;
+
+    subfunction = {
+        name: doc.name,
+        path: doc.path,
+        items: {}
+    };
+
+    context = {
+        doc: doc,
+        input: doc.items,
+        output: subfunction.items
+    };
+
+    traverse_graph(
+        context,
+        entry_id,
+        copy_subfunction_node
+    );
+
+    subfunction.items["sub-start"] = {
+        type: "branch",
+        branchId: 0,
+        content: start_state,
+        one: entry_id
+    };
+
+    return subfunction;
+}
+
+function complex_silhouette_to_tree(context, body) {
+    var state_var;
+    var loop;
+    var switch_node;
+    var branch;
+    var condition;
+    var option;
+
+    state_var = context.state_var;
+
+    loop = {
+        type: "loop",
+        content: "while " + state_var + " do",
+        body: []
+    };
+
+    body.push(loop);
+
+    switch_node = {
+        type: "if-switch",
+        options: [],
+        other: []
+    };
+
+    loop.body.push(switch_node);
+
+    for (branch of context.branches) {
+        condition = state_var + " == \"" + branch.name + "\"";
+
+        option = {
+            type: "option",
+            condition: condition,
+            body: []
+        };
+
+        switch_node.options.push(option);
+
+        convert_tree(context, branch.body, option.body);
+    }
+
+    add_action("return", switch_node.other, true);
+}
+
+function convert_tree(context, nodes, body) {
+    var node;
+    var content;
+    var final;
+    var item;
+    var state_id;
+    var next_branch;
+
+    for (node of nodes) {
+        if (node.type === "action") {
+            content = node.content;
+            final = is_final(context.doc, node);
+
+            item = {
+                content: content,
+                type: node.type,
+                final: final
+            };
+
+            body.push(item);
+        } else {
+            if (node.type === "event") {
+                state_id = node.content;
+                content = "me.state = \"" + state_id + "\"\nme._buzy = false\nreturn";
+
+                item = {
+                    content: content,
+                    type: "action",
+                    final: true
+                };
+
+                body.push(item);
+            } else {
+                if (node.type === "question") {
+                    content = qc(node.content);
+
+                    item = {
+                        content: content,
+                        type: node.type,
+                        yes: [],
+                        no: []
+                    };
+
+                    convert_tree(context, node.yes, item.yes);
+                    convert_tree(context, node.no, item.no);
+
+                    body.push(item);
+                } else {
+                    if (node.type === "loop") {
+                        content = node.content || "while true do";
+
+                        item = {
+                            type: "loop",
+                            content: content,
+                            body: []
+                        };
+
+                        convert_tree(context, node.body, item.body);
+
+                        body.push(item);
+                    } else {
+                        if (node.type === "address") {
+                            if (!has_final(body)) {
+                                if (context.simple) {
+                                    next_branch = find_branch(context.branches, node.content);
+                                    convert_tree(context, next_branch.body, body);
+                                } else {
+                                    add_action(context.state_var + " = \"" + node.content + "\"", body);
+                                }
+                            }
+                        } else {
+                            if (node.type === "break") {
+                                if (!has_final(body)) {
+                                    add_action("break", body, true);
+                                }
+                            } else {
+                                if (node.type === "error") {
+                                    add_action(
+                                        "error(\"" + node.message + ": \" .. tostring(" + node.content + "))",
+                                        body,
+                                        true
+                                    );
+                                } else {
+                                    report_error(
+                                        "Unexpected node type: " + node.type,
+                                        context.doc.path,
+                                        node.id
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+function copy_subfunction_node(context, node_id, node) {
+    if (node.type === "sinput" || (node.type === "select" && node.content === "receive")) {
+        context.output[node_id] = {
+            type: "event",
+            content: node_id,
+            final: true
+        };
+
+        return false;
+    } else {
+        if (node.type === "arrow-loop" || node.type === "loopbegin") {
+            report_error(
+                "This item is not allowed in a state machine",
+                context.doc.path,
+                node_id
+            );
+        } else {
+            context.output[node_id] = node;
+            return true;
+        }
+    }
+}
+
+function create_function(name, args, self_name) {
+    return {
+        type: "function",
+        name: name,
+        args: args,
+        self_name: self_name,
+        body: []
+    };
+}
+
+function create_function_node(doc) {
+    return {
+        type: "function",
+        name: doc.name,
+        args: doc.args,
+        body: []
+    };
+}
+
+function declare_variables(scope, body) {
+    var locals;
+    var name;
+    var type;
+    var content;
+
+    locals = [];
+
+    for (name in scope.declarations) {
+        type = scope.declarations[name];
+
+        if (type === "local") {
+            locals.push(name);
+        }
+    }
+
+    if (locals.length !== 0) {
+        locals.sort();
+        content = "local " + locals.join(", ");
+        add_action(content, body);
+    }
+}
+
+function drakon_to_tree(doc, noLoop) {
+    var tmp;
+    var json;
+    var options;
+    var raw_tree_json;
+
+    tmp = {
+        items: doc.items
+    };
+
+    json = JSON.stringify(tmp);
+
+    options = {
+        noLoop: noLoop
+    };
+
+    raw_tree_json = global_options.toTree(
+        json,
+        doc.name,
+        doc.path,
+        "en",
+        options
+    );
+
+    return JSON.parse(raw_tree_json);
+}
+
+function find_first_node(doc) {
+    var branches;
+    var item_id;
+    var branch;
+    var first;
+
+    branches = [];
+
+    for (item_id of doc.branches) {
+        branch = doc.items[item_id];
+        branches.push(branch);
+    }
+
+    branches.sort(function (left, right) {
+        return left.branchId - right.branchId;
+    });
+
+    first = branches[0];
+    return first.one;
+}
+
+function has_final(body) {
+    var last;
+
+    if (body.length === 0) {
+        return false;
+    } else {
+        last = body[body.length - 1];
+        return last.final;
+    }
+}
+
+function is_final(doc, node) {
+    var item;
+    var last;
+
+    if (node.id) {
+        item = doc.items[node.id];
+
+        if (item.statements && item.statements.length !== 0) {
+            last = item.statements[item.statements.length - 1];
+
+            if (last.type === "ReturnStatement") {
+                return true;
+            } else {
+                if (
+                    last.type === "CallStatement" &&
+                    last.expression.type === "CallExpression" &&
+                    last.expression.base.type === "Identifier" &&
+                    last.expression.base.name === "error"
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+function is_machine(doc) {
+    if (doc.states.length === 0) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+function is_simple_silhouette(raw_tree) {
+    var branch;
+    var last;
+    var node;
+
+    for (branch of raw_tree.branches) {
+        if (branch.refs > 1) {
+            return false;
+        }
+    }
+
+    last = raw_tree.branches[raw_tree.branches.length - 1];
+
+    if (last.body.length === 0) {
+        return true;
+    } else {
+        if (last.body.length === 1) {
+            node = last.body[0];
+            return node.type === "action";
+        } else {
+            return false;
+        }
+    }
+}
+
+function qc(content) {
+    var operand;
+    var left;
+    var right;
+
+    if (typeof content === "string") {
+        return content;
+    } else {
+        if (content.operator === "not") {
+            operand = qc(content.operand);
+            return "not (" + operand + ")";
+        } else {
+            if (content.operator === "and") {
+                left = qc(content.left);
+                right = qc(content.right);
+                return "(" + left + ") and (" + right + ")";
+            } else {
+                if (content.operator === "or") {
+                    left = qc(content.left);
+                    right = qc(content.right);
+                    return "(" + left + ") or (" + right + ")";
+                } else {
+                    if (content.operator !== "equal") {
+                        throw new Error("Unexpected case value: " + content.operator);
+                    }
+
+                    left = qc(content.left);
+                    right = qc(content.right);
+                    return left + " == " + right;
+                }
+            }
+        }
+    }
+}
+
+function report_error(message, handle, item_id, data) {
+    error_list.push({
+        message: message,
+        filename: handle,
+        nodeId: item_id,
+        data: data
+    });
+}
+
+function find_branch(branches, name) {
+    var branch;
+
+    for (branch of branches) {
+        if (branch.name === name) {
+            return branch;
+        }
+    }
+
+    return undefined;
+}
+
+function traverse_graph(context, first_node_id, visitor) {
+    var visited;
+
+    visited = {};
+    traverse_graph_node(context, first_node_id, visitor, visited);
+}
+
+function traverse_graph_node(context, node_id, visitor, visited) {
+    var node;
+    var should_continue;
+
+    if (node_id === undefined || node_id === null) {
+        return;
+    }
+
+    if (node_id in visited) {
+        return;
+    }
+
+    visited[node_id] = true;
+
+    node = context.input[node_id];
+    if (!node) {
+        return;
+    }
+
+    should_continue = visitor(context, node_id, node);
+
+    if (should_continue === false) {
+        return;
+    }
+
+    traverse_graph_node(context, node.one, visitor, visited);
+    traverse_graph_node(context, node.two, visitor, visited);
+}
+
+module.exports = {
+    build_module_tree: build_module_tree
+};
+},{}],11:[function(require,module,exports){
 function topologicaSort(start, getAdjacentNodes, reportError) {
     var context = {
         permanent: {},
@@ -4934,7 +7167,7 @@ function topologicaSortCore(context, key, crumbs) {
 module.exports = {
     topologicaSort
 }
-},{}],7:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 function findFirst(array, predicate) {
     for (var item of array) {
         if (predicate(item)) {
