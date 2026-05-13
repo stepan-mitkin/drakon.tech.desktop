@@ -4996,116 +4996,73 @@ function Lua2604Generator(options) {
 
 module.exports = { Lua2604Generator };
 },{"./lua2604/parser":7,"./lua2604/printer":8,"./lua2604/reader":9,"./lua2604/tree":10}],7:[function(require,module,exports){
-"use strict";
-
-var error_list = [];
 var global_options = undefined;
-var next_id = 1;
-
-function parse_items(doc, options) {
-    error_list = [];
-    global_options = options;
-    next_id = 1;
-
-    traverse_document_tree(doc, parse_items_in_document);
-
-    if (error_list.length === 0) {
-        process_assignments(doc, undefined);
-    }
-
-    return {
-        errors: error_list
-    };
-}
-
-function traverse_document_tree(doc, visitor) {
-    var name = undefined;
-
-    if (!doc) {
-        return;
-    }
-
-    visitor(doc);
-
-    if (!doc.members) {
-        return;
-    }
-
-    for (name in doc.members) {
-        if (name in doc.members) {
-            traverse_document_tree(doc.members[name], visitor);
-        }
-    }
-}
+var error_list = [];
+var next_id = 0;
 
 function add_signature(doc, item_id, item, state_id) {
     var expr = item.value;
-    var message = undefined;
-    var args = [];
-    var argument = undefined;
-    var arg_str = undefined;
-    var message_info = undefined;
-    var i = 0;
+    var message;
+    var args;
+    var arg_str;
+    var message_info;
+    var i;
+    var argument;
 
-    if (
-        !expr ||
-        expr.type !== "CallExpression" ||
-        !expr.base ||
-        expr.base.type !== "Identifier"
-    ) {
+    if (expr && ((expr.type === "CallExpression" && expr.base) && expr.base.type === "Identifier")) {
+        message = expr.base.name;
+        args = [];
+
+        for (i = 0; i < expr.arguments.length; i++) {
+            argument = expr.arguments[i];
+
+            if (argument.type === "Identifier") {
+                args.push(argument.name);
+            } else {
+                report_error(
+                    "Only identifiers are allowed in incoming messages",
+                    doc.path,
+                    item_id
+                );
+                return null;
+            }
+        }
+
+        arg_str = args.join(",");
+
+        if (message in doc.messages) {
+            message_info = doc.messages[message];
+
+            if (message_info.arg_str === arg_str) {
+                message_info.states.push(state_id);
+                message_info.items.push(item.one);
+            } else {
+                report_error(
+                    "Signature mismatch in incoming message",
+                    doc.path,
+                    item_id
+                );
+            }
+        } else {
+            doc.messages[message] = {
+                message: message,
+                args: args,
+                arg_str: arg_str,
+                states: [state_id],
+                items: [item.one]
+            };
+        }
+
+        item.message = message;
+        return message;
+    } else {
         report_error(
             "A function call expression is expected here",
             doc.path,
             item_id
         );
-        return undefined;
+        return null;
     }
-
-    message = expr.base.name;
-
-    for (i = 0; i < expr.arguments.length; i++) {
-        argument = expr.arguments[i];
-
-        if (argument.type === "Identifier") {
-            args.push(argument.name);
-        } else {
-            report_error(
-                "Only identifiers are allowed in incoming messages",
-                doc.path,
-                item_id
-            );
-            return undefined;
-        }
-    }
-
-    arg_str = args.join(",");
-
-    if (message in doc.messages) {
-        message_info = doc.messages[message];
-
-        if (message_info.arg_str === arg_str) {
-            message_info.states.push(state_id);
-            message_info.items.push(item.one);
-        } else {
-            report_error(
-                "Signature mismatch in incoming message",
-                doc.path,
-                item_id
-            );
-            return undefined;
-        }
-    } else {
-        doc.messages[message] = {
-            message: message,
-            args: args,
-            arg_str: arg_str,
-            states: [state_id],
-            items: [item.one]
-        };
-    }
-
-    item.message = message;
-    return message;
 }
 
 function can_declare(doc) {
@@ -5131,25 +5088,16 @@ function extract_expression(context) {
     var doc = context.doc;
     var item_id = context.item_id;
     var item = context.item;
-    var var_name = undefined;
-    var statements = undefined;
+    var var_name;
 
-    if (item.value.type !== "Identifier") {
+    if (!(item.value.type === "Identifier")) {
         var_name = generate_random_var_name();
         doc.scope.declarations[var_name] = "local";
-
-        statements = parse_statements({
-            doc: doc,
-            item_id: item_id,
-            item: item,
-            content: var_name + " = " + item.content
-        });
 
         insert_action_before(
             doc,
             item_id,
-            var_name + " = " + item.content,
-            statements
+            var_name + " = " + item.content
         );
 
         item.value = create_identifier(var_name);
@@ -5160,7 +5108,7 @@ function extract_expression(context) {
 function find_cases(context) {
     var item = context.item;
     var current_case_id = item.one;
-    var case_item = undefined;
+    var case_item;
 
     item.cases = [];
 
@@ -5177,7 +5125,7 @@ function find_cases(context) {
 
 function find_declaration(step, name) {
     var current = step;
-    var role = undefined;
+    var role;
 
     while (true) {
         if (current) {
@@ -5189,7 +5137,7 @@ function find_declaration(step, name) {
                 current = current.parent;
             }
         } else {
-            return undefined;
+            return null;
         }
     }
 }
@@ -5197,7 +5145,7 @@ function find_declaration(step, name) {
 function find_loop_end(doc, item_id, item) {
     var depth = 1;
     var current_id = item.one;
-    var current_item = undefined;
+    var current_item;
 
     while (true) {
         if (current_id) {
@@ -5222,7 +5170,7 @@ function find_loop_end(doc, item_id, item) {
                 doc.path,
                 item_id
             );
-            return undefined;
+            return null;
         }
     }
 }
@@ -5233,9 +5181,9 @@ function generate_random_var_name() {
 }
 
 function get_messages_from_cases(doc, state_id, select) {
-    var i = 0;
-    var case_id = undefined;
-    var item = undefined;
+    var i;
+    var case_id;
+    var item;
 
     for (i = 0; i < select.cases.length; i++) {
         case_id = select.cases[i];
@@ -5251,25 +5199,23 @@ function get_messages_from_cases(doc, state_id, select) {
 }
 
 function insert_action_before(doc, item_id, content, statements) {
-    var new_item_id = undefined;
-    var id = undefined;
-    var other_item = undefined;
-    var item = undefined;
+    var new_item_id;
+    var id;
+    var other_item;
+    var item;
 
     next_id++;
     new_item_id = item_id + "_" + next_id;
 
     for (id in doc.items) {
-        if (id in doc.items) {
-            other_item = doc.items[id];
+        other_item = doc.items[id];
 
-            if (other_item.one === item_id) {
-                other_item.one = new_item_id;
-            }
+        if (other_item.one === item_id) {
+            other_item.one = new_item_id;
+        }
 
-            if (other_item.two === item_id) {
-                other_item.two = new_item_id;
-            }
+        if (other_item.two === item_id) {
+            other_item.two = new_item_id;
         }
     }
 
@@ -5283,19 +5229,42 @@ function insert_action_before(doc, item_id, content, statements) {
     doc.items[new_item_id] = item;
 }
 
+function is_iter(content) {
+    var parts;
+
+    if (content && content.startsWith("fun.iter")) {
+        return true;
+    } else {
+        if (content && content.endsWith(")")) {
+            return false;
+        } else {
+            parts = content ? content.split(",") : [];
+
+            if (parts.length > 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}
+
 function parse_arguments(doc) {
-    var lines = undefined;
-    var args = [];
-    var i = 0;
-    var arg = undefined;
+    var lines;
+    var args;
+    var i;
+    var line;
+    var arg;
 
     if (doc.params) {
         lines = doc.params.split(/\r?\n/);
+        args = [];
 
         for (i = 0; i < lines.length; i++) {
-            arg = lines[i].trim();
+            line = lines[i];
+            arg = line.trim();
 
-            if (arg !== "") {
+            if (!(arg === "")) {
                 if (args.indexOf(arg) !== -1) {
                     report_error(
                         "Argument is not unique",
@@ -5310,7 +5279,8 @@ function parse_arguments(doc) {
         }
 
         for (i = 0; i < args.length; i++) {
-            doc.scope.declarations[args[i]] = "arg";
+            arg = args[i];
+            doc.scope.declarations[arg] = "arg";
         }
 
         doc.args = args;
@@ -5329,92 +5299,88 @@ function parse_item(doc, item_id, item) {
     };
 
     if (item.type === "action") {
-        if (content !== "") {
+        if (!(content === "")) {
             item.statements = parse_statements(context);
         }
-    } else {
-        if (item.type === "question") {
-            if (content === "") {
-                report_error(
-                    "Icon cannot be empty",
-                    doc.path,
-                    item_id
-                );
-            } else {
-                item.value = parse_value(context);
+    } else if (item.type === "question") {
+        if (content === "") {
+            report_error("Icon cannot be empty", doc.path, item_id);
+        } else {
+            item.value = parse_value(context);
+        }
+    } else if (item.type === "select") {
+        parse_select(context);
+    } else if (item.type === "case") {
+        if (content === "") {
+            if (item.two) {
+                report_error("Icon cannot be empty", doc.path, item_id);
             }
         } else {
-            if (item.type === "select") {
-                parse_select(context);
-            } else {
-                if (item.type === "case") {
-                    if (content === "") {
-                        if (item.two) {
-                            report_error(
-                                "Icon cannot be empty",
-                                doc.path,
-                                item_id
-                            );
-                        }
-                    } else {
-                        item.value = parse_value(context);
-                    }
-                } else {
-                    if (item.type === "loopbegin") {
-                        if (content === "") {
-                            report_error(
-                                "Icon cannot be empty",
-                                doc.path,
-                                item_id
-                            );
-                        } else {
-                            parse_loop(context);
-                        }
-                    } else {
-                        if (item.type === "sinput") {
-                            if (content === "") {
-                                report_error(
-                                    "Icon cannot be empty",
-                                    doc.path,
-                                    item_id
-                                );
-                            } else {
-                                parse_sinput(context);
-                            }
-                        } else {
-                            if (item.type === "branch") {
-                                doc.branches.push(item_id);
-                            }
-                        }
-                    }
-                }
-            }
+            item.value = parse_value(context);
+        }
+    } else if (item.type === "loopbegin") {
+        if (content === "") {
+            report_error("Icon cannot be empty", doc.path, item_id);
+        } else {
+            parse_loop(context);
+        }
+    } else if (item.type === "sinput") {
+        if (content === "") {
+            report_error("Icon cannot be empty", doc.path, item_id);
+        } else {
+            parse_sinput(context);
+        }
+    } else if (item.type === "branch") {
+        doc.branches.push(item_id);
+    }
+}
+
+function parse_items(doc, options) {
+    global_options = options;
+    error_list = [];
+    next_id = 0;
+
+    traverse_document_tree(doc);
+
+    if (error_list.length === 0) {
+        process_assignments(
+            doc,
+            null
+        );
+    }
+
+    return {
+        errors: error_list
+    };
+}
+
+function traverse_document_tree(doc) {
+    var key;
+    var member;
+
+    parse_items_in_document(doc);
+
+    if (doc.members) {
+        for (key in doc.members) {
+            member = doc.members[key];
+            traverse_document_tree(member);
         }
     }
 }
 
 function parse_items_in_document(doc) {
-    var item_ids = undefined;
-    var i = 0;
-    var item_id = undefined;
-    var item = undefined;
+    var item_ids;
+    var i;
+    var item_id;
+    var item;
 
     doc.scope = {
-        declarations: {},
-        name: doc.name
+        name: doc.name,
+        declarations: {}
     };
-
     doc.messages = {};
     doc.states = [];
     doc.branches = [];
-
-    if (!doc.items) {
-        doc.items = {};
-    }
-
-    if (!doc.members) {
-        doc.members = {};
-    }
 
     parse_arguments(doc);
 
@@ -5435,117 +5401,127 @@ function parse_loop(context) {
     var item = context.item;
     var content = context.content;
     var parts = content.split(";");
-    var left = undefined;
-    var vars = undefined;
-    var expression = undefined;
-    var expression_context = undefined;
-    var ast1 = undefined;
-    var ast2 = undefined;
-    var ast3 = undefined;
-    var end_id = undefined;
 
     if (parts.length === 2) {
-        left = parts[0].trim();
-        expression = parts[1].trim();
-        vars = left.split(",");
-
-        if (vars.length === 1) {
-            item.var1 = vars[0].trim();
-            doc.scope.declarations[item.var1] = "loop";
-            item.content = expression;
-            item.subtype = "array";
-
-            expression_context = {
-                doc: doc,
-                item_id: item_id,
-                item: item,
-                content: expression
-            };
-
-            item.value = parse_value(expression_context);
-            extract_expression(expression_context);
-
-            item.content = "for _, " + item.var1 + " in ipairs(" + item.content + ") do";
-        } else {
-            if (vars.length === 2) {
-                item.var1 = vars[0].trim();
-                doc.scope.declarations[item.var1] = "loop";
-                item.var2 = vars[1].trim();
-                doc.scope.declarations[item.var2] = "loop";
-
-                item.content = expression;
-                item.subtype = "map";
-
-                expression_context = {
-                    doc: doc,
-                    item_id: item_id,
-                    item: item,
-                    content: expression
-                };
-
-                item.value = parse_value(expression_context);
-                extract_expression(expression_context);
-
-                item.content = "for " + item.var1 + ", " + item.var2 + " in pairs(" + item.content + ") do";
-            } else {
-                report_error(
-                    "Bad format",
-                    doc.path,
-                    item_id
-                );
-            }
-        }
+        parse_iterator_loop(doc, item_id, item, parts);
+    } else if (parts.length === 3) {
+        parse_for_loop(doc, item_id, item, parts);
     } else {
-        if (parts.length === 3) {
-            item.subtype = "for";
+        report_error(
+            "Bad format",
+            doc.path,
+            item_id
+        );
+    }
+}
 
-            ast1 = parse_statements({
-                doc: doc,
-                item_id: item_id,
-                item: item,
-                content: parts[0].trim()
-            });
+function parse_iterator_loop(doc, item_id, item, parts) {
+    var variables = parts[0].split(",");
+    var expression = parts[1].trim();
+    var collection;
 
-            ast2 = parse_value({
-                doc: doc,
-                item_id: item_id,
-                item: item,
-                content: parts[1].trim()
-            });
+    if (variables.length === 1) {
+        item.var1 = variables[0].trim();
+        doc.scope.declarations[item.var1] = "loop";
+        item.content = expression;
+        item.subtype = "array";
+        item.value = parse_value({
+            doc: doc,
+            item_id: item_id,
+            item: item,
+            content: expression
+        });
 
-            ast3 = parse_statements({
-                doc: doc,
-                item_id: item_id,
-                item: item,
-                content: parts[2].trim()
-            });
-
-            item.content = "while " + parts[1].trim() + " do";
-
-            insert_action_before(
-                doc,
-                item_id,
-                parts[0].trim(),
-                ast1
-            );
-
-            end_id = find_loop_end(doc, item_id, item);
-
-            if (end_id) {
-                insert_action_before(
-                    doc,
-                    end_id,
-                    parts[2].trim(),
-                    ast3
-                );
-            }
+        if (is_iter(item.content)) {
+            collection = item.content;
         } else {
-            report_error(
-                "Bad format",
-                doc.path,
-                item_id
-            );
+            collection = "ipairs(" + item.content + ")";
         }
+
+        item.content = "for _, " + item.var1 + " in " + collection + " do";
+    } else if (variables.length === 2) {
+        item.var1 = variables[0].trim();
+        doc.scope.declarations[item.var1] = "loop";
+
+        item.var2 = variables[1].trim();
+        doc.scope.declarations[item.var2] = "loop";
+
+        item.content = expression;
+        item.subtype = "map";
+        item.value = parse_value({
+            doc: doc,
+            item_id: item_id,
+            item: item,
+            content: expression
+        });
+
+        if (is_iter(item.content)) {
+            collection = item.content;
+        } else {
+            collection = "pairs(" + item.content + ")";
+        }
+
+        item.content = "for " + item.var1 + ", " + item.var2 + " in " + collection + " do";
+    } else {
+        report_error(
+            "Bad format",
+            doc.path,
+            item_id
+        );
+    }
+}
+
+function parse_for_loop(doc, item_id, item, parts) {
+    var expression1 = parts[0].trim();
+    var expression2 = parts[1].trim();
+    var expression3 = parts[2].trim();
+    var ast1;
+    var ast2;
+    var ast3;
+    var end_id;
+
+    item.subtype = "for";
+
+    ast1 = parse_statements({
+        doc: doc,
+        item_id: item_id,
+        item: item,
+        content: expression1
+    });
+
+    ast2 = parse_value({
+        doc: doc,
+        item_id: item_id,
+        item: item,
+        content: expression2
+    });
+
+    ast3 = parse_statements({
+        doc: doc,
+        item_id: item_id,
+        item: item,
+        content: expression3
+    });
+
+    item.value = ast2;
+    item.content = "while " + expression2 + " do";
+
+    insert_action_before(
+        doc,
+        item_id,
+        expression1,
+        ast1
+    );
+
+    end_id = find_loop_end(doc, item_id, item);
+
+    if (end_id) {
+        insert_action_before(
+            doc,
+            end_id,
+            expression3,
+            ast3
+        );
     }
 }
 
@@ -5590,46 +5566,42 @@ function parse_sinput(context) {
 
 function parse_statements(context) {
     var wrapped = "function _wrap_() " + context.content + " end";
-    var ast = undefined;
+    var ast;
 
     try {
         ast = parse_lua(wrapped);
-    } catch (ex) {
+        return ast.body[0].body;
+    } catch (error) {
         report_error(
-            get_error_message(ex),
+            error.message,
             context.doc.path,
             context.item_id
         );
-        return undefined;
+        return null;
     }
-
-    return ast.body[0].body;
 }
 
 function parse_value(context) {
-    var wrapped = undefined;
-    var ast = undefined;
-
-    wrapped = "x=" + context.content;
+    var wrapped = "x=" + context.content;
+    var ast;
 
     try {
         ast = parse_lua(wrapped);
-    } catch (ex) {
+        return ast.body[0].init[0];
+    } catch (error) {
         report_error(
-            get_error_message(ex),
+            error.message,
             context.doc.path,
             context.item_id
         );
-        return undefined;
+        return null;
     }
-
-    return ast.body[0].init[0];
 }
 
 function process_assignment(step, item_id, assignment) {
-    var i = 0;
-    var item = undefined;
-    var var_type = undefined;
+    var i;
+    var item;
+    var var_type;
 
     for (i = 0; i < assignment.variables.length; i++) {
         item = assignment.variables[i];
@@ -5653,11 +5625,11 @@ function process_assignment(step, item_id, assignment) {
 }
 
 function process_assignments(doc, parent) {
-    var step = undefined;
-    var item_id = undefined;
-    var item = undefined;
-    var member_name = undefined;
-    var member = undefined;
+    var step;
+    var item_id;
+    var item;
+    var key;
+    var member;
 
     step = {
         parent: parent,
@@ -5667,34 +5639,37 @@ function process_assignments(doc, parent) {
     };
 
     for (item_id in doc.items) {
-        if (item_id in doc.items) {
-            item = doc.items[item_id];
+        item = doc.items[item_id];
 
-            if (item.type === "action" && item.statements) {
-                scan_assignments(step, item_id, item);
-            }
+        if (item.type === "action" && item.statements) {
+            scan_assignments(step, item_id, item);
         }
     }
 
-    for (member_name in doc.members) {
-        if (member_name in doc.members) {
-            member = doc.members[member_name];
+    if (doc.members) {
+        for (key in doc.members) {
+            member = doc.members[key];
             process_assignments(member, step);
         }
     }
 }
 
 function process_declaration(step, item_id, declaration) {
-    var i = 0;
-    var variable = undefined;
+    var i;
+    var variable;
+    var name;
 
     if (step.declares) {
         for (i = 0; i < declaration.variables.length; i++) {
             variable = declaration.variables[i];
 
-            if (variable.type === "Identifier") {
-                step.scope.declarations[variable.name] = "declared";
+            if (typeof variable === "string") {
+                name = variable;
+            } else {
+                name = variable.name;
             }
+
+            step.scope.declarations[name] = "declared";
         }
     } else {
         report_error(
@@ -5706,9 +5681,9 @@ function process_declaration(step, item_id, declaration) {
 }
 
 function read_cases(doc) {
-    var i = 0;
-    var item_id = undefined;
-    var item = undefined;
+    var i;
+    var item_id;
+    var item;
 
     for (i = 0; i < doc.states.length; i++) {
         item_id = doc.states[i];
@@ -5734,62 +5709,28 @@ function report_error(message, handle, item_id, data) {
 }
 
 function scan_assignments(step, item_id, item) {
-    var i = 0;
-    var statement = undefined;
+    var i;
+    var statement;
+
     for (i = 0; i < item.statements.length; i++) {
         statement = item.statements[i];
 
         if (statement.type === "AssignmentStatement") {
             process_assignment(step, item_id, statement);
-        } else {
-            if (statement.type === "LocalStatement") {
-                process_declaration(step, item_id, statement);
-            }
+        } else if (statement.type === "LocalStatement") {
+            process_declaration(step, item_id, statement);
         }
     }
-}
-
-function get_error_message(ex) {
-    if (!ex) {
-        return "Parse error";
-    }
-
-    if (ex.message) {
-        return ex.message;
-    }
-
-    return String(ex);
 }
 
 module.exports = {
     parse_items: parse_items
 };
-
 },{}],8:[function(require,module,exports){
-"use strict";
-
-function add_line(text, depth, lines) {
-    var indent = "";
-    var i = 0;
-
-    for (i = 0; i < depth * 4; i++) {
-        indent += " ";
-    }
-
-    lines.push(indent + text);
-}
-
 function build_module_code(root, options) {
     var lines = [];
-    var i = 0;
-    var node = undefined;
 
-    if (!root || !root.body) {
-        return { code: "" };
-    }
-
-    for (i = 0; i < root.body.length; i++) {
-        node = root.body[i];
+    for (var node of root.body) {
         print_node(node, 0, lines);
     }
 
@@ -5798,144 +5739,138 @@ function build_module_code(root, options) {
     };
 }
 
-function print_action(node, depth, lines) {
-    var parts = undefined;
-    var i = 0;
-
-    if (!node || !node.content) {
-        return;
-    }
-
-    parts = node.content.split("\n");
-
-    for (i = 0; i < parts.length; i++) {
-        add_line(parts[i], depth, lines);
-    }
+function add_line(context, text) {
+    var depth = context.depth;
+    var lines = context.lines;
+    var indent = " ".repeat(depth * 4);
+    var line = indent + text;
+    lines.push(line);
 }
 
-function print_body(body, depth, lines) {
-    var i = 0;
-
-    if (!body) {
-        return;
-    }
-
-    for (i = 0; i < body.length; i++) {
-        print_node(body[i], depth + 1, lines);
-    }
-}
-
-function print_function(node, depth, lines) {
-    var args = "";
-    var header = "";
-
-    add_line("", depth, lines);
-
-    if (!node) {
-        return;
-    }
-
-    if (node.args) {
-        args = node.args.join(", ");
-    }
-
-    if (node.self_name) {
-        header = node.self_name + "." + node.name + " = function(" + args + ")";
-    } else {
-        header = node.name + " = function(" + args + ")";
-    }
-
-    add_line(header, depth, lines);
-
-    print_body(node.body, depth, lines);
-
-    add_line("end", depth, lines);
-}
-
-function print_loop(node, depth, lines) {
-    if (!node) {
-        return;
-    }
-
-    add_line(node.content || "while true do", depth, lines);
-    print_body(node.body, depth, lines);
-    add_line("end", depth, lines);
-}
-
-function print_question(node, depth, lines) {
-    var parts = undefined;
-    var content = "";
-    var i = 0;
-
-    if (!node) {
-        return;
-    }
+function print_action(context) {
+    var node = context.node;
 
     if (node.content) {
-        parts = node.content.split("\n");
-        content = parts.join(" ");
+        var parts = node.content.split("\n");
+        for (var part of parts) {
+            add_line(context, part);
+        }
     }
-
-    add_line("if " + content + " then", depth, lines);
-
-    print_body(node.yes, depth, lines);
-
-    if (node.no && node.no.length > 0) {
-        add_line("else", depth, lines);
-        print_body(node.no, depth, lines);
-    }
-
-    add_line("end", depth, lines);
 }
 
-function print_switch(node, depth, lines) {
-    var i = 0;
-    var option = undefined;
+function print_body(context, body) {
+    var depth = context.depth;
+    var lines = context.lines;
 
-    if (!node || !node.options || node.options.length === 0) {
-        return;
+    for (var child of body) {
+        print_node(child, depth + 1, lines);
+    }
+}
+
+function print_exit(context) {
+    add_line(context, "me.state = nil");
+    add_line(context, "me._buzy = false");
+    add_line(context, "return");
+}
+
+function print_function(context) {
+    var node = context.node;
+
+    add_line(context, "");
+
+    var args = node.args.join(", ");
+    if (node.self_name) {
+        add_line(context, node.self_name + "." + node.name + " = function(" + args + ")");
+    } else {
+        add_line(context, "function " + node.name + "(" + args + ")");
     }
 
-    for (i = 0; i < node.options.length; i++) {
-        option = node.options[i];
+    print_body(context, node.body);
+    add_line(context, "end");
+}
 
-        if (i === 0) {
-            add_line("if " + option.condition + " then", depth, lines);
-        } else {
-            add_line("elseif " + option.condition + " then", depth, lines);
-        }
+function print_loop(context) {
+    var node = context.node;
 
-        print_body(option.body, depth, lines);
-    }
-
-    if (node.other && node.other.length > 0) {
-        add_line("else", depth, lines);
-        print_body(node.other, depth, lines);
-    }
-
-    add_line("end", depth, lines);
+    add_line(context, node.content);
+    print_body(context, node.body);
+    add_line(context, "end");
 }
 
 function print_node(node, depth, lines) {
-    if (!node) {
-        return;
-    }
+    var context = {
+        node: node,
+        depth: depth,
+        lines: lines
+    };
 
     if (node.type === "function") {
-        print_function(node, depth, lines);
-    } else if (node.type === "action") {
-        print_action(node, depth, lines);
-    } else if (node.type === "question") {
-        print_question(node, depth, lines);
-    } else if (node.type === "loop") {
-        print_loop(node, depth, lines);
-    } else if (node.type === "if-switch") {
-        print_switch(node, depth, lines);
-    } else if (node.type === "empty-line") {
-        add_line("", depth, lines);
+        print_function(context);
     } else {
-        throw new Error("Unexpected node type: " + node.type);
+        if (node.type === "action") {
+            print_action(context);
+        } else {
+            if (node.type === "question") {
+                print_question(context);
+            } else {
+                if (node.type === "loop") {
+                    print_loop(context);
+                } else {
+                    if (node.type === "if-switch") {
+                        print_switch(context);
+                    } else {
+                        if (node.type === "empty-line") {
+                            add_line(context, "");
+                        } else {
+                            if (!(node.type === "exit")) {
+                                throw new Error("Unexpected case value: " + node.type);
+                            }
+                            print_exit(context);
+                        }
+                    }
+                }
+            }
+        }
     }
+}
+
+function print_question(context) {
+    var node = context.node;
+    var parts = node.content.split("\n");
+    var content = parts.join(" ");
+
+    add_line(context, "if " + content + " then");
+    print_body(context, node.yes);
+
+    if (!(node.no.length === 0)) {
+        add_line(context, "else");
+        print_body(context, node.no);
+    }
+
+    add_line(context, "end");
+}
+
+function print_switch(context) {
+    var node = context.node;
+    var first = true;
+
+    for (var option of node.options) {
+        if (first) {
+            add_line(context, "if " + option.condition + " then");
+            first = false;
+        } else {
+            add_line(context, "elseif " + option.condition + " then");
+        }
+
+        print_body(context, option.body);
+    }
+
+    if (!(node.other.length === 0)) {
+        add_line(context, "else");
+        print_body(context, node.other);
+    }
+
+    add_line(context, "end");
 }
 
 module.exports = {
@@ -6373,10 +6308,6 @@ function build_function_tree(doc) {
     names = Object.keys(doc.members);
     names.sort();
 
-    for (name of names) {
-        add_action("local " + name, fun_node.body);
-    }
-
     if (is_machine(doc)) {
         build_machine(
             doc,
@@ -6703,32 +6634,30 @@ function build_subfunction(doc, entry_id, start_state) {
 }
 
 function complex_silhouette_to_tree(context, body) {
-    var state_var;
+    var state_var = context.state_var;
     var loop;
-    var switch_node;
+    var switch_item;
+    var i;
     var branch;
     var condition;
     var option;
 
-    state_var = context.state_var;
-
     loop = {
         type: "loop",
-        content: "while " + state_var + " do",
+        content: "while true do",
         body: []
     };
-
     body.push(loop);
 
-    switch_node = {
+    switch_item = {
         type: "if-switch",
         options: [],
         other: []
     };
+    loop.body.push(switch_item);
 
-    loop.body.push(switch_node);
-
-    for (branch of context.branches) {
+    for (i = 0; i < context.branches.length; i++) {
+        branch = context.branches[i];
         condition = state_var + " == \"" + branch.name + "\"";
 
         option = {
@@ -6736,103 +6665,101 @@ function complex_silhouette_to_tree(context, body) {
             condition: condition,
             body: []
         };
+        switch_item.options.push(option);
 
-        switch_node.options.push(option);
-
+        add_action(state_var + " = nil", option.body, false);
         convert_tree(context, branch.body, option.body);
     }
 
-    add_action("return", switch_node.other, true);
+    add_action("return", switch_item.other, true);
 }
 
 function convert_tree(context, nodes, body) {
-    var node;
-    var content;
-    var final;
-    var item;
-    var state_id;
-    var next_branch;
-
-    for (node of nodes) {
+    for (var node of nodes) {
         if (node.type === "action") {
-            content = node.content;
-            final = is_final(context.doc, node);
-
-            item = {
+            var content = node.content;
+            var final = is_final(context.doc, node);
+            var item = {
                 content: content,
                 type: node.type,
                 final: final
             };
-
             body.push(item);
         } else {
-            if (node.type === "event") {
-                state_id = node.content;
-                content = "me.state = \"" + state_id + "\"\nme._buzy = false\nreturn";
-
-                item = {
-                    content: content,
-                    type: "action",
+            if (node.type === "exit") {
+                var item = {
+                    type: node.type,
                     final: true
                 };
-
                 body.push(item);
             } else {
-                if (node.type === "question") {
-                    content = qc(node.content);
-
-                    item = {
+                if (node.type === "event") {
+                    var state_id = node.content;
+                    var content = "me.state = \"" + state_id + "\"\nme._buzy = false\nreturn";
+                    var final = true;
+                    var item = {
                         content: content,
-                        type: node.type,
-                        yes: [],
-                        no: []
+                        type: "action",
+                        final: final
                     };
-
-                    convert_tree(context, node.yes, item.yes);
-                    convert_tree(context, node.no, item.no);
-
                     body.push(item);
                 } else {
-                    if (node.type === "loop") {
-                        content = node.content || "while true do";
-
-                        item = {
-                            type: "loop",
+                    if (node.type === "question") {
+                        var content = qc(node.content);
+                        var item = {
                             content: content,
-                            body: []
+                            type: node.type,
+                            yes: [],
+                            no: []
                         };
-
-                        convert_tree(context, node.body, item.body);
-
+                        convert_tree(context, node.yes, item.yes);
+                        convert_tree(context, node.no, item.no);
                         body.push(item);
                     } else {
-                        if (node.type === "address") {
-                            if (!has_final(body)) {
-                                if (context.simple) {
-                                    next_branch = find_branch(context.branches, node.content);
-                                    convert_tree(context, next_branch.body, body);
-                                } else {
-                                    add_action(context.state_var + " = \"" + node.content + "\"", body);
-                                }
-                            }
+                        if (node.type === "loop") {
+                            var content = node.content || "while true do";
+                            var item = {
+                                type: "loop",
+                                content: content,
+                                body: []
+                            };
+                            convert_tree(context, node.body, item.body);
+                            body.push(item);
                         } else {
-                            if (node.type === "break") {
+                            if (node.type === "address") {
                                 if (!has_final(body)) {
-                                    add_action("break", body, true);
+                                    if (context.simple) {
+                                        var next_branch = undefined;
+                                        for (var branch of context.branches) {
+                                            if (branch.name === node.content) {
+                                                next_branch = branch;
+                                                break;
+                                            }
+                                        }
+                                        convert_tree(context, next_branch.body, body);
+                                    } else {
+                                        add_action(context.state_var + " = \"" + node.content + "\"", body);
+                                    }
                                 }
                             } else {
-                                if (node.type === "error") {
-                                    add_action(
-                                        "error(\"" + node.message + ": \" .. tostring(" + node.content + "))",
-                                        body,
-                                        true
-                                    );
+                                if (node.type === "break") {
+                                    if (!has_final(body)) {
+                                        add_action("break", body, true);
+                                    }
                                 } else {
-                                    report_error(
-                                        "Unexpected node type: " + node.type,
-                                        context.doc.path,
-                                        node.id
-                                    );
+                                    if (node.type === "error") {
+                                        add_action(
+                                            "error(\"" + node.message + ": \" .. tostring(" + node.content + "))",
+                                            body,
+                                            true
+                                        );
+                                    } else {
+                                        report_error(
+                                            "Unexpected node type: " + node.type,
+                                            context.doc.path,
+                                            node.id
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -6850,7 +6777,6 @@ function copy_subfunction_node(context, node_id, node) {
             content: node_id,
             final: true
         };
-
         return false;
     } else {
         if (node.type === "arrow-loop" || node.type === "loopbegin") {
@@ -6859,9 +6785,18 @@ function copy_subfunction_node(context, node_id, node) {
                 context.doc.path,
                 node_id
             );
+            return false;
         } else {
-            context.output[node_id] = node;
-            return true;
+            if (node.type === "end") {
+                context.output[node_id] = {
+                    type: "exit",
+                    final: false
+                };
+                return false;
+            } else {
+                context.output[node_id] = node;
+                return true;
+            }
         }
     }
 }
