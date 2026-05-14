@@ -14237,6 +14237,7 @@ function toTokens(machines, text) {
 
 function toTokens2(machines, text) {
     var c, category, i, length, machine
+    machine = machines.top()
     length = text.length
     i = 0;
     while (true) {
@@ -14253,7 +14254,6 @@ function toTokens2(machines, text) {
                 machine.onChar("eol")
             } else {
                 category = classifyChar(c)
-                machine = machines.top()
                 machine.onChar(
                     "char",
                     category,
@@ -14264,7 +14264,6 @@ function toTokens2(machines, text) {
         }
         i++;
     }
-    machine = machines.top()
     machine.onChar("finish")
 }
 
