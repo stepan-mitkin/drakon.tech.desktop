@@ -9340,6 +9340,7 @@ function lexInit() {
     saveOpChar("'")
     saveOpChar("\"")
     saveOpChar("`")
+    saveOpChar("~")
     module.ZERO = firstChar("0")
     module.NINE = firstChar("9")
     module.UNDER = firstChar("_")
@@ -9388,6 +9389,7 @@ function lexInit() {
     addLongOp("**")
     addLongOp("??")
     addLongOp("??=")
+    addLongOp("~=")
     module.luakeywords = arrayToSet(["and", "break", "do", "else",
     "elseif", "end", "for", "function", "goto",
     "if", "in", "local", "not", "or",
