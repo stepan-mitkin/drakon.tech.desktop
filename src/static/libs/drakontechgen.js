@@ -4237,6 +4237,9 @@ function Js2604Generator(options) {
     }
     function isSimpleSilhouette(branches) {
         var branch, i;
+        if (branches[0].refs > 0) {
+            return false;
+        }
         for (i = 0; i < branches.length; i++) {
             branch = branches[i];
             if (branch.refs > 1) {
@@ -6939,28 +6942,28 @@ function is_machine(doc) {
 }
 
 function is_simple_silhouette(raw_tree) {
-    var branch;
-    var last;
-    var node;
+    var first_branch = raw_tree.branches[0];
 
-    for (branch of raw_tree.branches) {
+    if (first_branch.refs > 0) {
+        return false;
+    }
+
+    for (var i = 0; i < raw_tree.branches.length; i++) {
+        var branch = raw_tree.branches[i];
+        var is_last = i === raw_tree.branches.length - 1;
+
         if (branch.refs > 1) {
-            return false;
+            if (!is_last) {
+                return false;
+            } else {
+                if (branch.body.length > 1) {
+                    return false;
+                }
+            }
         }
     }
 
-    last = raw_tree.branches[raw_tree.branches.length - 1];
-
-    if (last.body.length === 0) {
-        return true;
-    } else {
-        if (last.body.length === 1) {
-            node = last.body[0];
-            return node.type === "action";
-        } else {
-            return false;
-        }
-    }
+    return true;
 }
 
 function qc(content) {
