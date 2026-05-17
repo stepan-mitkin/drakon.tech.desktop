@@ -4844,7 +4844,7 @@ function validateModuleName(name, language) {
                         // item 3424
                         return null
                     } else {
-                        if (language === "clojure") {
+                        if (language === "clojure" || language === "PFL2605") {
                             if (name.indexOf(" ") !== -1) {
                                 return "ERR_NAME_INVALID_IDENTIFIER"    
                             }

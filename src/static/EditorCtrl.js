@@ -3591,6 +3591,8 @@ function EditorCtrl(window, document, elementId, userId) {
       data.language = "JS";
     } else if (data.language.startsWith("LUA")) {
       data.language = "LUA";
+    } else if (data.language.startsWith("PFL")) {
+      data.language = "PFL";      
     }
     if (data.items) {
     } else {
