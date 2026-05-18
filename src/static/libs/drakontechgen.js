@@ -3135,10 +3135,10 @@ function Js2604Generator(options) {
     gDebugAst = false;
     gById = {};
     function addActionToAst(step, body) {
-        var _collection_139, expr;
+        var _collection_141, expr;
         if (step.content) {
-            _collection_139 = step.content;
-            for (expr of _collection_139) {
+            _collection_141 = step.content;
+            for (expr of _collection_141) {
                 body.push(expr);
             }
         }
@@ -3181,11 +3181,11 @@ function Js2604Generator(options) {
         addDeclaratonsToBody(step);
     }
     function addDeclarationsRecursive(step, folder) {
-        var _collection_170, canDeclare, child, childStep, name;
+        var _collection_174, canDeclare, child, childStep, name;
         addDeclarationsInFunction(step);
-        _collection_170 = folder.children;
-        for (name in _collection_170) {
-            child = _collection_170[name];
+        _collection_174 = folder.children;
+        for (name in _collection_174) {
+            child = _collection_174[name];
             canDeclare = child.type === 'class';
             childStep = createScopeStep(step, name, child.path, child.scope, getFunBody(child.ast), true, canDeclare);
             childStep.canAwait = child.keywords.async;
@@ -3219,11 +3219,11 @@ function Js2604Generator(options) {
         body.push(expr);
     }
     function addEventCase(event, cs) {
-        var _collection_141, arg;
+        var _collection_143, arg;
         cs.consequent.push(parseStatement('_args_=[]'));
         cs.consequent.push(parseStatement('_args_.push("' + event.name + '")'));
-        _collection_141 = event.args;
-        for (arg of _collection_141) {
+        _collection_143 = event.args;
+        for (arg of _collection_143) {
             cs.consequent.push(parseStatement('_args_.push(' + arg + ')'));
         }
         cs.consequent.push(parseStatement('me._busy =true'));
@@ -3254,11 +3254,11 @@ function Js2604Generator(options) {
         }
     }
     function addExports(module, src) {
-        var _collection_204, child, code, dep, deps, exportSrc, exported, line, lines, name, parsed;
+        var _collection_208, child, code, dep, deps, exportSrc, exported, line, lines, name, parsed;
         exported = [];
-        _collection_204 = module.children;
-        for (name in _collection_204) {
-            child = _collection_204[name];
+        _collection_208 = module.children;
+        for (name in _collection_208) {
+            child = _collection_208[name];
             if (child.keywords.export) {
                 exported.push(child.name);
             }
@@ -3330,19 +3330,14 @@ function Js2604Generator(options) {
         body.push(node);
     }
     function addResolveAtEnd(ast) {
-        var body, last;
-        body = ast.body.body;
-        if (body.length === 0) {
-            body.push(parseStatement('_topResolve_()'));
-        } else {
-            last = body[body.length - 1];
-            if (!(last.type === 'ReturnStatement')) {
-                body.push(parseStatement('_topResolve_()'));
+        if (!bodyHasReturn(ast.body)) {
+            if (!ast.sil) {
+                ast.body.body.push(parseStatement('_topResolve_()'));
             }
         }
     }
     function addSelectEvent(folder, item, id) {
-        var _collection_186, caseId, caseItem, content, lines, name;
+        var _collection_190, caseId, caseItem, content, lines, name;
         addLocal(folder.scope, '_eventType_');
         addLocal(folder.scope, '_event_');
         item.content = createIdentifier('_eventType_');
@@ -3355,8 +3350,8 @@ function Js2604Generator(options) {
         content = linesToContent(folder, id, lines);
         insertActionBefore(folder, id, content);
         item.eventNames = [];
-        _collection_186 = item.cases;
-        for (caseId of _collection_186) {
+        _collection_190 = item.cases;
+        for (caseId of _collection_190) {
             caseItem = folder.items[caseId];
             if (ensureCall(folder, caseId, caseItem)) {
                 name = addEventSignature(folder, caseId, caseItem);
@@ -3373,17 +3368,24 @@ function Js2604Generator(options) {
         addDeclarationsRecursive(rootStep, module);
     }
     function assignEventArguments(folder, name, lines) {
-        var _collection_188, arg, counter, eventInfo;
+        var _collection_192, arg, counter, eventInfo;
         eventInfo = folder.events[name];
         counter = 1;
-        _collection_188 = eventInfo.args;
-        for (arg of _collection_188) {
+        _collection_192 = eventInfo.args;
+        for (arg of _collection_192) {
             lines.push(arg + ' = _event_[' + counter + ']');
             counter++;
         }
     }
+    function bodyHasReturn(body) {
+        if (body && body.body && body.body.length) {
+            return hasReturn(body.body[body.body.length - 1]);
+        } else {
+            return false;
+        }
+    }
     function buildComplexSilhouette(fun, tree, functionBody) {
-        var _collection_143, branch, branchState, caseBody, caseClause, defClause, end, firstName, lastBranch, loop, loopBody, ordinal, select;
+        var _collection_145, branch, branchState, caseBody, caseClause, defClause, end, firstName, lastBranch, loop, loopBody, ordinal, select;
         branchState = '_branch_';
         addLocal(fun.scope, branchState);
         firstName = tree.branches[0].name;
@@ -3395,8 +3397,8 @@ function Js2604Generator(options) {
         loopBody.push(select);
         ordinal = 0;
         end = hasEnd(fun);
-        _collection_143 = tree.branches;
-        for (branch of _collection_143) {
+        _collection_145 = tree.branches;
+        for (branch of _collection_145) {
             if (!(branch.name === 'catch')) {
                 caseClause = createCase(createStringLiteral(branch.name));
                 select.cases.push(caseClause);
@@ -3420,7 +3422,7 @@ function Js2604Generator(options) {
         select.cases.push(defClause);
     }
     function buildFunctionAst(fun) {
-        var _selectValue_145, drakonJson, funAst, functionBody, genOptions, tree, treeStr;
+        var _selectValue_147, drakonJson, funAst, functionBody, genOptions, tree, treeStr;
         funAst = createFunction(fun.name, fun.arguments);
         if (fun.keywords.async) {
             funAst.async = true;
@@ -3435,12 +3437,13 @@ function Js2604Generator(options) {
             return funAst;
         }
         tree = JSON.parse(treeStr);
-        _selectValue_145 = tree.branches.length;
-        if (!(_selectValue_145 === 0)) {
-            if (_selectValue_145 === 1) {
+        _selectValue_147 = tree.branches.length;
+        if (!(_selectValue_147 === 0)) {
+            if (_selectValue_147 === 1) {
                 convertNodesToAst(tree.branches[0].body, functionBody);
             } else {
                 convertSilhouetteToAst(fun, tree, functionBody);
+                funAst.sil = true;
             }
         }
         if (gDebugAst) {
@@ -3470,15 +3473,15 @@ function Js2604Generator(options) {
         functionBody.push(parseStatement('return _obj_.run()'));
     }
     function buildMachineAst(parent, fun) {
-        var _collection_147, _collection_149, ctr, eventName, evt, functionBody, guard, mainAst, me, name, runAst;
+        var _collection_149, _collection_151, ctr, eventName, evt, functionBody, guard, mainAst, me, name, runAst;
         ctr = createEmptyFunction(makeCreateName(fun.name));
         ctr.arguments = fun.arguments.slice();
         if (fun.keywords.export) {
             ctr.keywords.export = true;
         }
         addChild(parent, ctr);
-        _collection_147 = ctr.arguments;
-        for (name of _collection_147) {
+        _collection_149 = ctr.arguments;
+        for (name of _collection_149) {
             addDeclaration(ctr.scope, name);
         }
         ctr.ast = createFunction(ctr.name, ctr.arguments);
@@ -3513,9 +3516,9 @@ function Js2604Generator(options) {
         runAst.body.body.push(parseStatement('return new Promise((resolve, reject) => {' + '_topResolve_ = resolve;_topReject_=reject;})'));
         functionBody.push(parseStatement('me.run=' + makeRunName(fun.name)));
         functionBody.push(parseStatement('me.stop=function() {me.state=undefined;}'));
-        _collection_149 = fun.events;
-        for (eventName in _collection_149) {
-            evt = _collection_149[eventName];
+        _collection_151 = fun.events;
+        for (eventName in _collection_151) {
+            evt = _collection_151[eventName];
             createEventMethod(fun, eventName, functionBody);
         }
         functionBody.push(parseStatement('return me'));
@@ -3606,27 +3609,27 @@ function Js2604Generator(options) {
         return program;
     }
     function convertNodesToAst(steps, body) {
-        var _selectValue_152, step;
+        var _selectValue_154, step;
         for (step of steps) {
-            _selectValue_152 = step.type;
-            if (_selectValue_152 === 'action') {
+            _selectValue_154 = step.type;
+            if (_selectValue_154 === 'action') {
                 addActionToAst(step, body);
             } else {
-                if (_selectValue_152 === 'question') {
+                if (_selectValue_154 === 'question') {
                     addQuestionToAst(step, body);
                 } else {
-                    if (_selectValue_152 === 'loop') {
+                    if (_selectValue_154 === 'loop') {
                         addLoopToAst(step, body);
                     } else {
-                        if (_selectValue_152 === 'error') {
+                        if (_selectValue_154 === 'error') {
                             addErrorToAst(step, body);
                         } else {
-                            if (_selectValue_152 === 'break') {
+                            if (_selectValue_154 === 'break') {
                                 if (!endsWithReturn(body)) {
                                     body.push(createBreak());
                                 }
                             } else {
-                                if (_selectValue_152 === 'address') {
+                                if (_selectValue_154 === 'address') {
                                     if (!endsWithReturn(body)) {
                                         addAddressToAst(step, body);
                                     }
@@ -3655,10 +3658,10 @@ function Js2604Generator(options) {
         };
     }
     function convertSilhouetteToAst(fun, tree, functionBody) {
-        var _collection_154, branch, catchBranch, catchNode;
+        var _collection_156, branch, catchBranch, catchNode;
         gBranches = {};
-        _collection_154 = tree.branches;
-        for (branch of _collection_154) {
+        _collection_156 = tree.branches;
+        for (branch of _collection_156) {
             if (!branch.name) {
                 reportError('Branch name cannot be empty', fun.path, branch.id);
                 return;
@@ -3754,7 +3757,7 @@ function Js2604Generator(options) {
         };
     }
     function createEventMethod(fun, eventName, functionBody) {
-        var _collection_156, body, cs, def, event, eventItem, funAst, itemId, sw;
+        var _collection_158, body, cs, def, event, eventItem, funAst, itemId, sw;
         event = fun.events[eventName];
         funAst = createFunction(eventName, event.args);
         delete funAst.id;
@@ -3763,8 +3766,8 @@ function Js2604Generator(options) {
         body.push(parseStatement('if (me._busy) {throw new Error("Synchronous reentry is not allowed");}'));
         sw = createSwitch(createMember(createIdentifier('me'), 'state'));
         body.push(sw);
-        _collection_156 = fun.eventItems;
-        for (itemId of _collection_156) {
+        _collection_158 = fun.eventItems;
+        for (itemId of _collection_158) {
             eventItem = fun.items[itemId];
             if (!(eventItem.eventNames.indexOf(eventName) === -1)) {
                 cs = createCase(createStringLiteral(itemId));
@@ -3906,10 +3909,10 @@ function Js2604Generator(options) {
         };
     }
     function createScopeStepForLambda(step, node) {
-        var _collection_173, nextScope, nextStep, param;
+        var _collection_177, nextScope, nextStep, param;
         nextScope = createScope('lambda', 'lambda');
-        _collection_173 = node.params;
-        for (param of _collection_173) {
+        _collection_177 = node.params;
+        for (param of _collection_177) {
             if (param.type === 'Identifier') {
                 addDeclaration(nextScope, param.name);
             }
@@ -3982,23 +3985,23 @@ function Js2604Generator(options) {
         };
     }
     function decodeQuestionContent(content) {
-        var _selectValue_158, decoded, left, right;
-        _selectValue_158 = content.operator;
-        if (_selectValue_158 === 'not') {
+        var _selectValue_160, decoded, left, right;
+        _selectValue_160 = content.operator;
+        if (_selectValue_160 === 'not') {
             decoded = decodeQuestionContent(content.operand);
             return createNot(decoded);
         } else {
-            if (_selectValue_158 === 'and') {
+            if (_selectValue_160 === 'and') {
                 left = decodeQuestionContent(content.left);
                 right = decodeQuestionContent(content.right);
                 return createAnd(left, right);
             } else {
-                if (_selectValue_158 === 'or') {
+                if (_selectValue_160 === 'or') {
                     left = decodeQuestionContent(content.left);
                     right = decodeQuestionContent(content.right);
                     return createOr(left, right);
                 } else {
-                    if (_selectValue_158 === 'equal') {
+                    if (_selectValue_160 === 'equal') {
                         left = decodeQuestionContent(content.left);
                         right = decodeQuestionContent(content.right);
                         return createEqual(left, right);
@@ -4015,7 +4018,7 @@ function Js2604Generator(options) {
             return false;
         } else {
             last = caseBody[caseBody.length - 1];
-            if (last.type === 'ReturnStatement' || last.type === 'ThrowStatement') {
+            if (hasReturn(last)) {
                 return true;
             } else {
                 return false;
@@ -4034,10 +4037,10 @@ function Js2604Generator(options) {
         }
     }
     function ensureCall(folder, id, item) {
-        var _collection_190, arg;
+        var _collection_194, arg;
         if (item.content && (item.content.type === 'CallExpression' && item.content.callee.type === 'Identifier')) {
-            _collection_190 = item.content.arguments;
-            for (arg of _collection_190) {
+            _collection_194 = item.content.arguments;
+            for (arg of _collection_194) {
                 if (!(arg.type === 'Identifier')) {
                     reportError('This call expression expects variables', folder.path, id);
                     return false;
@@ -4069,20 +4072,20 @@ function Js2604Generator(options) {
         }
     }
     function extractVariablesFromDeclaration(node, scope) {
-        var _collection_175, _collection_179, _collection_181, _selectValue_177, decl, item, prop;
-        _collection_175 = node.declarations;
-        for (decl of _collection_175) {
+        var _collection_179, _collection_183, _collection_185, _selectValue_181, decl, item, prop;
+        _collection_179 = node.declarations;
+        for (decl of _collection_179) {
             if (decl.type === 'VariableDeclarator') {
-                _selectValue_177 = decl.id.type;
-                if (_selectValue_177 === 'ObjectPattern') {
-                    _collection_181 = decl.id.properties;
-                    for (prop of _collection_181) {
+                _selectValue_181 = decl.id.type;
+                if (_selectValue_181 === 'ObjectPattern') {
+                    _collection_185 = decl.id.properties;
+                    for (prop of _collection_185) {
                         tryAddIdentifier(scope, prop.key);
                     }
                 } else {
-                    if (_selectValue_177 === 'ArrayPattern') {
-                        _collection_179 = decl.id.elements;
-                        for (item of _collection_179) {
+                    if (_selectValue_181 === 'ArrayPattern') {
+                        _collection_183 = decl.id.elements;
+                        for (item of _collection_183) {
                             tryAddIdentifier(scope, item);
                         }
                     } else {
@@ -4149,15 +4152,36 @@ function Js2604Generator(options) {
         return fun.body.body;
     }
     function hasEnd(fun) {
-        var _collection_160, id, item;
-        _collection_160 = fun.items;
-        for (id in _collection_160) {
-            item = _collection_160[id];
+        var _collection_162, id, item;
+        _collection_162 = fun.items;
+        for (id in _collection_162) {
+            item = _collection_162[id];
             if (item.type === 'end') {
                 return true;
             }
         }
         return false;
+    }
+    function hasReturn(node) {
+        var _selectValue_165;
+        _selectValue_165 = node.type;
+        if (_selectValue_165 === 'ReturnStatement') {
+            return true;
+        } else {
+            if (_selectValue_165 === 'ThrowStatement') {
+                return true;
+            } else {
+                if (_selectValue_165 === 'IfStatement') {
+                    if (bodyHasReturn(node.consequent) && bodyHasReturn(node.alternate)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
     }
     function insertActionAfter(folder, existingId, content) {
         var before, id, item;
@@ -4173,7 +4197,7 @@ function Js2604Generator(options) {
         folder.items[id] = item;
     }
     function insertActionBefore(folder, beforeId, expression) {
-        var _collection_201, content, existingItem, id, item, itemId;
+        var _collection_205, content, existingItem, id, item, itemId;
         id = generateId('_item_');
         if (Array.isArray(expression)) {
             content = expression;
@@ -4186,9 +4210,9 @@ function Js2604Generator(options) {
             content: content,
             one: beforeId
         };
-        _collection_201 = folder.items;
-        for (itemId in _collection_201) {
-            existingItem = _collection_201[itemId];
+        _collection_205 = folder.items;
+        for (itemId in _collection_205) {
+            existingItem = _collection_205[itemId];
             if (existingItem.one === beforeId) {
                 existingItem.one = id;
             }
@@ -4359,30 +4383,30 @@ function Js2604Generator(options) {
         }
     }
     function parseItem(folder, id, item) {
-        var _selectValue_192;
-        _selectValue_192 = item.type;
-        if (_selectValue_192 === 'action') {
+        var _selectValue_196;
+        _selectValue_196 = item.type;
+        if (_selectValue_196 === 'action') {
             parseAction(folder, id, item);
         } else {
-            if (_selectValue_192 === 'question') {
+            if (_selectValue_196 === 'question') {
                 parseQuestion(folder, id, item);
             } else {
-                if (_selectValue_192 === 'select') {
+                if (_selectValue_196 === 'select') {
                     parseSelect(folder, id, item);
                 } else {
-                    if (_selectValue_192 === 'case') {
+                    if (_selectValue_196 === 'case') {
                         parseCase(folder, id, item);
                     } else {
-                        if (_selectValue_192 === 'loopbegin') {
+                        if (_selectValue_196 === 'loopbegin') {
                             parseLoop(folder, id, item);
                         } else {
-                            if (_selectValue_192 === 'soutput') {
+                            if (_selectValue_196 === 'soutput') {
                                 parseOutput(folder, id, item);
                             } else {
-                                if (_selectValue_192 === 'sinput') {
+                                if (_selectValue_196 === 'sinput') {
                                     parseSInput(folder, id, item);
                                 } else {
-                                    if (_selectValue_192 === 'pause') {
+                                    if (_selectValue_196 === 'pause') {
                                         parsePause(folder, id, item);
                                     }
                                 }
@@ -4409,11 +4433,11 @@ function Js2604Generator(options) {
         }
     }
     function parseItems(folder) {
-        var _collection_194, child, name;
+        var _collection_198, child, name;
         parseItemsInFunction(folder);
-        _collection_194 = folder.children;
-        for (name in _collection_194) {
-            child = _collection_194[name];
+        _collection_198 = folder.children;
+        for (name in _collection_198) {
+            child = _collection_198[name];
             parseItems(child);
         }
     }
@@ -4430,14 +4454,14 @@ function Js2604Generator(options) {
         setUpMachine(folder);
     }
     function parseLoop(folder, id, item) {
-        var _selectValue_197, init, test, update;
+        var _selectValue_201, init, test, update;
         parseItemContent(folder, id, item);
         if (ensureHasContent(folder, id, item)) {
-            _selectValue_197 = item.content.length;
-            if (_selectValue_197 === 2) {
+            _selectValue_201 = item.content.length;
+            if (_selectValue_201 === 2) {
                 parseForEachLoop(folder, id, item);
             } else {
-                if (_selectValue_197 === 3) {
+                if (_selectValue_201 === 3) {
                     init = stripExpression(item.content[0]);
                     test = stripExpression(item.content[1]);
                     update = stripExpression(item.content[2]);
@@ -4514,10 +4538,10 @@ function Js2604Generator(options) {
         body.push(createExpression(createAssignment(createIdentifier(variable), value)));
     }
     async function readChildren(folder) {
-        var _collection_207, child, childPath, result;
+        var _collection_211, child, childPath, result;
         result = [];
-        _collection_207 = folder.children;
-        for (childPath of _collection_207) {
+        _collection_211 = folder.children;
+        for (childPath of _collection_211) {
             child = await options.getObjectByHandle(childPath);
             if (child) {
                 if (!(child.type === 'folder')) {
@@ -4660,18 +4684,18 @@ function Js2604Generator(options) {
         return module;
     }
     function replaceReturnInAction(item) {
-        var _collection_163, _selectValue_165, index, stm;
+        var _collection_167, _selectValue_169, index, stm;
         if (item.type === 'action' && item.content) {
             index = 0;
-            _collection_163 = item.content;
-            for (stm of _collection_163) {
-                _selectValue_165 = stm.type;
-                if (_selectValue_165 === 'ReturnStatement') {
+            _collection_167 = item.content;
+            for (stm of _collection_167) {
+                _selectValue_169 = stm.type;
+                if (_selectValue_169 === 'ReturnStatement') {
                     convertReturnToResolve(stm, '_topResolve_');
                     item.content.splice(index + 1, 0, createReturn(null));
                     return;
                 } else {
-                    if (_selectValue_165 === 'ThrowStatement') {
+                    if (_selectValue_169 === 'ThrowStatement') {
                         convertReturnToResolve(stm, '_topReject_');
                         item.content.splice(index + 1, 0, createReturn(null));
                         return;
@@ -4682,10 +4706,10 @@ function Js2604Generator(options) {
         }
     }
     function replaceReturnInMachine(fun) {
-        var _collection_167, id, item;
-        _collection_167 = fun.items;
-        for (id in _collection_167) {
-            item = _collection_167[id];
+        var _collection_171, id, item;
+        _collection_171 = fun.items;
+        for (id in _collection_171) {
+            item = _collection_171[id];
             replaceReturnInAction(item);
         }
     }
@@ -4762,12 +4786,12 @@ function Js2604Generator(options) {
         }
     }
     function scanForAssignments(step, node) {
-        var _selectValue_183, nextStep, varName;
+        var _selectValue_187, nextStep, varName;
         if (node.itemId) {
             step.itemId = node.itemId;
         }
-        _selectValue_183 = node.type;
-        if (_selectValue_183 === 'AssignmentExpression') {
+        _selectValue_187 = node.type;
+        if (_selectValue_187 === 'AssignmentExpression') {
             if (node.left.type === 'Identifier') {
                 varName = node.left.name;
                 if (!isDeclared(step, varName)) {
@@ -4776,7 +4800,7 @@ function Js2604Generator(options) {
             }
             return true;
         } else {
-            if (_selectValue_183 === 'CallExpression') {
+            if (_selectValue_187 === 'CallExpression') {
                 if (node.callee.type === 'Identifier' && node.callee.name === 'getHandlerData') {
                     node.type = 'Identifier';
                     node.name = '_handlerData_';
@@ -4787,7 +4811,7 @@ function Js2604Generator(options) {
                     return true;
                 }
             } else {
-                if (_selectValue_183 === 'VariableDeclaration') {
+                if (_selectValue_187 === 'VariableDeclaration') {
                     if (step.canDeclare) {
                         extractVariablesFromDeclaration(node, step.scope);
                     } else {
@@ -4795,13 +4819,13 @@ function Js2604Generator(options) {
                     }
                     return true;
                 } else {
-                    if (_selectValue_183 === 'AwaitExpression') {
+                    if (_selectValue_187 === 'AwaitExpression') {
                         if (!step.canAwait) {
                             reportError('await is allowed only in async functions', step.path, step.itemId);
                         }
                         return true;
                     } else {
-                        if ((_selectValue_183 === 'FunctionExpression' || _selectValue_183 === 'ArrowFunctionExpression' || _selectValue_183 === 'FunctionDeclaration') && node.body.type === 'BlockStatement') {
+                        if ((_selectValue_187 === 'FunctionExpression' || _selectValue_187 === 'ArrowFunctionExpression' || _selectValue_187 === 'FunctionDeclaration') && node.body.type === 'BlockStatement') {
                             nextStep = createScopeStepForLambda(step, node);
                             nextStep.canAwait = node.async;
                             addDeclarationsInFunction(nextStep);
@@ -4815,15 +4839,15 @@ function Js2604Generator(options) {
         }
     }
     function setUpMachine(folder) {
-        var _collection_199, id, item;
+        var _collection_203, id, item;
         if (folder.keywords.async) {
             if (!(folder.eventItems.length === 0)) {
                 reportError('events are not allowed in async functions', folder.path, folder.eventItems[0]);
             }
         } else {
             folder.events = {};
-            _collection_199 = folder.eventItems;
-            for (id of _collection_199) {
+            _collection_203 = folder.eventItems;
+            for (id of _collection_203) {
                 item = folder.items[id];
                 if (item.type === 'select') {
                     addSelectEvent(folder, item, id);
