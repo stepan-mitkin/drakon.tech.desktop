@@ -54,6 +54,7 @@ const {
 } = require("./drakontechgen");
 const { Js2604Generator } = require("./js2604");
 const { Lua2604Generator } = require("./lua2604");
+const { Pfl2605Generator } = require("./pfl2605");
 
 window.drakontechgen = {
   buildGenerator: function (
@@ -87,13 +88,15 @@ window.drakontechgen = {
       return Lua2604Generator(genOptions);    
     } else if (language === "JS2604") {
       return Js2604Generator(genOptions);
+    } else if (language === "PFL2605") {
+      return Pfl2605Generator(genOptions);      
     } else {
       return createClojureGenerator(genOptions);
     }
   },
 };
 
-},{"./drakontechgen":4,"./js2604":5,"./lua2604":6}],3:[function(require,module,exports){
+},{"./drakontechgen":4,"./js2604":5,"./lua2604":6,"./pfl2605":11}],3:[function(require,module,exports){
 
 function lexClojure(text) {
     const operators = ["(", ")", "[", "]", "{", "}", "#", ",", "`", "'"];
@@ -3121,7 +3124,7 @@ module.exports = {
     createClojureGenerator,
 };
 
-},{"./astScanner":1,"./clojurelexer":3,"./sort":11,"./tools":12}],5:[function(require,module,exports){
+},{"./astScanner":1,"./clojurelexer":3,"./sort":16,"./tools":17}],5:[function(require,module,exports){
 const {sortBy, findFirst, addRange, clone, replace} = require('./tools');
 function Js2604Generator(options) {
     var self = { _type: 'Js2604Generator' };
@@ -4925,7 +4928,7 @@ function splitTrim(text, separator) {
     return trimmed.filter(part => Boolean(part));
 }
 module.exports = { Js2604Generator };
-},{"./tools":12}],6:[function(require,module,exports){
+},{"./tools":17}],6:[function(require,module,exports){
 const {read_project} = require("./lua2604/reader")
 const {parse_items} = require("./lua2604/parser")
 const {build_module_tree} = require("./lua2604/tree")
@@ -7086,6 +7089,1410 @@ module.exports = {
     build_module_tree: build_module_tree
 };
 },{}],11:[function(require,module,exports){
+const {read_project} = require("./pfl2605/reader")
+const {parse_items} = require("./pfl2605/parser")
+const {build_module_tree} = require("./pfl2605/tree")
+const {build_module_code} = require("./pfl2605/printer")
+
+function pause(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+
+async function generate_pfl(options) {
+    var project;
+    var parse_result;
+    var tree;
+    var module_src;
+
+    project = await read_project(options);
+    if (project.errors && project.errors.length) {
+        return {
+            errors: project.errors
+        };
+    }
+
+    await pause(1);
+
+    parse_result = parse_items(
+        project.module,
+        options
+    );
+    if (parse_result.errors && parse_result.errors.length) {
+        return {
+            errors: parse_result.errors
+        };
+    }
+
+
+
+    await pause(1);
+
+    tree = build_module_tree(
+        project.module,
+        options
+    );
+    if (tree.errors && tree.errors.length) {
+        return {
+            errors: tree.errors
+        };
+    }
+
+    await pause(1);
+    module_src = build_module_code(
+        tree.module,
+        options
+    );
+    if (module_src.errors && module_src.errors.length) {
+        return {
+            errors: module_src.errors
+        };
+    }
+
+    return {
+        code: module_src.code
+    };
+}
+
+async function wrapPflGenerator(options) {
+    var result
+    try {
+        result = await generate_pfl(options)
+    } catch (ex) {
+        options.onError({
+            message: ex.message,
+            filename: ex.filename,
+            nodeId: ex.nodeId,
+            data: ex.data
+        })
+        return
+    }
+    if (result.errors && result.errors.length != 0) {
+        for (var error of result.errors) {
+            options.onError(error)
+        }
+    } else {
+        await options.onData(result.code)
+    }
+}
+
+
+function Pfl2605Generator(options) {
+    var self = { _type: 'Pfl2605Generator' };
+    self.run = () => wrapPflGenerator(options)
+    self.stop = function() {}
+    return self
+}
+
+module.exports = { Pfl2605Generator };
+},{"./pfl2605/parser":12,"./pfl2605/printer":13,"./pfl2605/reader":14,"./pfl2605/tree":15}],12:[function(require,module,exports){
+"use strict";
+
+var global_options = undefined;
+var error_list = [];
+var next_id = 1;
+
+function is_declaration(item) {
+    if ((item.type === "action" && item.content) &&
+        item.content.startsWith("Перем ")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function parse_arguments(doc) {
+    var lines;
+    var args;
+    var i;
+    var line;
+    var arg;
+    var last;
+
+    if (doc.params) {
+        lines = doc.params.split(/\r?\n/);
+        args = [];
+
+        for (i = 0; i < lines.length; i++) {
+            line = lines[i];
+            arg = line.trim();
+
+            if (arg !== "") {
+                if (args.indexOf(arg) !== -1) {
+                    report_error(
+                        "Аргумент неуникальный",
+                        doc.path,
+                        "params",
+                        arg
+                    );
+                }
+
+                args.push(arg);
+            }
+        }
+
+        if (args.length !== 0) {
+            last = args[args.length - 1];
+
+            if (last.startsWith("тип ")) {
+                args.pop();
+                doc.returns = last;
+            }
+        }
+
+        doc.args = args;
+    } else {
+        doc.args = [];
+    }
+}
+
+function parse_items(module, options) {
+    var class_name;
+    var klass;
+    var method_name;
+    var method;
+
+    global_options = options;
+    error_list = [];
+
+    for (class_name in module.classes) {
+        if (class_name in module.classes) {
+            klass = module.classes[class_name];
+
+            if (klass.constructor) {
+                parse_items_in_document(klass.constructor);
+            }
+
+            for (method_name in klass.methods) {
+                if (method_name in klass.methods) {
+                    method = klass.methods[method_name];
+                    parse_items_in_document(method);
+                }
+            }
+        }
+    }
+
+    return {
+        errors: error_list
+    };
+}
+
+function parse_items_in_document(doc) {
+    var item_id;
+    var item;
+
+    parse_arguments(doc);
+
+    doc.declarations = [];
+
+    if (!doc.items) {
+        return;
+    }
+
+    for (item_id in doc.items) {
+        if (item_id in doc.items) {
+            item = doc.items[item_id];
+
+            if (is_declaration(item)) {
+                doc.declarations.push(item_id);
+            } else {
+                if (item.type === "end") {
+                    item.type = "exit";
+                }
+            }
+        }
+    }
+}
+
+function report_error(message, handle, item_id, data) {
+    error_list.push({
+        message: message,
+        filename: handle,
+        nodeId: item_id,
+        data: data
+    });
+}
+
+module.exports = {
+    parse_items: parse_items
+};
+},{}],13:[function(require,module,exports){
+"use strict";
+
+var error_list = [];
+var global_options = undefined;
+var next_id = 1;
+
+function create_error(message, details) {
+    return {
+        id: next_id++,
+        message: message,
+        details: details
+    };
+}
+
+function report_error(message, details) {
+    error_list.push(create_error(message, details));
+}
+
+function repeat_space(count) {
+    var result = "";
+    var i = 0;
+    while (i < count) {
+        result += " ";
+        i++;
+    }
+    return result;
+}
+
+function is_empty(array) {
+    return !array || array.length === 0;
+}
+
+function add_line(context, text) {
+    var indent = repeat_space(context.depth * 4);
+    var line = indent + text;
+    context.lines.push(line);
+}
+
+function build_module_code(root, options) {
+    global_options = options;
+    error_list = [];
+
+    var lines = [];
+    var i = 0;
+    var node = undefined;
+
+    if (!root || !root.body) {
+        report_error("Root body is missing", undefined);
+        return {
+            code: "",
+            errors: error_list
+        };
+    }
+
+    while (i < root.body.length) {
+        node = root.body[i];
+        print_node(node, 0, lines);
+        i++;
+    }
+
+    return {
+        code: lines.join("\n"),
+        errors: error_list
+    };
+}
+
+function print_action(context) {
+    var node = context.node;
+    var parts = undefined;
+    var i = 0;
+
+    if (node.content) {
+        parts = node.content.split("\n");
+        while (i < parts.length) {
+            add_line(context, parts[i]);
+            i++;
+        }
+    }
+}
+
+function print_body(context, body) {
+    var child_context = undefined;
+    var i = 0;
+
+    if (!body) {
+        return;
+    }
+
+    while (i < body.length) {
+        child_context = {
+            node: body[i],
+            depth: context.depth + 1,
+            lines: context.lines
+        };
+        print_node(child_context.node, child_context.depth, child_context.lines);
+        i++;
+    }
+}
+
+function print_class(context) {
+    var node = context.node;
+
+    add_line(context, "");
+    add_line(context, "&ВидноВсем");
+    add_line(context, "Класс " + node.name);
+    print_body(context, node.body);
+    add_line(context, "КонецКласса");
+}
+
+function print_exit(context) {
+    add_line(context, "Возврат");
+}
+
+function print_function(context) {
+    var node = context.node;
+    var args = "";
+
+    add_line(context, "");
+
+    if (
+        node.keywords &&
+        node.keywords.export === true
+    ) {
+        add_line(context, "&ВидноВсем");
+    }
+
+    if (
+        node.keywords &&
+        node.keywords.async === true
+    ) {
+        add_line(context, "&Асинх");
+    }
+
+    args = node.args.join(", ");
+
+    if (node.name === "Конструктор") {
+        add_line(context, node.name + "(" + args + ")");
+    } else {
+        if (node.returns) {
+            add_line(
+                context,
+                "Функция " +
+                    node.name +
+                    "(" +
+                    args +
+                    ") " +
+                    node.returns
+            );
+        } else {
+            add_line(
+                context,
+                "Процедура " +
+                    node.name +
+                    "(" +
+                    args +
+                    ")"
+            );
+        }
+    }
+
+    print_body(context, node.body);
+
+    if (node.name === "Конструктор") {
+        add_line(context, "КонецКонструктора");
+    } else {
+        if (node.returns) {
+            add_line(context, "КонецФункции");
+        } else {
+            add_line(context, "КонецПроцедуры");
+        }
+    }
+}
+
+function print_loop(context) {
+    var node = context.node;
+
+    add_line(context, node.content);
+    print_body(context, node.body);
+    add_line(context, "КонецЦикла");
+}
+
+function print_node(node, depth, lines) {
+    var context = {
+        node: node,
+        depth: depth,
+        lines: lines
+    };
+
+    if (!node) {
+        report_error("Node is missing", undefined);
+        return;
+    }
+
+    if (node.type === "function") {
+        print_function(context);
+    } else if (node.type === "action") {
+        print_action(context);
+    } else if (node.type === "question") {
+        print_question(context);
+    } else if (node.type === "loop") {
+        print_loop(context);
+    } else if (node.type === "if-switch") {
+        print_switch(context);
+    } else if (node.type === "empty-line") {
+        add_line(context, "");
+    } else if (node.type === "exit") {
+        print_exit(context);
+    } else if (node.type === "class") {
+        print_class(context);
+    } else if (node.type === "program") {
+        print_program(context);
+    } else {
+        report_error("Unexpected case value", node.type);
+    }
+}
+
+function print_program(context) {
+    var node = context.node;
+
+    add_line(context, "");
+    add_line(context, "Программа " + node.name);
+    print_body(context, node.body);
+    add_line(context, "КонецПрограммы");
+}
+
+function print_question(context) {
+    var node = context.node;
+    var parts = [];
+    var content = "";
+
+    if (node.content) {
+        parts = node.content.split("\n");
+        content = parts.join(" ");
+    }
+
+    add_line(context, "Если " + content + " Тогда");
+    print_body(context, node.yes);
+
+    if (!is_empty(node.no)) {
+        add_line(context, "Иначе");
+        print_body(context, node.no);
+    }
+
+    add_line(context, "КонецЕсли");
+}
+
+function print_switch(context) {
+    var node = context.node;
+    var i = 0;
+    var option = undefined;
+
+    if (node.options) {
+        while (i < node.options.length) {
+            option = node.options[i];
+
+            if (i === 0) {
+                add_line(context, "Если " + option.condition + " Тогда");
+            } else {
+                add_line(context, "ИначеЕсли " + option.condition + " Тогда");
+            }
+
+            print_body(context, option.body);
+            i++;
+        }
+    }
+
+    if (!is_empty(node.other)) {
+        add_line(context, "Иначе");
+        print_body(context, node.other);
+    }
+
+    add_line(context, "КонецЕсли");
+}
+
+module.exports = {
+    build_module_code: build_module_code
+};
+},{}],14:[function(require,module,exports){
+"use strict";
+
+var error_list = [];
+var global_options = undefined;
+var next_id = 1;
+
+async function read_project(options) {
+    error_list = [];
+    global_options = options;
+
+    var root_folder = await read_object(global_options.root);
+    var module = create_module();
+
+    await read_project_folder(module, root_folder);
+
+    if (error_list.length === 0) {
+        return {
+            module: module
+        };
+    } else {
+        return {
+            errors: error_list
+        };
+    }
+}
+
+function create_module() {
+    return {
+        header: undefined,
+        classes: {}
+    };
+}
+
+function create_class_object(name, type) {
+    return {
+        name: name,
+        type: type,
+        class_body: undefined,
+        methods: {},
+        constructor: undefined
+    };
+}
+
+async function add_function(klass, func) {
+    if (func.name in klass.methods) {
+        report_error(
+            "Имя функции неуникально",
+            func.path
+        );
+    } else {
+        klass.methods[func.name] = func;
+    }
+}
+
+async function create_class(module, folder) {
+    var name = try_extract_name(
+        folder.name,
+        "класс"
+    );
+
+    if (name in module.classes) {
+        report_error(
+            "Имя класса неуникально",
+            folder.path
+        );
+    } else {
+        var klass = create_class_object(
+            name,
+            "class"
+        );
+
+        module.classes[name] = klass;
+
+        await read_class_folder(
+            klass,
+            folder
+        );
+    }
+}
+
+async function create_program(module, folder) {
+    var name = try_extract_name(
+        folder.name,
+        "программа"
+    );
+
+    if (name in module.classes) {
+        report_error(
+            "Имя программы неуникально",
+            folder.path
+        );
+    } else {
+        var program = create_class_object(
+            name,
+            "program"
+        );
+
+        module.classes[name] = program;
+
+        await read_program_folder(
+            program,
+            folder
+        );
+    }
+}
+
+function is_class(text) {
+    var name = try_extract_name(
+        text,
+        "класс"
+    );
+
+    if (name) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function is_program(text) {
+    var name = try_extract_name(
+        text,
+        "программа"
+    );
+
+    if (name) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+async function read_children(node) {
+    if (node.children) {
+        var result = [];
+        var i = 0;
+
+        while (i < node.children.length) {
+            var child_path = node.children[i];
+            var child = await read_object(child_path);
+
+            if (child && (child.type === "drakon" || child.type === "folder")) {
+                result.push(child);
+            }
+
+            i++;
+        }
+
+        return result;
+    } else {
+        return [];
+    }
+}
+
+async function read_class_folder(klass, folder) {
+    var children = await read_children(folder);
+    var i = 0;
+
+    while (i < children.length) {
+        var child = children[i];
+
+        if (child.name === "Заголовок") {
+            report_error(
+                "Заголовок не может быть внутри класса",
+                child.path
+            );
+        } else if (child.name === "ТелоКласса") {
+            set_class_body(
+                klass,
+                child
+            );
+        } else if (child.name === "Конструктор") {
+            set_constructor(
+                klass,
+                child
+            );
+        } else if (child.type === "folder") {
+            if (is_program(child.name)) {
+                report_error(
+                    "Программа не может быть внутри класса",
+                    child.path
+                );
+            } else if (is_class(child.name)) {
+                report_error(
+                    "Класс не может быть внутри класса",
+                    child.path
+                );
+            } else {
+                await read_class_folder(
+                    klass,
+                    child
+                );
+            }
+        } else {
+            await add_function(
+                klass,
+                child
+            );
+        }
+
+        i++;
+    }
+}
+
+async function read_object(handle) {
+    var node = await global_options.getObjectByHandle(
+        handle
+    );
+
+    if (node && node.type === "drakon") {
+        if (!node.keywords) {
+            node.keywords = {};
+        }
+
+        if (!node.items) {
+            node.items = {};
+        }
+    }
+
+    return node;
+}
+
+async function read_program_folder(program, folder) {
+    var children = await read_children(folder);
+    var i = 0;
+
+    while (i < children.length) {
+        var child = children[i];
+
+        if (child.name === "Заголовок") {
+            report_error(
+                "Заголовок не может быть внутри программы",
+                child.path
+            );
+        } else if (child.name === "ТелоКласса") {
+            report_error(
+                "Тело класса может быть только в классе",
+                child.path
+            );
+        } else if (child.name === "Конструктор") {
+            report_error(
+                "Конструкторы могут быть только в классах",
+                child.path
+            );
+        } else if (child.type === "folder") {
+            if (is_program(child.name)) {
+                report_error(
+                    "Программа не может быть внутри программы",
+                    child.path
+                );
+            } else if (is_class(child.name)) {
+                report_error(
+                    "Класс не может быть внутри программы",
+                    child.path
+                );
+            } else {
+                await read_program_folder(
+                    program,
+                    child
+                );
+            }
+        } else {
+            await add_function(
+                program,
+                child
+            );
+        }
+
+        i++;
+    }
+}
+
+async function read_project_folder(module, folder) {
+    var children = await read_children(folder);
+    var i = 0;
+
+    while (i < children.length) {
+        var child = children[i];
+
+        if (child.name === "Заголовок") {
+            set_header(
+                module,
+                child
+            );
+        } else if (child.name === "ТелоКласса") {
+            report_error(
+                "Тело класса может быть только в классе",
+                child.path
+            );
+        } else if (child.name === "Конструктор") {
+            report_error(
+                "Конструкторы могут быть только в классах",
+                child.path
+            );
+        } else if (child.type === "folder") {
+            if (is_program(child.name)) {
+                await create_program(
+                    module,
+                    child
+                );
+            } else if (is_class(child.name)) {
+                await create_class(
+                    module,
+                    child
+                );
+            } else {
+                await read_project_folder(
+                    module,
+                    child
+                );
+            }
+        } else {
+            report_error(
+                "Функции могут быть только в классах и программах",
+                child.path
+            );
+        }
+
+        i++;
+    }
+}
+
+function report_error(message, handle, item_id, data) {
+    error_list.push({
+        message: message,
+        filename: handle,
+        nodeId: item_id,
+        data: data
+    });
+}
+
+function set_class_body(klass, folder) {
+    if (klass.class_body) {
+        report_error(
+            "Тело класса уже есть",
+            folder.path
+        );
+    } else {
+        klass.class_body = folder;
+    }
+}
+
+function set_constructor(klass, folder) {
+    if (klass.constructor) {
+        report_error(
+            "Конструктор уже есть",
+            folder.path
+        );
+    } else {
+        klass.constructor = folder;
+    }
+}
+
+function set_header(module, folder) {
+    if (module.header) {
+        report_error(
+            "Заголовок уже есть",
+            folder.path
+        );
+    } else {
+        module.header = folder;
+    }
+}
+
+function try_extract_name(text, prefix) {
+    var low = text.toLowerCase();
+    var before = prefix + " ";
+
+    if (low.startsWith(before)) {
+        return text.substring(before.length);
+    } else {
+        return undefined;
+    }
+}
+
+module.exports = {
+    read_project: read_project
+};
+},{}],15:[function(require,module,exports){
+"use strict";
+
+var global_options = undefined;
+var error_list = [];
+
+function add_action(content, body, final) {
+    var item = {
+        type: "action",
+        content: content,
+        final: final || false
+    };
+
+    body.push(item);
+}
+
+function build_class_tree(klass, output) {
+    var class_tree;
+    var names;
+    var i;
+    var name;
+    var method;
+
+    class_tree = {
+        type: klass.type,
+        name: klass.name,
+        body: []
+    };
+
+    output.push(class_tree);
+
+    generate_method_body(
+        klass.class_body,
+        class_tree.body
+    );
+
+    if (klass.constructor) {
+        build_method_tree(
+            klass.constructor,
+            class_tree.body
+        );
+    }
+
+    names = Object.keys(klass.methods);
+    names.sort();
+
+    for (i = 0; i < names.length; i++) {
+        name = names[i];
+        method = klass.methods[name];
+
+        build_method_tree(
+            method,
+            class_tree.body
+        );
+    }
+}
+
+function build_method_tree(method, output) {
+    var tree = {
+        type: "function",
+        keywords: method.keywords,
+        name: method.name,
+        args: method.args,
+        returns: method.returns,
+        body: []
+    };
+
+    output.push(tree);
+    generate_method_body(method, tree.body);
+}
+
+function build_module_tree(module, options) {
+    var tree;
+    var names;
+    var i;
+    var name;
+    var klass;
+
+    global_options = options;
+    error_list = [];
+
+    tree = {
+        type: "module",
+        body: []
+    };
+
+    generate_method_body(
+        module.header,
+        tree.body
+    );
+
+    names = Object.keys(module.classes);
+    names.sort();
+
+    for (i = 0; i < names.length; i++) {
+        name = names[i];
+        klass = module.classes[name];
+
+        build_class_tree(
+            klass,
+            tree.body
+        );
+    }
+
+    if (error_list.length === 0) {
+        return {
+            module: tree
+        };
+    } else {
+        return {
+            errors: error_list
+        };
+    }
+}
+
+function complex_silhouette_to_tree(context, body) {
+    var state_var;
+    var loop;
+    var switch_node;
+    var i;
+    var branch;
+    var condition;
+    var option;
+
+    state_var = context.state_var;
+
+    loop = {
+        type: "loop",
+        content: "Цикл",
+        body: []
+    };
+
+    body.push(loop);
+
+    switch_node = {
+        type: "if-switch",
+        options: [],
+        other: []
+    };
+
+    loop.body.push(switch_node);
+
+    for (i = 0; i < context.branches.length; i++) {
+        branch = context.branches[i];
+        condition = state_var + " = \"" + branch.name + "\"";
+
+        option = {
+            type: "option",
+            condition: condition,
+            body: []
+        };
+
+        switch_node.options.push(option);
+
+        convert_tree(context, branch.body, option.body);
+    }
+}
+
+function convert_tree(context, nodes, body) {
+    var i;
+    var node;
+    var content;
+    var final;
+    var item;
+    var next_branch;
+
+    for (i = 0; i < nodes.length; i++) {
+        node = nodes[i];
+
+        if (node.id && context.declarations.indexOf(node.id) !== -1) {
+            continue;
+        }
+
+        if (node.type === "action") {
+            content = node.content;
+            final = is_final(context.doc, node);
+
+            item = {
+                content: content,
+                type: node.type,
+                final: final
+            };
+
+            body.push(item);
+        } else {
+            if (node.type === "exit") {
+                if (!context.simple) {
+                    item = {
+                        type: node.type,
+                        final: true
+                    };
+
+                    if (!has_final(body)) {
+                        body.push(item);
+                    }
+                }
+            } else {
+                if (node.type === "question") {
+                    content = qc(node.content);
+
+                    item = {
+                        content: content,
+                        type: node.type,
+                        yes: [],
+                        no: []
+                    };
+
+                    convert_tree(context, node.yes, item.yes);
+                    convert_tree(context, node.no, item.no);
+
+                    body.push(item);
+                } else {
+                    if (node.type === "loop") {
+                        content = node.content || "Цикл";
+
+                        item = {
+                            type: "loop",
+                            content: content,
+                            body: []
+                        };
+
+                        convert_tree(context, node.body, item.body);
+
+                        body.push(item);
+                    } else {
+                        if (node.type === "address") {
+                            if (!has_final(body)) {
+                                if (context.simple) {
+                                    next_branch = find_branch(context.branches, node.content);
+
+                                    if (next_branch) {
+                                        convert_tree(context, next_branch.body, body);
+                                    } else {
+                                        report_error(
+                                            "Branch not found: " + node.content,
+                                            context.doc.path,
+                                            node.id
+                                        );
+                                    }
+                                } else {
+                                    add_action(context.state_var + " = \"" + node.content + "\"", body);
+                                }
+                            }
+                        } else {
+                            if (node.type === "break") {
+                                if (!has_final(body)) {
+                                    add_action("Прервать", body, true);
+                                }
+                            } else {
+                                if (node.type === "error") {
+                                    add_action(
+                                        "ВызватьИсключение \"" + node.message + ": \" + " + node.content,
+                                        body,
+                                        true
+                                    );
+                                } else {
+                                    report_error(
+                                        "Unexpected node type: " + node.type,
+                                        context.doc.path,
+                                        node.id
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+function declare_variables(doc, output) {
+    var i;
+    var item_id;
+    var item;
+
+    if (doc.declarations) {
+        for (i = 0; i < doc.declarations.length; i++) {
+            item_id = doc.declarations[i];
+            item = doc.items[item_id];
+
+            add_action(
+                item.content,
+                output
+            );
+        }
+    }
+}
+
+function drakon_to_tree(doc, noLoop) {
+    var tmp;
+    var json;
+    var options;
+    var raw_tree_json;
+
+    tmp = {
+        items: doc.items
+    };
+
+    json = JSON.stringify(tmp);
+
+    options = {
+        noLoop: noLoop
+    };
+
+    raw_tree_json = global_options.toTree(
+        json,
+        doc.name,
+        doc.path,
+        "en",
+        options
+    );
+
+    return JSON.parse(raw_tree_json);
+}
+
+function generate_method_body(doc, output) {
+    var raw_tree;
+    var first;
+    var declarations;
+    var context;
+
+    if (!doc) {
+        return;
+    }
+
+    raw_tree = drakon_to_tree(
+        doc,
+        false
+    );
+
+    if (raw_tree.branches.length === 0) {
+        return;
+    }
+
+    first = raw_tree.branches[0];
+    declarations = doc.declarations || [];
+
+    declare_variables(
+        doc,
+        output
+    );
+
+    if (raw_tree.branches.length === 1) {
+        context = {
+            declarations: declarations,
+            doc: doc,
+            simple: true,
+            branches: raw_tree.branches
+        };
+
+        convert_tree(
+            context,
+            first.body,
+            output
+        );
+    } else {
+        if (is_simple_silhouette(raw_tree)) {
+            context = {
+                declarations: declarations,
+                doc: doc,
+                simple: true,
+                branches: raw_tree.branches
+            };
+
+            convert_tree(
+                context,
+                first.body,
+                output
+            );
+        } else {
+            add_action(
+                "Перем _ветка_  тип Строка = \"" + first.name + "\"",
+                output
+            );
+
+            context = {
+                declarations: declarations,
+                doc: doc,
+                simple: false,
+                branches: raw_tree.branches,
+                state_var: "_ветка_ "
+            };
+
+            complex_silhouette_to_tree(
+                context,
+                output
+            );
+        }
+    }
+}
+
+function has_final(body) {
+    var last;
+
+    if (body.length === 0) {
+        return false;
+    } else {
+        last = body[body.length - 1];
+
+        if (last.final) {
+            return true;
+        } else {
+            if ((last.type === "question" && has_final(last.yes)) && has_final(last.no)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}
+
+function is_final(doc, node) {
+    var item;
+
+    if (node.id) {
+        item = doc.items[node.id];
+
+        if (item.content &&
+            (item.content.startsWith("Возврат ") ||
+                item.content.startsWith("ВызватьИсключение "))) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+function is_simple_silhouette(raw_tree) {
+    var first_branch;
+    var i;
+    var branch;
+    var is_last;
+
+    first_branch = raw_tree.branches[0];
+
+    if (first_branch.refs > 0) {
+        return false;
+    }
+
+    for (i = 0; i < raw_tree.branches.length; i++) {
+        branch = raw_tree.branches[i];
+        is_last = i === raw_tree.branches.length - 1;
+
+        if (branch.refs > 1) {
+            if (!(is_last && !(branch.body.length > 2))) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function qc(content) {
+    var operand;
+    var left;
+    var right;
+
+    if (typeof content === "string") {
+        return content;
+    } else {
+        if (content.operator === "not") {
+            operand = qc(content.operand);
+            return "Не (" + operand + ")";
+        } else {
+            if (content.operator === "and") {
+                left = qc(content.left);
+                right = qc(content.right);
+                return "(" + left + ") И (" + right + ")";
+            } else {
+                if (content.operator === "or") {
+                    left = qc(content.left);
+                    right = qc(content.right);
+                    return "(" + left + ") Или (" + right + ")";
+                } else {
+                    if (!(content.operator === "equal")) {
+                        throw new Error("Unexpected case value: " + content.operator);
+                    }
+
+                    left = qc(content.left);
+                    right = qc(content.right);
+
+                    return left + " = " + right;
+                }
+            }
+        }
+    }
+}
+
+function find_branch(branches, name) {
+    var i;
+    var branch;
+
+    for (i = 0; i < branches.length; i++) {
+        branch = branches[i];
+
+        if (branch.name === name) {
+            return branch;
+        }
+    }
+
+    return undefined;
+}
+
+function report_error(message, handle, item_id, data) {
+    error_list.push({
+        message: message,
+        filename: handle,
+        nodeId: item_id,
+        data: data
+    });
+}
+
+module.exports = {
+    build_module_tree: build_module_tree
+};
+},{}],16:[function(require,module,exports){
 function topologicaSort(start, getAdjacentNodes, reportError) {
     var context = {
         permanent: {},
@@ -7125,7 +8532,7 @@ function topologicaSortCore(context, key, crumbs) {
 module.exports = {
     topologicaSort
 }
-},{}],12:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 function findFirst(array, predicate) {
     for (var item of array) {
         if (predicate(item)) {
