@@ -1,5 +1,6 @@
 function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
   var Nav = NavModule();
+  var globalLanguage = ""
 
   var gSkipPushState = false;
   var FEATURE_SAVE_PROJECT = true;
@@ -989,6 +990,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
   }
 
   function FolderShower_GettingFolder_onData(self, data) {
+    globalLanguage = data.language
     showFolderCommon(self.id, data);
     if (canContainChildren(globs.current)) {
       setActiveScreen("middle_folder", data.access);
@@ -1892,7 +1894,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
       var onSave = function (text) {
         self.onData(text.trim());
       };
-      showRenameDialog(folder, onSave, folder.language);
+      showRenameDialog(folder, onSave, globalLanguage);
       self.state = "EnteringName";
     } else {
       self.state = null;

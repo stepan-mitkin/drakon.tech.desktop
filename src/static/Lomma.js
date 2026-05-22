@@ -2224,9 +2224,15 @@ function addItemWithLength(statement, item) {
     statement.length += item.length
 }
 
-function addKeyword(keywords, name, output) {
+function addKeyword(keywords, name, output, pfl) {
+    var text
+    if (isPfl()) {
+        text = pfl
+    } else {
+        text = name
+    }
     if (keywords[name]) {
-        output.push(name)
+        output.push(text)
     }
 }
 
@@ -2301,9 +2307,7 @@ function addLowerCorner(crawler, node) {
 }
 
 function addNoWs(self, token) {
-    if ((token.type == "whitespace") || (token.type == "eol")) {
-        
-    } else {
+    if ((self.ws) || (!((token.type == "whitespace") || (token.type == "eol")))) {
         if (token.type == "identifier") {
             if (token.text in module.keyOps) {
                 token.type = "operator"
@@ -5179,8 +5183,8 @@ function createJunction(visuals, finalTarget) {
 function createKeywordsText(storage) {
     var keyText, keywords
     keywords = []
-    addKeyword(storage.keywords, "export", keywords)
-    addKeyword(storage.keywords, "async", keywords)
+    addKeyword(storage.keywords, "export", keywords, "ВидноВсем")
+    addKeyword(storage.keywords, "async", keywords, "Асинх")
     if (keywords.length == 0) {
         keyText = ""
     } else {
@@ -5507,16 +5511,17 @@ function createToken(type, text) {
     }
 }
 
-function createTokenCollection() {
+function createTokenCollection(ws) {
     var self
     self = {
-        tokens : []
+        tokens : [],
+        ws : ws
     }
     self.onToken = function(token) {
     	addNoWs(self, token)
     }
     self.eol = function() {
-    
+    	tcEol(self)
     }
     return self
 }
@@ -6423,7 +6428,11 @@ function editMethod(name, method) {
 }
 
 function end() {
-    return translateLabel("end", "DIA_END")
+    if (isPfl()) {
+        return "Конец"
+    } else {
+        return translateLabel("end", "DIA_END")
+    }
 }
 
 function endToken(self) {
@@ -8817,7 +8826,11 @@ function isKeyword(text) {
         if (isLua()) {
             return text in module.luakeywords
         } else {
-            return text in module.cljkeywords
+            if (isPfl()) {
+                return text in module.pflkeywords
+            } else {
+                return text in module.cljkeywords
+            }
         }
     }
 }
@@ -8901,6 +8914,10 @@ function isPart(haystack, start, needle) {
             i++;
         }
     }
+}
+
+function isPfl() {
+    return module.language === "PFL"
 }
 
 function isRightT(node) {
@@ -9068,7 +9085,11 @@ function isValueKeyword(text) {
         if (isLua()) {
             return text in module.luakeyvalues
         } else {
-            return false
+            if (isPfl()) {
+                return text in module.pflkeyvalues
+            } else {
+                return false
+            }
         }
     }
 }
@@ -9394,6 +9415,8 @@ function lexInit() {
     "elseif", "end", "for", "function", "goto",
     "if", "in", "local", "not", "or",
     "repeat", "return", "then", "until", "while"])
+    module.pflkeywords = arrayToSet([
+    ])
     module.cljkeywords = arrayToSet([
       "first", "rest", "cons", "conj", "map", "filter", "reduce", "into", "take", "drop", 
       "nth", "get", "assoc", "dissoc", "keys", "vals", "merge", "select-keys",
@@ -9437,6 +9460,36 @@ function lexInit() {
     module.noSpaces["!"] = true
     module.keyValues = arrayToSet(["true", "false", "null", "undefined", "this"])
     module.luakeyvalues = arrayToSet(["true", "false", "nil"])
+    module.pflkeyvalues = arrayToSet([
+    "False","Nothing","True","Да","Истина",
+    "Ложь","Неопределено","Нет","Правда",
+    "And","BitAnd","BitOr","BitXor","Is","IsNot","LogAnd",
+    "LogOr","Or","Xor","БитИ","БитИли","БитИсклИли","И","Или","ИсклИли",
+    "Как","ЛогИ","ЛогИли","Это","ЭтоНе","ЭтоТип","ЭтоНеТип",
+    "Блокировка","Выбор","Если","Завершение","Иначе","ИначеЕсли",
+    "Исключение","Использовать","Когда","Попытка","При","Тогда",
+    "Для","Каждого","По","Пока","Прервать","ПрерватьЕсли","Продолжить",
+    "ПродолжитьЕсли","Цикл","Шаг","ИмпортИмен","Наследует","Определено",
+    "Реализует","Родитель","Тип","ЭтотКласс","ЭтотОбъект","КонецБлокировки",
+    "КонецВыбора","КонецЕсли","КонецИспользовать","КонецПопытки",
+    "КонецЦикла","КонецВызвать","КонецДеструктора","КонецДобавить",
+    "КонецЗавершителя","КонецИтератора","КонецКонструктора","КонецМетода",
+    "КонецОператора","КонецПолучить","КонецПроцедуры","КонецУдалить",
+    "КонецУстановить","КонецФункции","КонецСвойства","КонецСобытия",
+    "КонецИнтерфейса","КонецКласса","КонецМодуля","КонецПеречисления",
+    "КонецПрограммы","КонецСтруктуры","ИсточникСобытий","Поле","Поля",
+    "Свойства","Свойство","Событие","События","ВводСтроки","Возврат",
+    "ВозвратЕсли","ВыводСтроки","ВызватьЗавершитель","ВызватьИсключение",
+    "ВызватьСобытие","ДобавитьОбработчик","Ждать","МассивИзменить",
+    "МассивНовый","МассивОчистить","МассивУдалить","Новый","Перейти",
+    "ПолучитьДелегат","ПолучитьРесурс","Присвоить","УдалитьОбработчик",
+    "Вызвать","Деструктор","Добавить","Завершитель","Итератор","Конструктор",
+    "Метод","Оператор","Получить","Процедура","Удалить","Установить",
+    "Функция","Знч","Исп","Конст","Константа","Массив","Пер","Перем",
+    "Переменная","До","От","BitNot","IsTrue","IsFalse","Not","БитНе",
+    "Не","ЭтоИстина","ЭтоЛожь","Делегат","Интерфейс","Класс","Модуль",
+    "Перечисление","Программа","Структура","тип"
+    ])
 }
 
 function lexSearch(text) {
@@ -9462,7 +9515,7 @@ function lexSource(text) {
     var lexer, machineList, machines, ob, tcollection
     text = text  || ""
     lexer = createTreeLexer()
-    tcollection = createTokenCollection()
+    tcollection = createTokenCollection(isPfl())
     ob = new OperBuilder()
     ob.tokens = []
     ob.finish = function() {mergeOps(ob)}
@@ -10467,7 +10520,11 @@ function nextSymbol(state) {
 }
 
 function no() {
-    return translateLabel("no", "DIA_NO")
+    if (isPfl()) {
+        return "Нет"
+    } else {
+        return translateLabel("no", "DIA_NO")
+    }
 }
 
 function noBreakKeyword(item) {
@@ -11284,30 +11341,34 @@ function prepend(item, array) {
 
 function prettify(tokens, type) {
     var block2, rawFlower, root, rootBlock, state
-    root = createBlock()
-    state = createParsingState(
-        tokens
-    )
-    readBlock(state, root, null, true)
-    rootBlock = root.statement.items[0]
-    if (rootBlock) {
-        block2 = addSpaces(rootBlock)
-        rawFlower = createRawFlower()
-        if ((type == "loopbegin") || (type == "loopend")) {
-            printBlockLine(
-                block2,
-                0,
-                rawFlower
-            )
-        } else {
-            printRootBlock(
-                block2,
-                rawFlower
-            )
-        }
-        return rawFlower.tokens
+    if (isPfl()) {
+        return tokens
     } else {
-        return []
+        root = createBlock()
+        state = createParsingState(
+            tokens
+        )
+        readBlock(state, root, null, true)
+        rootBlock = root.statement.items[0]
+        if (rootBlock) {
+            block2 = addSpaces(rootBlock)
+            rawFlower = createRawFlower()
+            if ((type == "loopbegin") || (type == "loopend")) {
+                printBlockLine(
+                    block2,
+                    0,
+                    rawFlower
+                )
+            } else {
+                printRootBlock(
+                    block2,
+                    rawFlower
+                )
+            }
+            return rawFlower.tokens
+        } else {
+            return []
+        }
     }
 }
 
@@ -14016,6 +14077,16 @@ function takeOldValues(fields, old) {
     return undo
 }
 
+function tcEol(self) {
+    var token
+    if (isPfl()) {
+        token = {
+        	type: "eol"
+        }
+        self.tokens.push(token)
+    }
+}
+
 function tmpRenderSource(render, item, text, isSource) {
     var format, left, prims, texId, top
     format = {}
@@ -14793,7 +14864,11 @@ function withinSameLoopCore(node, target, depth) {
 }
 
 function yes() {
-    return translateLabel("yes", "DIA_YES")
+    if (isPfl()) {
+        return "Да"
+    } else {
+        return translateLabel("yes", "DIA_YES")
+    }
 }
 
 function yesWidth(render) {

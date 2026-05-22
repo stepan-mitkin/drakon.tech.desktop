@@ -1,0 +1,1 @@
+electron src/main.js --dev

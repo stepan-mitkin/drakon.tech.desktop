@@ -224,9 +224,16 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
       }
       tpart.style.display = "inline-block";
       tpart.style.marginTop = "8px";
-      HtmlUtils.setDivText(tpart, translate(item.text));
+      tpart.style.whiteSpace = "normal"
+      var text = replace(item.text, "\\", " / ")
+      text = replace(text, "/", " / ")
+      HtmlUtils.setDivText(tpart, translate(text));
       _ind2396++;
     }
+  }
+
+  function replace(text, from, to) {
+    return text.split(from).join(to)
   }
 
   function addMenuSection(parent, menu) {
@@ -2339,7 +2346,7 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
         "MES_LAZY_ALGOPROP",
         node.algoprop && node.lazy,
       );
-    } else if (language === "JS2604") {
+    } else if (language === "JS2604" || language === "PFL2605") {
       addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
       var s2 = make(div, "div");
       s2.style.height = "10px";
