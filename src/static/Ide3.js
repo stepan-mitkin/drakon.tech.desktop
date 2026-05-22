@@ -2355,6 +2355,10 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
       addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
       var s2 = make(div, "div");
       s2.style.height = "10px";
+    } else if (language === "OS2605") {
+      addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
+      var s2 = make(div, "div");
+      s2.style.height = "10px";
     }
   }
 
