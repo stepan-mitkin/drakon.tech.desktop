@@ -2224,10 +2224,16 @@ function addItemWithLength(statement, item) {
     statement.length += item.length
 }
 
-function addKeyword(keywords, name, output, pfl) {
-    var text
-    if (isPfl()) {
-        text = pfl
+function addKeyword(keywords, name, output) {
+    var lang, text, value
+    lang = module.syntax
+    if (lang) {
+        value = lang[name]
+        if (value) {
+            text = value
+        } else {
+            text = name
+        }
     } else {
         text = name
     }
@@ -5183,8 +5189,24 @@ function createJunction(visuals, finalTarget) {
 function createKeywordsText(storage) {
     var keyText, keywords
     keywords = []
-    addKeyword(storage.keywords, "export", keywords, "ВидноВсем")
-    addKeyword(storage.keywords, "async", keywords, "Асинх")
+    var _ind13633 = 0;
+    var _col13633 = storage.keywords;
+    var _keys13633 = Object.keys(_col13633); 
+    var _len13633 = _keys13633.length;
+    while (true) {
+        if (_ind13633 < _len13633) {
+            
+        } else {
+            break;
+        }
+        var key = _keys13633[_ind13633]; var value = _col13633[key];
+        if (key === "function") {
+            
+        } else {
+            addKeyword(storage.keywords, key, keywords)
+        }
+        _ind13633++;
+    }
     if (keywords.length == 0) {
         keyText = ""
     } else {
@@ -6431,11 +6453,7 @@ function editMethod(name, method) {
 }
 
 function end() {
-    if (isPfl()) {
-        return "Конец"
-    } else {
-        return translateLabel("end", "DIA_END")
-    }
+    return getDiagramLabel("end", "DIA_END")
 }
 
 function endToken(self) {
@@ -7518,6 +7536,21 @@ function getDiagramAsItems() {
         name : storage.name,
         type : storage.type,
         items : items
+    }
+}
+
+function getDiagramLabel(text, labelId) {
+    var lang, value
+    lang = module.syntax
+    if (lang) {
+        value = lang[text]
+        if (value) {
+            return value
+        } else {
+            return translateLabel(text, labelId)
+        }
+    } else {
+        return translateLabel(text, labelId)
     }
 }
 
@@ -8909,10 +8942,6 @@ function isPart(haystack, start, needle) {
     }
 }
 
-function isPfl() {
-    return module.language === "PFL"
-}
-
 function isRightT(node) {
     if (((((node.type == "junction") && (!(node.left))) && (node.up)) && (node.right)) && (node.down)) {
         return true
@@ -9433,7 +9462,7 @@ function lexSource(text) {
     var lexer, machineList, machines, ob, tcollection
     text = text  || ""
     lexer = createTreeLexer()
-    tcollection = createTokenCollection(isPfl())
+    tcollection = createTokenCollection(!shouldPrettify())
     ob = new OperBuilder()
     ob.tokens = []
     ob.finish = function() {mergeOps(ob)}
@@ -10438,11 +10467,7 @@ function nextSymbol(state) {
 }
 
 function no() {
-    if (isPfl()) {
-        return "Нет"
-    } else {
-        return translateLabel("no", "DIA_NO")
-    }
+    return getDiagramLabel("no", "DIA_NO")
 }
 
 function noBreakKeyword(item) {
@@ -14007,7 +14032,9 @@ function takeOldValues(fields, old) {
 
 function tcEol(self) {
     var token
-    if (isPfl()) {
+    if (shouldPrettify()) {
+        
+    } else {
         token = {
         	type: "eol"
         }
@@ -14792,11 +14819,7 @@ function withinSameLoopCore(node, target, depth) {
 }
 
 function yes() {
-    if (isPfl()) {
-        return "Да"
-    } else {
-        return translateLabel("yes", "DIA_YES")
-    }
+    return getDiagramLabel("yes", "DIA_YES")
 }
 
 function yesWidth(render) {

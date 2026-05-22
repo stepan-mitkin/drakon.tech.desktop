@@ -4844,28 +4844,10 @@ function validateModuleName(name, language) {
                         // item 3424
                         return null
                     } else {
-                        if (language === "clojure" || language.startsWith("PFL")) {
-                            if (name.indexOf(" ") !== -1) {
-                                return "ERR_NAME_INVALID_IDENTIFIER"    
-                            }
-                            return null
+                        if (name.indexOf(" ") !== -1) {
+                            return "ERR_NAME_INVALID_IDENTIFIER"    
                         }
-                        // item 3434
-                        if (containsIdentifierChars(name)) {
-                            // item 3466
-                            var first = name.charCodeAt(0)
-                            // item 3463
-                            if (isDigit(first)) {
-                                // item 3467
-                                return "MES_IDENTIFIER_FIRST"
-                            } else {
-                                // item 3424
-                                return null
-                            }
-                        } else {
-                            // item 3432
-                            return "ERR_NAME_INVALID_IDENTIFIER"
-                        }
+                        return null
                     }
                 }
             }

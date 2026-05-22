@@ -33,6 +33,11 @@ function CreateSyntaxHighlightingOptions() {
         },
         "PFL": {
             prettify: false,
+            yes: "Да",
+            no: "Нет",
+            end: "Конец",
+            async: "Асинх",
+            export: "ВидноВсем",
             keywords: {},
             values: arrayToSet([
                 "Из",

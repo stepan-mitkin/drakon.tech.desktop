@@ -3586,14 +3586,14 @@ function EditorCtrl(window, document, elementId, userId) {
     div.style.whiteSpace = "nowrap";
   }
 
+  function takeBeforeFirstDigit(text) {
+    const match = text.match(/\d/);
+    return match ? text.substring(0, match.index) : text;
+  }
+
   function normalizeDiagram(data) {
-    if (data.language.startsWith("JS")) {
-      data.language = "JS";
-    } else if (data.language.startsWith("LUA")) {
-      data.language = "LUA";
-    } else if (data.language.startsWith("PFL")) {
-      data.language = "PFL";      
-    }
+    data.language = takeBeforeFirstDigit(data.language)
+
     if (data.items) {
     } else {
       if (data.nodes) {
