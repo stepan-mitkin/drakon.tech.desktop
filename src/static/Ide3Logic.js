@@ -2946,7 +2946,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
     return {
       text: item,
       action: function () {
-        dtApp.tryOpenFolder(item);
+        dtApp.openProjectCore(item);
       },
     };
   }
@@ -2962,11 +2962,11 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
       action: backend.newWindow,
     });
     fileItems.push({
-      text: "Open folder",
-      action: dtApp.openFolder,
+      text: "Open project",
+      action: dtApp.openProject,
     });
     fileItems.push({
-      text: "Close folder",
+      text: "Close project",
       action: dtApp.closeFolder,
     });
     var exportItems = [

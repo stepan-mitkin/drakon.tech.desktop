@@ -10,7 +10,7 @@ const {
     getFolder,
     updateFolder,
     getHistory,
-    openFolderCore,
+    openProjectCore,
     changeManyCore,
     getFilePathById,
     searchFolders,
@@ -62,7 +62,7 @@ function getRecentPath() {
 async function setRecent(winInfo, recent) {
     var filename = getRecentPath()
     var obj = {
-        recent: recent
+        recentProjects: recent
     }
     await writeJson(filename, obj)
 }
@@ -70,7 +70,7 @@ async function setRecent(winInfo, recent) {
 async function getRecent() {
     var filename = getRecentPath()
     var obj = await readJson(filename)
-    var result = obj.recent || []
+    var result = obj.recentProjects || []
     return result
 }
 
@@ -98,10 +98,15 @@ async function updateSettings(winInfo, update) {
     }
 }
 
-async function chooseFolder(winInfo) {
+async function getDocumentsPath() {
+    return app.getPath("documents")
+}
+ 
+async function chooseFolder(winInfo, folder) {
     var dialogResult = await dialog.showOpenDialog(
         winInfo.window,
         {
+            defaultPath: folder,
             properties: ['openDirectory']
         }
     )
@@ -152,6 +157,41 @@ async function setClipboard(winInfo, type, content) {
     invokeClipboardUpdated()
 }
 
+async function createProject(winInfo, project) {
+    try {
+        const projectFolder = path.join(
+            project.path,
+            project.name
+        );
+
+        await fs.mkdir(projectFolder, {
+            recursive: true
+        });
+
+        const projectPath = path.join(
+            project.path,
+            project.name,
+            project.name + ".dtproj"
+        );
+
+        const body = {
+            language: project.language,
+            outputFile: project.output
+        };
+
+        await fs.writeFile(
+            projectPath,
+            JSON.stringify(body, undefined, 4),
+            "utf8"
+        );
+
+        return projectPath;
+    } catch (ex) {
+        console.error(ex);
+        return undefined;
+    }
+}
+
 function invokeClipboardUpdated() {
     for (var winId in globals.windows) {
         var winInfo = globals.windows[winId]
@@ -159,13 +199,35 @@ function invokeClipboardUpdated() {
     }
 }
 
-async function openFolder(winInfo, folderPath) {
-    var win = findWindowByPathExact(folderPath)
+async function openProjectFile(winInfo, startPath) {
+    const result = await dialog.showOpenDialog(
+        winInfo.window,
+        {
+            defaultPath: startPath,
+            properties: ["openFile"],
+            filters: [
+                {
+                    name: "DrakonTech project",
+                    extensions: ["dtproj"]
+                }
+            ]
+        }
+    );
+
+    if (result.canceled || result.filePaths.length === 0) {
+        return undefined;
+    }
+
+    return result.filePaths[0];
+}
+
+async function openProject(winInfo, projectPath) {
+    var win = findWindowByPathExact(projectPath)
     if (win) {
         raiseWindow(win)
         return undefined
     } else {
-        return await openFolderCore(winInfo, folderPath)
+        return await openProjectCore(winInfo, projectPath)
     }
 }
 
@@ -264,8 +326,11 @@ function registerMainCallbacks() {
     registerHandler(getSettings)
     registerHandler(updateSettings)
     registerHandler(chooseFolder)
+    registerHandler(getDocumentsPath)
     registerHandler(getMyFolder)    
-    registerHandler(openFolder)
+    registerHandler(openProjectFile)
+    registerHandler(openProject)
+    registerHandler(createProject)
     registerHandler(getFolder)
     registerHandler(getHistory)
     registerHandler(createFolder)

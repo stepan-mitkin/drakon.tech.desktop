@@ -514,8 +514,13 @@ async function loadRecordFromDiscToCache(winInfo, filepath) {
   return id;
 }
 
-async function openFolderCore(winInfo, folderPath) {
-  await determineAccess(winInfo, folderPath);
+async function openProjectCore(winInfo, projectPath) {
+  var folderPath = path.dirname(projectPath)
+  const name = path.basename(
+    projectPath,
+    ".dtproj"
+  );
+  await determineAccess(winInfo, folderPath, name);
   createMemoryStructures(winInfo, folderPath);
   await loadHistory(winInfo, folderPath);
   await loadProjectSettings(winInfo);
@@ -525,10 +530,7 @@ async function openFolderCore(winInfo, folderPath) {
 async function loadProjectSettings(winInfo) {
   var language = "JS";
   var format = "CommonJS";
-  var solution = await tryReadJson(path.join(winInfo.path, "module.json"));
-  if (!solution) {
-    solution = await tryReadJson(path.join(winInfo.path, "solution.json"));
-  }
+  var solution = await tryReadJson(path.join(winInfo.path, winInfo.name + ".dtproj"));
   if (!solution) {
     solution = {};
   }
@@ -547,7 +549,7 @@ async function loadProjectSettings(winInfo) {
   winInfo.dependencies = solution.dependencies;
 }
 
-async function determineAccess(winInfo, folderPath) {
+async function determineAccess(winInfo, folderPath, name) {
   folderPath = path.resolve(folderPath);
   if (!(await isDirectory(folderPath))) {
     throw new Error("Invalid folder path");
@@ -561,7 +563,7 @@ async function determineAccess(winInfo, folderPath) {
     console.log("determineAccess", ex.message);
     access = "read";
   }
-  winInfo.name = path.parse(folderPath).name;
+  winInfo.name = name
   winInfo.path = folderPath;
   winInfo.access = access;
 }
@@ -1258,7 +1260,7 @@ module.exports = {
   getFolder,
   updateFolder,
   getHistory,
-  openFolderCore,
+  openProjectCore,
   changeManyCore,
   getFilePathById,
   searchFolders,

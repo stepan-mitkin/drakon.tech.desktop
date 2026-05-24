@@ -257,7 +257,23 @@
             createStyle(".button-div", [
                 "margin", "10px 0",
                 "text-align", "center"
-            ])    
+            ]),
+
+            createStyle(".pp-central-dialog input", [
+                "margin-top", "5px",
+                "padding", "5px",
+                "width", "100%"
+            ]),
+
+            createStyle(".pp-central-dialog select", [
+                "margin-top", "5px",
+                "padding", "5px"
+            ]),            
+
+            createStyle(".pp-central-dialog h2", [
+                "font-size", "20px",
+                "font-weight", "bold"
+            ])               
         ])     
     }
 
@@ -358,16 +374,107 @@
         add(recentItem, div("recent-name", {text:last}))
         add(recentItem, div("recent-value", {text:recent}))
         var callback = function() {
-            tryOpenFolder(recent)
+            openProjectCore(recent)
         }
         recentItem.addEventListener("click", callback)
         add(parent, recentItem);
     }
 
-    async function openFolder() {
-        var folder = await backend.chooseFolder()
-        if (!folder) {return}
-        await tryOpenFolder(folder)
+    async function openProject() {
+        console.log("openProject")
+        try {
+            var startPath = await getProjectFolder()
+            var projectPath = await backend.openProjectFile(startPath)
+            if (!projectPath) {return}
+            return await openProjectCore(projectPath)            
+        } catch (ex) {
+            console.error(ex)
+            return {
+                ok: false,
+                error: translate("An error has occurred")
+            }
+        }
+    }
+
+    async function chooseFolder(startPath) {
+        var path = await backend.chooseFolder(startPath);
+        if (path) {
+            localStorage.setItem("dt-project-path", path);
+        }
+        return path;
+    }    
+
+    async function getProjectFolder() {
+        var path = localStorage.getItem("dt-project-path")
+        if (!path) {
+            return await backend.getDocumentsPath()
+        }
+        return path
+    }
+
+    async function doCreateProject(project) {
+        console.log("doCreateProject", project)
+        try {
+            var projectPath = await backend.createProject(project)
+            if (!projectPath) {
+                return {
+                    ok: false,
+                    error: translate("An error has occurred")
+                }
+            }
+            return {
+                projectPath: projectPath,
+                ok: true
+            }            
+        } catch (ex) {
+            console.error(ex)
+            return {
+                ok: false,
+                error: translate("An error has occurred")
+            }
+        }
+    }
+
+    async function doUpdateProject(project) {
+        console.log("doUpdateProject", project)
+        return {
+            ok: true
+        }
+    }
+
+    async function doOpenProject(projectPath) {
+        console.log("doOpenProject", projectPath)
+        await openProjectCore(projectPath)
+        return {
+            ok: true
+        }
+    }    
+
+    async function createProject() {
+        console.log("createProject")
+        var createOptions = {
+            translate: translate,
+
+            defaultButtonClass: "ui2-default-button",
+            normalButtonClass: "ui2-normal-button",
+
+            createProject: doCreateProject,
+            updateProject: doUpdateProject,
+
+            openProject: doOpenProject,
+            reloadProject: undefined,
+            choosePath: chooseFolder,
+
+            showErrorBar: function(message) {
+                console.error(message)
+            },
+
+            path: await getProjectFolder(),
+            name: undefined,
+            language: undefined,
+            output: undefined
+        }
+        showCreateProjectDialog(createOptions)
     }
 
     async function addToRecent(folder) {
@@ -383,18 +490,22 @@
         await backend.setRecent(recent)
     }
 
-    async function tryOpenFolder(folder) {
+    async function openProjectCore(projectPath) {
         try {
             var settings = await backend.getSettings()
             setLanguage(settings.language)            
-            var spaceId = await backend.openFolder(folder)
+            var spaceId = await backend.openProject(projectPath)
             if (!spaceId) {return}
-            await addToRecent(folder)
-            var folderName = await backend.getProjectName()
-            startIde(spaceId, folderName)
+            await addToRecent(projectPath)
+            var projectName = await backend.getProjectName()
+            startIde(spaceId, projectName)
         } catch (ex) {
             console.log(ex)
             await showStartPage()
+            return {
+                ok: false,
+                error: translate("An error has occurred")
+            }
         }
     }
 
@@ -405,8 +516,8 @@
     }
 
     window.dtApp = {
-        openFolder: openFolder,
-        tryOpenFolder: tryOpenFolder,
+        openProject: openProject,
+        openProjectCore: openProjectCore,
         closeFolder: closeFolder
     }
 
@@ -488,13 +599,19 @@
         body.style.margin = "auto"; // Center align body content
         add(container, body);
 
-        // Add "Open folder..." button
-        const openFolderButtonDiv = div("button-div");
-        const openFolderButton = div("ui2-default-button");
-        openFolderButton.innerText = translate("Open folder") + "...";
-        openFolderButton.onclick = openFolder; // Set click handler
-        add(openFolderButtonDiv, openFolderButton);
-        add(body, openFolderButtonDiv);
+        const createProjectButtonDiv = div("button-div");
+        const createProjectButton = div("ui2-normal-button");
+        createProjectButton.innerText = translate("Create a new project");
+        createProjectButton.onclick = createProject
+        add(createProjectButtonDiv, createProjectButton);
+        add(body, createProjectButtonDiv);
+
+        const openProjectButtonDiv = div("button-div");
+        const openProjectButton = div("ui2-default-button");
+        openProjectButton.innerText = translate("Open project") + "...";
+        openProjectButton.onclick = openProject; // Set click handler
+        add(openProjectButtonDiv, openProjectButton);
+        add(body, openProjectButtonDiv);
 
         if (recent.length === 0) {return}
         
@@ -540,6 +657,7 @@
         wide.style.top = "0px"
         wide.style.width = "100vw"
         wide.style.height = "100vh"        
+        wide.style.overflow = "auto"
     }
 
     async function main() {
@@ -550,7 +668,7 @@
         var folder = await backend.getMyFolder()
         if (folder) {
             await backend.downloadExample(folder)
-            await tryOpenFolder(folder)
+            await openProjectCore(folder)
         } else {
             await showStartPage()
         }
