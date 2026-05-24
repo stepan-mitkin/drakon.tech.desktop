@@ -2986,6 +2986,10 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
 
     var rwShotItems = [];
     rwShotItems.push({
+      text: "Project properties",
+      action: dtApp.editProject,
+    });
+    rwShotItems.push({
       text: "MES_PROJECT_TREE",
       action: openLeftPane,
     });
@@ -5387,6 +5391,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
           addNewItems(id, list);
         }
         if (isSpace) {
+          makeTextListItem(list, "Project properties", dtApp.editProject)
         } else {
           if (shouldFindReferences(folder.type)) {
             makeTextListItem(list, "MES_FIND_REFERENCES", function () {

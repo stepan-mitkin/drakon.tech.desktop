@@ -26,7 +26,9 @@ const {
     getObjectByHandle,
     getFolderInfoByHandle,
     showGeneratedFile,
-    getSolution
+    getSolution,
+    getProject,
+    updateProject
 } = require("./filetree")
 
 var logg = undefined
@@ -176,12 +178,22 @@ async function createProject(winInfo, project) {
 
         const body = {
             language: project.language,
-            outputFile: project.output
+            outputFile: project.outputFile
         };
-        
+
         if (project.format) {
             body.format = project.format
         }
+
+        if (project.deps) {
+            body.dependencies = project.dependencies
+        }
+
+        if (project.mainFun) {
+            body.mainFun = project.mainFun
+
+        }        
+
 
         await fs.writeFile(
             projectPath,
@@ -356,6 +368,9 @@ function registerMainCallbacks() {
     registerHandler(exportProject)
     registerHandler(clearProject)
     registerHandler(getProjectName)
+    registerHandler(getProject)
+    registerHandler(updateProject)
+    
 
     registerHandler(getFilePathById)
 
@@ -481,7 +496,7 @@ function raiseWindow(winInfo) {
 }
 
 function onSecondInstance(evt, argv) {
-    var foldername = getFilenameFromCommandLine(argv)
+    var foldername = getCommandLineArgument()
     if (foldername) {
         foldername = path.resolve(foldername)
         log("onSecondInstance: got foldername: " + foldername)
@@ -540,20 +555,6 @@ const createWindow = async (folderpath) => {
     })
 }
 
-function getFilenameFromCommandLine(argv) {
-    for (var i = argv.length - 1; i > 0; i--) {
-        var part = argv[i]
-        if (part && part.substring(0, 2) !== "--") {
-            var result = path.normalize(part)
-            log("getFilenameFromCommandLine: " + result)
-            return result
-        }
-    }
-
-    log("getFilenameFromCommandLine: undefined")
-    return undefined
-}
-
 function createWindowIfNoWindows() {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow(undefined)
@@ -589,8 +590,31 @@ async function main() {
     app.on('activate', createWindowIfNoWindows)
     await app.whenReady()
     registerMainCallbacks()
-    var filename = getFilenameFromCommandLine(process.argv)
+    var filename = getCommandLineArgument()
     createWindow(filename)
+}
+
+function getCommandLineArgument() {
+    var args;
+
+    if (process.argv.length < 2) {
+        return undefined;
+    }
+
+    if (process.argv[1] && process.argv[1].endsWith(".js")) {
+        // electron src/main.js myproject.dtsrc
+        args = process.argv.slice(2);
+    } else {
+        // drakonhub.exe myproject.dtsrc
+        args = process.argv.slice(1);
+    }
+
+    for (var arg of args) {
+        if (arg !== "--dev") {
+            return arg
+        }
+    }
+    return undefined;
 }
 
 

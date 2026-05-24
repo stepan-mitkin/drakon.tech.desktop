@@ -32,6 +32,8 @@ contextBridge.exposeInMainWorld('backend', {
     saveAsPng: (filename, dataurl) => ipcRenderer.invoke("saveAsPng", filename, dataurl),
     getMyFolder: () => ipcRenderer.invoke("getMyFolder"),
     getProjectName: () => ipcRenderer.invoke("getProjectName"),
+    getProject: () => ipcRenderer.invoke("getProject"),
+    updateProject: (project) => ipcRenderer.invoke("updateProject", project),
     getAppVersion: () => ipcRenderer.invoke("getAppVersion"),
     getRootHandle: () => ipcRenderer.invoke("getRootHandle"),
     downloadExample: () => ipcRenderer.invoke("downloadExample"),

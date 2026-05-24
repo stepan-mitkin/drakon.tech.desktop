@@ -437,6 +437,7 @@
 
     async function doUpdateProject(project) {
         console.log("doUpdateProject", project)
+        await backend.updateProject(project)
         return {
             ok: true
         }
@@ -449,6 +450,14 @@
             ok: true
         }
     }    
+
+    async function reloadProject() {
+        var project = await backend.getProject()
+        await openProjectCore(project.projectFile)
+        return {
+            ok: true
+        }
+    }
 
     async function createProject() {
         console.log("createProject")
@@ -475,6 +484,36 @@
             output: undefined
         }
         showCreateProjectDialog(createOptions)
+    }
+
+    async function editProject() {
+        console.log("editProject")
+        var project = await backend.getProject()
+        var createOptions = {
+            translate: translate,
+
+            defaultButtonClass: "ui2-default-button",
+            normalButtonClass: "ui2-normal-button",
+
+            createProject: undefined,
+            updateProject: doUpdateProject,
+
+            openProject: doOpenProject,
+            reloadProject: reloadProject,
+            choosePath: undefined,
+
+            showErrorBar: function(message) {
+                console.error(message)
+            },
+
+            name: project.name,
+            language: project.language,
+            outputFile: project.outputFile,
+            dependencies: project.dependencies,
+            mainFun: project.mainFun,
+            format: project.format
+        }
+        showProjectPropertiesDialog(createOptions)
     }
 
     async function addToRecent(folder) {
@@ -516,6 +555,7 @@
     }
 
     window.dtApp = {
+        editProject: editProject,
         createProject: createProject,
         openProject: openProject,
         openProjectCore: openProjectCore,

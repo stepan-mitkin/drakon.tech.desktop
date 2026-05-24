@@ -527,10 +527,29 @@ async function openProjectCore(winInfo, projectPath) {
   return winInfo.spaceId;
 }
 
+function getProjectFilename(winInfo) {
+  return path.join(winInfo.path, winInfo.name + ".dtproj")
+}
+
+
+
+async function getProject(winInfo) {
+  var projectFile = getProjectFilename(winInfo)
+  var project = await tryReadJson(projectFile) || {};
+  project.name = winInfo.name
+  project.projectFile = projectFile
+  return project
+}
+
+async function updateProject(winInfo, project) {
+  var projectFilename = getProjectFilename(winInfo)
+  await writeJson(projectFilename, project)
+}
+
 async function loadProjectSettings(winInfo) {
-  var language = "JS";
+  var language = "JS2604";
   var format = "CommonJS";
-  var solution = await tryReadJson(path.join(winInfo.path, winInfo.name + ".dtproj"));
+  var solution = await tryReadJson(getProjectFilename(winInfo))
   if (!solution) {
     solution = {};
   }
@@ -1277,4 +1296,6 @@ module.exports = {
   getFolderInfoByHandle,
   showGeneratedFile,
   getSolution,
+  getProject,
+  updateProject
 };
