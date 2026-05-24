@@ -1065,6 +1065,7 @@ var gStringsRu = {
 	"Open folder": "Открыть папку",
 	"Open project": "Открыть проект",
 	"Close project": "Закрыть проект",
+	"Format": "Формат",
 	"Create a new project": "Создать новый проект",
 	"Create project": "Создать проект",
 	"Project properties": "Свойства проекта",

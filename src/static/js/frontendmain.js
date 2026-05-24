@@ -516,6 +516,7 @@
     }
 
     window.dtApp = {
+        createProject: createProject,
         openProject: openProject,
         openProjectCore: openProjectCore,
         closeFolder: closeFolder

@@ -2962,6 +2962,10 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
       action: backend.newWindow,
     });
     fileItems.push({
+      text: "Create project",
+      action: dtApp.createProject,
+    });    
+    fileItems.push({
       text: "Open project",
       action: dtApp.openProject,
     });

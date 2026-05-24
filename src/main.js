@@ -178,6 +178,10 @@ async function createProject(winInfo, project) {
             language: project.language,
             outputFile: project.output
         };
+        
+        if (project.format) {
+            body.format = project.format
+        }
 
         await fs.writeFile(
             projectPath,
