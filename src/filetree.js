@@ -535,7 +535,7 @@ function getProjectFilename(winInfo) {
 
 async function getProject(winInfo) {
   var projectFile = getProjectFilename(winInfo)
-  var project = await tryReadJson(projectFile) || {};
+  var project = await readJsonOrDie(projectFile)
   project.name = winInfo.name
   project.projectFile = projectFile
   return project
@@ -549,13 +549,12 @@ async function updateProject(winInfo, project) {
 async function loadProjectSettings(winInfo) {
   var language = "JS2604";
   var format = "CommonJS";
-  var solution = await tryReadJson(getProjectFilename(winInfo))
-  if (!solution) {
-    solution = {};
+  var solution = await readJsonOrDie(getProjectFilename(winInfo))
+  if (!solution.language) {
+    throw new Error("language is missing in project file")
   }
-  if (solution.language) {
-    language = solution.language;
-  }
+  language = solution.language;
+
   if (solution.format) {
     format = solution.format;
   }
@@ -1175,6 +1174,11 @@ async function tryReadJson(filepath) {
   } catch (ex) {
     return undefined;
   }
+}
+
+async function readJsonOrDie(filepath) {
+  const content = await fs.readFile(filepath, "utf-8");
+  return JSON.parse(content);
 }
 
 async function writeJson(filepath, object) {
