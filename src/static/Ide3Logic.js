@@ -2999,7 +2999,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
     });
 
     var recent = await backend.getRecent();
-    var recentItems = recent.map(buildGoToRecentItem).slice(0, 5);
+    var recentItems = recent.map(buildGoToRecentItem).slice(0, 10);
     var menu = [
       {
         title: "Window",

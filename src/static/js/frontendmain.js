@@ -516,17 +516,34 @@
         showProjectPropertiesDialog(createOptions)
     }
 
-    async function addToRecent(folder) {
+    function getDirectory(path) {
+        if (!path) {
+            return "";
+        }
+
+        const normalized = path.replace(/\\/g, "/");
+        const pos = normalized.lastIndexOf("/");
+
+        if (pos === -1) {
+            return "";
+        }
+
+        return normalized.substring(0, pos);
+    }
+
+    async function addToRecent(filepath) {
         var recent = await backend.getRecent()
-        var index = recent.indexOf(folder)
+        var index = recent.indexOf(filepath)
         if (index !== -1) {
             recent.splice(index, 1)
         }
-        recent.unshift(folder)
+        recent.unshift(filepath)
         while (recent.length > 20) {
             recent.pop()
         }
         await backend.setRecent(recent)
+        var folder = getDirectory(filepath)
+        localStorage.setItem("dt-project-path", folder);
     }
 
     async function openProjectCore(projectPath) {
