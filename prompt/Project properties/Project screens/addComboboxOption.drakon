@@ -1,0 +1,1 @@
+{"params":"<p>combo<\/p><p>value<\/p><p>text<\/p>","items":{"2":{"type":"branch","one":"3","branchId":0},"4":{"type":"action","content":"<p>add<\/p><ul><li>container: combo<\/li><li>element: option<\/li><\/ul>","one":"1"},"1":{"type":"end"},"3":{"type":"action","content":"<p>option = create option element<\/p><ul><li>value<\/li><li>text<\/li><\/ul>","one":"4"}},"type":"drakon"}

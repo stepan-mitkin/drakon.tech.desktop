@@ -1,0 +1,1 @@
+{"items":{"2":{"type":"branch","one":"3","branchId":0},"4":{"content":"<p>clear(central)<\/p>","one":"1","type":"action","two":""},"1":{"type":"end"},"3":{"content":"<p>central = get element by id (\"central\")<\/p>","one":"4","type":"action","two":""}},"type":"drakon"}
