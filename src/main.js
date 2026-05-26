@@ -10,7 +10,7 @@ const {
     getFolder,
     updateFolder,
     getHistory,
-    openFolderCore,
+    openProjectCore,
     changeManyCore,
     getFilePathById,
     searchFolders,
@@ -26,7 +26,9 @@ const {
     getObjectByHandle,
     getFolderInfoByHandle,
     showGeneratedFile,
-    getSolution
+    getSolution,
+    getProject,
+    updateProject
 } = require("./filetree")
 
 var logg = undefined
@@ -62,7 +64,7 @@ function getRecentPath() {
 async function setRecent(winInfo, recent) {
     var filename = getRecentPath()
     var obj = {
-        recent: recent
+        recentProjects: recent
     }
     await writeJson(filename, obj)
 }
@@ -70,7 +72,7 @@ async function setRecent(winInfo, recent) {
 async function getRecent() {
     var filename = getRecentPath()
     var obj = await readJson(filename)
-    var result = obj.recent || []
+    var result = obj.recentProjects || []
     return result
 }
 
@@ -98,10 +100,15 @@ async function updateSettings(winInfo, update) {
     }
 }
 
-async function chooseFolder(winInfo) {
+async function getDocumentsPath() {
+    return app.getPath("documents")
+}
+ 
+async function chooseFolder(winInfo, folder) {
     var dialogResult = await dialog.showOpenDialog(
         winInfo.window,
         {
+            defaultPath: folder,
             properties: ['openDirectory']
         }
     )
@@ -152,6 +159,55 @@ async function setClipboard(winInfo, type, content) {
     invokeClipboardUpdated()
 }
 
+async function createProject(winInfo, project) {
+    try {
+        const projectFolder = path.join(
+            project.path,
+            project.name
+        );
+
+        await fs.mkdir(projectFolder, {
+            recursive: true
+        });
+
+        const projectPath = path.join(
+            project.path,
+            project.name,
+            project.name + ".dtproj"
+        );
+
+        const body = {
+            language: project.language,
+            outputFile: project.outputFile
+        };
+
+        if (project.format) {
+            body.format = project.format
+        }
+
+        if (project.deps) {
+            body.dependencies = project.dependencies
+        }
+
+        if (project.mainFun) {
+            body.mainFun = project.mainFun
+
+        }        
+
+
+        await fs.writeFile(
+            projectPath,
+            JSON.stringify(body, undefined, 4),
+            "utf8"
+        );
+
+        return projectPath;
+    } catch (ex) {
+        console.error(ex);
+        return undefined;
+    }
+}
+
 function invokeClipboardUpdated() {
     for (var winId in globals.windows) {
         var winInfo = globals.windows[winId]
@@ -159,13 +215,35 @@ function invokeClipboardUpdated() {
     }
 }
 
-async function openFolder(winInfo, folderPath) {
-    var win = findWindowByPathExact(folderPath)
+async function openProjectFile(winInfo, startPath) {
+    const result = await dialog.showOpenDialog(
+        winInfo.window,
+        {
+            defaultPath: startPath,
+            properties: ["openFile"],
+            filters: [
+                {
+                    name: "DrakonTech project",
+                    extensions: ["dtproj"]
+                }
+            ]
+        }
+    );
+
+    if (result.canceled || result.filePaths.length === 0) {
+        return undefined;
+    }
+
+    return result.filePaths[0];
+}
+
+async function openProject(winInfo, projectPath) {
+    var win = findWindowByPathExact(projectPath)
     if (win) {
         raiseWindow(win)
         return undefined
     } else {
-        return await openFolderCore(winInfo, folderPath)
+        return await openProjectCore(winInfo, projectPath)
     }
 }
 
@@ -264,8 +342,11 @@ function registerMainCallbacks() {
     registerHandler(getSettings)
     registerHandler(updateSettings)
     registerHandler(chooseFolder)
+    registerHandler(getDocumentsPath)
     registerHandler(getMyFolder)    
-    registerHandler(openFolder)
+    registerHandler(openProjectFile)
+    registerHandler(openProject)
+    registerHandler(createProject)
     registerHandler(getFolder)
     registerHandler(getHistory)
     registerHandler(createFolder)
@@ -287,6 +368,9 @@ function registerMainCallbacks() {
     registerHandler(exportProject)
     registerHandler(clearProject)
     registerHandler(getProjectName)
+    registerHandler(getProject)
+    registerHandler(updateProject)
+    
 
     registerHandler(getFilePathById)
 
@@ -412,7 +496,7 @@ function raiseWindow(winInfo) {
 }
 
 function onSecondInstance(evt, argv) {
-    var foldername = getFilenameFromCommandLine(argv)
+    var foldername = getCommandLineArgument()
     if (foldername) {
         foldername = path.resolve(foldername)
         log("onSecondInstance: got foldername: " + foldername)
@@ -471,20 +555,6 @@ const createWindow = async (folderpath) => {
     })
 }
 
-function getFilenameFromCommandLine(argv) {
-    for (var i = argv.length - 1; i > 0; i--) {
-        var part = argv[i]
-        if (part && part.substring(0, 2) !== "--") {
-            var result = path.normalize(part)
-            log("getFilenameFromCommandLine: " + result)
-            return result
-        }
-    }
-
-    log("getFilenameFromCommandLine: undefined")
-    return undefined
-}
-
 function createWindowIfNoWindows() {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow(undefined)
@@ -520,8 +590,31 @@ async function main() {
     app.on('activate', createWindowIfNoWindows)
     await app.whenReady()
     registerMainCallbacks()
-    var filename = getFilenameFromCommandLine(process.argv)
+    var filename = getCommandLineArgument()
     createWindow(filename)
+}
+
+function getCommandLineArgument() {
+    var args;
+
+    if (process.argv.length < 2) {
+        return undefined;
+    }
+
+    if (process.argv[1] && process.argv[1].endsWith(".js")) {
+        // electron src/main.js myproject.dtsrc
+        args = process.argv.slice(2);
+    } else {
+        // drakonhub.exe myproject.dtsrc
+        args = process.argv.slice(1);
+    }
+
+    for (var arg of args) {
+        if (arg !== "--dev") {
+            return arg
+        }
+    }
+    return undefined;
 }
 
 

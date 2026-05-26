@@ -2946,7 +2946,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
     return {
       text: item,
       action: function () {
-        dtApp.tryOpenFolder(item);
+        dtApp.openProjectCore(item);
       },
     };
   }
@@ -2962,25 +2962,33 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
       action: backend.newWindow,
     });
     fileItems.push({
-      text: "Open folder",
-      action: dtApp.openFolder,
+      text: "Create project",
+      action: dtApp.createProject,
+    });    
+    fileItems.push({
+      text: "Open project",
+      action: dtApp.openProject,
     });
     fileItems.push({
-      text: "Close folder",
+      text: "Close project",
       action: dtApp.closeFolder,
     });
-    var exportItems = [
-      {
-        text: "Import project",
-        action: showLoadProjectFromFileDialog,
-      },
-      {
-        text: "Export project",
-        action: backend.exportProject,
-      },
-    ];
+    // var exportItems = [
+    //   {
+    //     text: "Import project",
+    //     action: showLoadProjectFromFileDialog,
+    //   },
+    //   {
+    //     text: "Export project",
+    //     action: backend.exportProject,
+    //   },
+    // ];
 
     var rwShotItems = [];
+    rwShotItems.push({
+      text: "Project properties",
+      action: dtApp.editProject,
+    });
     rwShotItems.push({
       text: "MES_PROJECT_TREE",
       action: openLeftPane,
@@ -2991,18 +2999,18 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
     });
 
     var recent = await backend.getRecent();
-    var recentItems = recent.map(buildGoToRecentItem).slice(0, 5);
+    var recentItems = recent.map(buildGoToRecentItem).slice(0, 10);
     var menu = [
       {
         title: "Window",
         items: fileItems,
         color: green,
       },
-      {
-        title: "Export/Import",
-        items: exportItems,
-        color: yellow,
-      },
+      // {
+      //   title: "Export/Import",
+      //   items: exportItems,
+      //   color: yellow,
+      // },
       {
         title: showTitle,
         items: rwShotItems,
@@ -5383,6 +5391,7 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
           addNewItems(id, list);
         }
         if (isSpace) {
+          makeTextListItem(list, "Project properties", dtApp.editProject)
         } else {
           if (shouldFindReferences(folder.type)) {
             makeTextListItem(list, "MES_FIND_REFERENCES", function () {

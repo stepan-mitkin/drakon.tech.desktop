@@ -514,27 +514,47 @@ async function loadRecordFromDiscToCache(winInfo, filepath) {
   return id;
 }
 
-async function openFolderCore(winInfo, folderPath) {
-  await determineAccess(winInfo, folderPath);
+async function openProjectCore(winInfo, projectPath) {
+  var folderPath = path.dirname(projectPath)
+  const name = path.basename(
+    projectPath,
+    ".dtproj"
+  );
+  await determineAccess(winInfo, folderPath, name);
   createMemoryStructures(winInfo, folderPath);
   await loadHistory(winInfo, folderPath);
   await loadProjectSettings(winInfo);
   return winInfo.spaceId;
 }
 
+function getProjectFilename(winInfo) {
+  return path.join(winInfo.path, winInfo.name + ".dtproj")
+}
+
+
+
+async function getProject(winInfo) {
+  var projectFile = getProjectFilename(winInfo)
+  var project = await readJsonOrDie(projectFile)
+  project.name = winInfo.name
+  project.projectFile = projectFile
+  return project
+}
+
+async function updateProject(winInfo, project) {
+  var projectFilename = getProjectFilename(winInfo)
+  await writeJson(projectFilename, project)
+}
+
 async function loadProjectSettings(winInfo) {
-  var language = "JS";
+  var language = "JS2604";
   var format = "CommonJS";
-  var solution = await tryReadJson(path.join(winInfo.path, "module.json"));
-  if (!solution) {
-    solution = await tryReadJson(path.join(winInfo.path, "solution.json"));
+  var solution = await readJsonOrDie(getProjectFilename(winInfo))
+  if (!solution.language) {
+    throw new Error("language is missing in project file")
   }
-  if (!solution) {
-    solution = {};
-  }
-  if (solution.language) {
-    language = solution.language;
-  }
+  language = solution.language;
+
   if (solution.format) {
     format = solution.format;
   }
@@ -547,7 +567,7 @@ async function loadProjectSettings(winInfo) {
   winInfo.dependencies = solution.dependencies;
 }
 
-async function determineAccess(winInfo, folderPath) {
+async function determineAccess(winInfo, folderPath, name) {
   folderPath = path.resolve(folderPath);
   if (!(await isDirectory(folderPath))) {
     throw new Error("Invalid folder path");
@@ -561,7 +581,7 @@ async function determineAccess(winInfo, folderPath) {
     console.log("determineAccess", ex.message);
     access = "read";
   }
-  winInfo.name = path.parse(folderPath).name;
+  winInfo.name = name
   winInfo.path = folderPath;
   winInfo.access = access;
 }
@@ -1156,6 +1176,11 @@ async function tryReadJson(filepath) {
   }
 }
 
+async function readJsonOrDie(filepath) {
+  const content = await fs.readFile(filepath, "utf-8");
+  return JSON.parse(content);
+}
+
 async function writeJson(filepath, object) {
   const content = JSON.stringify(object, null, 4);
   await fs.writeFile(filepath, content, "utf-8");
@@ -1258,7 +1283,7 @@ module.exports = {
   getFolder,
   updateFolder,
   getHistory,
-  openFolderCore,
+  openProjectCore,
   changeManyCore,
   getFilePathById,
   searchFolders,
@@ -1275,4 +1300,6 @@ module.exports = {
   getFolderInfoByHandle,
   showGeneratedFile,
   getSolution,
+  getProject,
+  updateProject
 };

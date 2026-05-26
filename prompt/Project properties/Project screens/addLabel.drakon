@@ -1,0 +1,1 @@
+{"params":"<p>parent<\/p><p>text<\/p>","items":{"2":{"type":"branch","one":"3","branchId":0},"4":{"type":"action","content":"<p>div.inner text = text<\/p>","one":"1"},"1":{"type":"end"},"3":{"type":"action","content":"<p>div = create div<\/p><ul><li>parent: parent<\/li><\/ul>","one":"4"}},"type":"drakon"}
