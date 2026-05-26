@@ -2973,16 +2973,16 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
       text: "Close project",
       action: dtApp.closeFolder,
     });
-    var exportItems = [
-      {
-        text: "Import project",
-        action: showLoadProjectFromFileDialog,
-      },
-      {
-        text: "Export project",
-        action: backend.exportProject,
-      },
-    ];
+    // var exportItems = [
+    //   {
+    //     text: "Import project",
+    //     action: showLoadProjectFromFileDialog,
+    //   },
+    //   {
+    //     text: "Export project",
+    //     action: backend.exportProject,
+    //   },
+    // ];
 
     var rwShotItems = [];
     rwShotItems.push({
@@ -3006,11 +3006,11 @@ function Ide3Logic(gSpaceId, folderName, gUserId, browser, translate) {
         items: fileItems,
         color: green,
       },
-      {
-        title: "Export/Import",
-        items: exportItems,
-        color: yellow,
-      },
+      // {
+      //   title: "Export/Import",
+      //   items: exportItems,
+      //   color: yellow,
+      // },
       {
         title: showTitle,
         items: rwShotItems,
