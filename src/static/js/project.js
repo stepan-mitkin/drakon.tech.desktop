@@ -269,6 +269,13 @@
             return;
         }
         
+        if (name.value.length > 50) {
+            message = tr("ERR_NAME_TOO_LONG");
+            error.innerText = message;
+            return;
+        }
+
+
         if (!checkIfProjectNameIsValid(name.value)) {
             message = tr("Not a valid project name");
             error.innerText = message;
