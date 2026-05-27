@@ -1,20 +1,59 @@
 # DrakonTech
 
-A flowchart editor that generates source code in JavaScript, Lua, Clojure, Perfolenta.net, and OneScript/1C.
+
+DrakonTech is a development environment that generates programs from diagrams written in the Drakon visual language.
 
 ![DrakonTech screenshot: FizzBuzz algorithm](assets/drakontech-screenshot.png)
 
-## About DrakonTech
+The flowchart editor in DrakonTech is designed to eliminate the need for manual drawing. The user specifies the intent ("add a step," "switch a branch"), and the program automatically arranges the elements.
 
-DrakonTech enables users to build algorithms using DRAKON, a flowchart standard designed for clarity and precision. The editor automates flowchart construction with just a few clicks, transforming them into source code.
+DrakonTech generates source code in several languages:
 
-## Features
+- JavaScript
+- Lua
+- Clojure
+- Punched Tape
+- OneScript/1C-Enterprise
 
-- **Ergonomic Flowcharts**: Create algorithms with DRAKON’s clear, readable structure.
-- **Source Code Output**: Generate functional code directly from flowcharts.
+DrakonTech generates not only functions but also classes and finite state machines.
 
-## Get DrakonTech
+## How to program in DrakonTech
 
-DrakonTech is available for __Windows__, __macOS__, and __Linux__.
+1. Create a project. DrakonTech will create a separate folder for the project. The project file in DrakonTech has the .dtproj extension.
+1. Select the target programming language.
+Create Drakon diagrams in the project. DrakonTech will convert each diagram into a function in the selected language.
+1. Insert short snippets of linear code in the selected programming language into the Drakon diagram elements. Avoid using "if-else" statements or loops keywords. Use the diagram's visual structure to define the algorithm's logic.
+1. Click the "Build" button. DrakonTech will generate source code based on the diagrams.
+1. Include the generated source code in your project.
+
+## Download DrakonTech
+
+DrakonTech runs on __Windows__, __macOS__, and __Linux__.
 
 - [Download DrakonTech from GitHub releases](https://github.com/stepan-mitkin/drakon.tech.desktop/releases/)
+
+## Run DrakonTech Without Executables
+
+If you're wary of unknown executables, or if your architecture isn't supported, you can run DrakonTech from source without building.
+
+1. Download the DrakonTech source code.
+1. Install NodeJS.
+1. Globally install the electon npm package: _npm i -g electron_
+1. Go to the DrakonTech source code folder.
+1. Run the runme file or the following command: _electron src/main.js_
+
+## Production Status
+
+DrakonTech is a research project. However, it is fully functional. DrakonTech was used to develop [DrakonWidget library](https://github.com/stepan-mitkin/drakonwidget) and [DrakonHub](https://drakonhub.com/).
+
+## .drakon File Format
+
+DrakonTech stores Drakon flowcharts in .drakon files. .drakon files contain DrakonWidget's JSON-based file format. Its structure is simple and [well-documented](https://github.com/stepan-mitkin/drakonwidget#diagram-object).
+
+## License
+
+Public domain.
+
+## Contact the Author
+
+[mailto:drakon.editor@gmail.com](drakon.editor@gmail.com)
