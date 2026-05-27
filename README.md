@@ -56,4 +56,4 @@ Public domain.
 
 ## Contact the Author
 
-[mailto:drakon.editor@gmail.com](drakon.editor@gmail.com)
+[drakon.editor@gmail.com](mailto:drakon.editor@gmail.com)
