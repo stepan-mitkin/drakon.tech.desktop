@@ -48,7 +48,7 @@ DrakonTech is a research project. However, it is fully functional. DrakonTech wa
 
 ## .drakon File Format
 
-DrakonTech stores Drakon flowcharts in .drakon files. .drakon files contain DrakonWidget's JSON-based file format. Its structure is simple and [well-documented](https://github.com/stepan-mitkin/drakonwidget#diagram-object).
+DrakonTech stores Drakon flowcharts in .drakon files. DrakonTech's .drakon files contain a subset of DrakonWidget's JSON-based file format. Its structure is simple and [well-documented](https://github.com/stepan-mitkin/drakonwidget#diagram-data-model).
 
 ## License
 
