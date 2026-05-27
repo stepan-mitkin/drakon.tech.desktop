@@ -5,15 +5,15 @@ DrakonTech is a development environment that generates programs from diagrams wr
 
 ![DrakonTech screenshot: FizzBuzz algorithm](assets/drakontech-screenshot.png)
 
-The flowchart editor in DrakonTech is designed to eliminate the need for manual drawing. The user specifies the intent ("add a step," "switch a branch"), and the program automatically arranges the elements.
+Building diagrams in DrakonTech is fast and easy. The flowchart editor in DrakonTech eliminates the need for manual drawing. The user specifies the intent ("add a step," "switch a branch"), and the program automatically arranges the elements.
 
 DrakonTech generates source code in several languages:
 
 - JavaScript
 - Lua
 - Clojure
-- Punched Tape
-- OneScript/1C-Enterprise
+- Перфолента.Net
+- OneScript/1C:Enterprise
 
 DrakonTech generates not only functions but also classes and finite state machines.
 
@@ -23,8 +23,8 @@ DrakonTech generates not only functions but also classes and finite state machin
 1. Select the target programming language.
 Create Drakon diagrams in the project. DrakonTech will convert each diagram into a function in the selected language.
 1. Insert short snippets of linear code in the selected programming language into the Drakon diagram elements. Avoid using "if-else" statements or loops keywords. Use the diagram's visual structure to define the algorithm's logic.
-1. Click the "Build" button. DrakonTech will generate source code based on the diagrams.
-1. Include the generated source code in your project.
+1. Click the "Build" button. DrakonTech will generate a source code file based on the diagrams.
+1. Include the generated source code file in your program.
 
 ## Download DrakonTech
 
@@ -37,14 +37,14 @@ DrakonTech runs on __Windows__, __macOS__, and __Linux__.
 If you're wary of unknown executables, or if your architecture isn't supported, you can run DrakonTech from source without building.
 
 1. Download the DrakonTech source code.
-1. Install NodeJS.
-1. Globally install the electon npm package: _npm i -g electron_
+1. Install __NodeJS__.
+1. Globally install the __electon__ npm package: __npm i -g electron__
 1. Go to the DrakonTech source code folder.
-1. Run the runme file or the following command: _electron src/main.js_
+1. Run the __runme__ file or the following command: __electron src/main.js__
 
 ## Production Status
 
-DrakonTech is a research project. However, it is fully functional. DrakonTech was used to develop [DrakonWidget library](https://github.com/stepan-mitkin/drakonwidget) and [DrakonHub](https://drakonhub.com/).
+DrakonTech is a research project. However, it is fully functional. DrakonTech was used to develop [DrakonWidget library](https://github.com/stepan-mitkin/drakonwidget) and [DrakonHub app](https://drakonhub.com/).
 
 ## .drakon File Format
 
