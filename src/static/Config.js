@@ -61,7 +61,7 @@ var Config = {
 	FONT_TIMEOUT: 15,
 	SEARCH_PERIOD: 200,
 	DIAGRAM_VERSION: 20190320,
-	EDITOR_FONT: "Consolas, Monaco, Cousine"
+	EDITOR_FONT: "JetBrainsMono"
 };
 
 var Const = {

@@ -100,6 +100,29 @@ td {
 	font-weight: bold;
 }
 
+@font-face {
+	font-family: 'JetBrainsMono';
+	src: url('../fonts/JetBrainsMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'JetBrainsMono';
+	src: url('../fonts/JetBrainsMono-Italic.ttf') format('truetype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'JetBrainsMono';
+	src: url('../fonts/JetBrainsMono-Bold.ttf') format('truetype');
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'JetBrainsMono';
+	src: url('../fonts/JetBrainsMono-BoldItalic.ttf') format('truetype');
+	font-style: italic;
+	font-weight: bold;
+}
 
 @font-face {
 	font-family: 'Cousine';

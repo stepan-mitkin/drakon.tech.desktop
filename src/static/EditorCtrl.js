@@ -5477,6 +5477,11 @@ function EditorCtrl(window, document, elementId, userId) {
   addFontFile(true, false, "Vollkorn", "Vollkorn-Regular.ttf");
   addFontFile(true, true, "Vollkorn", "Vollkorn-Regular.ttf");
 
+  addFontFile(false, false, "JetBrainsMono", "JetBrainsMono-Regular.ttf");
+  addFontFile(false, true, "JetBrainsMono", "JetBrainsMono-Bold.ttf");
+  addFontFile(true, false, "JetBrainsMono", "JetBrainsMono-Italic.ttf");
+  addFontFile(true, true, "JetBrainsMono", "JetBrainsMono-BoldItalic.ttf");
+
   globals.root = get(elementId);
 
   this.resize = resize;
