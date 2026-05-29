@@ -14,7 +14,7 @@ var MaxChars = 40
 
 var CandyColor = "#00ff00"
 
-var MainFont = "14px " + Config.EDITOR_FONT
+var MainFont = "15px " + Config.EDITOR_FONT
 var HeaderFont = "bold 18px " + Config.EDITOR_FONT
 var SmallFont = "12px " + Config.EDITOR_FONT
 
