@@ -185,7 +185,7 @@ async function createProject(winInfo, project) {
             body.format = project.format
         }
 
-        if (project.deps) {
+        if (project.dependencies) {
             body.dependencies = project.dependencies
         }
 

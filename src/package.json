@@ -1,7 +1,7 @@
 {
   "name": "drakontech",
   "productName": "DrakonTech",
-  "version": "2026.05.24",
+  "version": "2026.06.02",
   "description": "A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, OneScript, or Clojure code",
   "main": "main.js",
   "scripts": {
