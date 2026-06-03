@@ -517,7 +517,7 @@
 
     function showProjectPropertiesDialog(options) {
         globalOptions = options;
-        showProjectDialog(tr("Project properties"), false, tr("Update"), updateProject);
+        showProjectDialog(tr("Project properties"), false, tr("MES_SAVE"), updateProject);
     }
 
     // Export functions to window

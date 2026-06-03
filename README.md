@@ -38,7 +38,7 @@ If you're wary of unknown executables, or if your architecture isn't supported, 
 
 1. Download the DrakonTech source code.
 1. Install __NodeJS__.
-1. Globally install the __electon__ npm package: __npm i -g electron__
+1. Globally install the __electron__ npm package: __npm install -g electron__
 1. Go to the DrakonTech source code folder.
 1. Run the __runme__ file or the following command: __electron src/main.js__
 
