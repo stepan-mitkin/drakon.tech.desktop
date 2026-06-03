@@ -3,6 +3,8 @@
 
 DrakonTech is a development environment that generates programs from diagrams written in the Drakon visual language.
 
+[Documentation](https://stepan-mitkin.github.io/drakon.tech.desktop/)
+
 ![DrakonTech screenshot: FizzBuzz algorithm](assets/drakontech-screenshot.png)
 
 Building diagrams in DrakonTech is fast and easy. The flowchart editor in DrakonTech eliminates the need for manual drawing. The user specifies the intent ("add a step," "switch a branch"), and the program automatically arranges the elements.
