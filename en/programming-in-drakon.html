@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>Programming in DRAKON</title>
+        <meta name="description" content="Practical advice on building software with flowcharts in DrakonTech." >
+        <meta property="og:title" content="Programming in DRAKON" >
+        <meta property="og:description" content="Practical advice on building software with flowcharts in DrakonTech." >
+        <meta property="og:image" content="../ru/assets/images/artist.png" >
+        <meta property="og:url" content="https://drakon.tech/en/programming-in-drakon" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../">
+        <img src="../ru/assets/images/favicon.png" alt="DrakonTech">
+    </a>
+
+    <div class="top-block-header">DrakonTech</div>
+
+    <a class="download-link" href="../en/download">Download</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Close</span>
+        </div>
+        <ul>
+            <li><a href="../">Main</a></li>
+            <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
+            <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
+            <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/download">Download</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Menu</span>
+        </div>
+        <h1 id="programming-in-drakon">Programming in DRAKON</h1>
+<p><strong>or How Not to Use DRAKON</strong></p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/artist.png" alt="How Not to Draw DRAKON Diagrams" style="max-width: 100%; width: 300px;"/>
+</div>
+
+<p>DRAKON improves the readability of algorithms, but it does not repeal the general laws of software development.</p>
+<p>This article is based on practical experience gained while programming in DRAKON. It summarizes the conclusions the author reached after several years of development using this visual language.</p>
+<p>The following software projects related to DRAKON were written fully or partially in DRAKON:</p>
+<ul>
+<li>Drakon Editor. Partially written in Drakon Editor.</li>
+<li>DrakonTech. Written partly in Drakon Editor and partly in DrakonTech.</li>
+<li>DrakonWidget/DrakonHub. Written entirely in DrakonTech.</li>
+</ul>
+<h2 id="draw-simple-diagrams">Draw Simple Diagrams</h2>
+<p>DrakonTech makes it easy to create DRAKON diagrams quickly. Do not abuse this. Try not to overload your diagrams. DRAKON makes it possible to create understandable algorithms, but it does not guarantee it. Much depends on your sense of proportion.</p>
+<p>A few simple recommendations:</p>
+<p><strong>Do not allow diagrams to become excessively tall.</strong> Long methods are difficult to read in traditional text-based programming. The same applies to excessively tall DRAKON diagrams. If a diagram grows beyond the height of the screen, use decomposition or convert the diagram into a silhouette.</p>
+<p><strong>Avoid too many branches in a silhouette.</strong> A silhouette does not have to fit on the screen horizontally, although it is good if each individual branch does. However, it is important not to let a silhouette grow endlessly to the right. The number of branches in a silhouette should not be excessive. Ten branches is already dangerous territory. Develop a sense of proportion.</p>
+<p><strong>Limit algorithmic complexity.</strong> This applies both to primitive diagrams and to silhouette branches. DRAKON presents algorithms in a more understandable way than indented text. Nevertheless, you should direct all your efforts toward eliminating unnecessary complexity. Constantly ask yourself: did I untangle this algorithm or make it more tangled? Did it become clearer or worse?</p>
+<p><strong>Avoid excessive line bends and unusual tricks.</strong> DRAKON makes it possible to reduce duplication in complex algorithms. Sometimes this is achieved at the cost of additional line bends or unusual connections between elements. Do not try to eliminate duplication at any price. Sometimes repetition is easier for the reader than straining their eyes to understand what a particular visual knot means.</p>
+<p>A good DRAKON pattern is a decision tree. An example of a poor pattern is a side connection.</p>
+<img src="../en/assets/images/side-connection.png" style="max-width:100%; width:780px; display:inline-block; vertical-align:middle; margin-bottom:20px;" alt="Side Connection">
+<img src="../en/assets/images/decision-tree.png" style="max-width:100%; width:725px; display:inline-block; vertical-align:middle; margin-bottom:20px;" alt="Decision Tree">
+
+<p>A side connection is acceptable, but it increases the cognitive effort required from the reader.</p>
+<h2 id="follow-standard-programming-practices">Follow Standard Programming Practices</h2>
+<p>Using DRAKON does not mean that you can stop following generally accepted software development practices. All useful programming advice works just as well in visual programming as it does in text-based programming.</p>
+<p>Here are some well-known recommendations that also help when creating DRAKON diagrams:</p>
+<ul>
+<li>An algorithm should solve only one problem. When creating a DRAKON diagram, you should clearly understand its purpose. There should be exactly one purpose. The name of the diagram should reflect that purpose. If you cannot explain to your cat what the algorithm does, it is time to decompose it.</li>
+<li>Program top-down. Start with high-level logic and pretend that all subroutines already exist. This will give you a better understanding of the problem at the beginning of the work rather than at the end. You will also get a complete list of the required subroutines together with their names and signatures. Fortunately, DrakonTech can automatically generate an empty function with the required signature through the context menu.
+Continue in the same way with the subroutines. This approach will probably speed up development by a factor of a hundred. More importantly, top-down design helps capture intent. Clarity of intent is the foundation of maintainable software.</li>
+<li>An algorithm should operate at a single level of abstraction. The actions performed in a diagram should not jump between abstraction levels. If your DRAKON diagram is responsible for controlling dialogs at a high level, it should not contain low-level calls such as <code>element.style.display = &quot;inline-block&quot;</code> or <code>name.toLowerCase()</code>.
+It is remarkable how easily violations of abstraction levels destroy the advantages of graphical algorithm representation.</li>
+<li>Avoid multiple function calls within a single expression. Ideally, one function call per line of code. Do not be afraid of temporary variables. You will thank yourself during debugging.</li>
+<li>If several actions form a single logical unit, place them in one Action icon. At the same time, follow the general DRAKON rule: one icon — one idea.</li>
+</ul>
+<h2 id="think-about-architecture">Think About Architecture</h2>
+<p>Using DRAKON does not mean that you can stop thinking. DRAKON can help you arrive at a good architecture because it visually shows what the software does. Nevertheless, the need to think carefully about architecture remains.</p>
+<p>Software architecture is a vast subject. Here we will mention only a few considerations that are useful when developing software in DrakonTech.</p>
+<p><strong>Avoid giant modules.</strong> DrakonTech allows you to work with projects that contain hundreds or even thousands of diagrams. This does not mean that it is easy for a developer to navigate a module that tries to contain everything. A module, like an algorithm, should have a clearly defined area of responsibility.</p>
+<p><strong>Visible entry points are the key to success.</strong> Every module implements a finite number of algorithms that are invoked from outside. These algorithms rely on the module&#39;s private functions. It is critically important to make these entry points easy to find.</p>
+<p>To achieve this, place all exported functions in a single folder. A good example is the project root folder or a dedicated folder with a meaningful name such as &quot;API&quot;. It is important not to mix public and private functions in the same folder.</p>
+<p>User interfaces have an additional type of entry point: callback functions. Callbacks are attached to events generated by the user. Callbacks are full-fledged entry points on par with exported functions. They should always be placed in a separate folder.</p>
+<p><strong>Avoid classes that are used only inside a module.</strong> Additional layers of encapsulation inside a module often do more harm than good. Excessive encapsulation makes code overly bureaucratic. If a component is used only within its own module, there is no need to turn it into a class.</p>
+<p>If you need polymorphism, use other techniques. For example, objects with polymorphic behavior can contain a &quot;type&quot; field. Separately, you can create a dictionary that returns the appropriate function depending on the object type.</p>
+<p>The DRAKON language does not require this approach, but techniques like these work well in DrakonTech because DrakonTech encourages a procedural style.</p>
+<h2 id="do-not-edit-generated-code">Do Not Edit Generated Code</h2>
+<p>DrakonTech tries to generate code that is easy to debug. At the same time, you should adopt one iron rule: never manually modify machine-generated code.</p>
+<p>Doing so creates two sources of truth. Two truths will inevitably contradict each other, and when they do, they will turn into two lies.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>DRAKON is a professional tool, not a magic wand.</p>
+<p>It helps make algorithms easier to understand. But that does not mean you can stop thinking. If an algorithm is bad, DRAKON will not make it good. If the architecture is bad, DRAKON will not save it. However, DRAKON makes a good design more visible, and mistakes easier to spot.</p>
+<p>Diagrams in DrakonTech are created quickly. Very quickly. There is a temptation to cram everything into a single diagram. Resist that temptation. Ten small diagrams are better than one large and confusing one.</p>
+<p>DRAKON does not eliminate the need for architecture. It does not eliminate the need for decomposition. It does not eliminate common sense.</p>
+<p>As for drawing diagrams, the main advice is simple: make them simpler. If it seems that you can simplify them even further, you probably can.</p>
+
+        <h2>Feedback</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

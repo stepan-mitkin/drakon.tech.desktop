@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>DRAKON Language Syntax</title>
+        <meta name="description" content="The main DRAKON language constructs for programmers." >
+        <meta property="og:title" content="DRAKON Language Syntax" >
+        <meta property="og:description" content="The main DRAKON language constructs for programmers." >
+        <meta property="og:image" content="../ru/assets/images/drakon-ulyb.png" >
+        <meta property="og:url" content="https://drakon.tech/en/drakon-syntax" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../">
+        <img src="../ru/assets/images/favicon.png" alt="DrakonTech">
+    </a>
+
+    <div class="top-block-header">DrakonTech</div>
+
+    <a class="download-link" href="../en/download">Download</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Close</span>
+        </div>
+        <ul>
+            <li><a href="../">Main</a></li>
+            <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
+            <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
+            <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/download">Download</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Menu</span>
+        </div>
+        <h1 id="drakon-language-syntax">DRAKON Language Syntax</h1>
+<p>This document describes the main DRAKON language constructs used for programming in DrakonTech.</p>
+<h2 id="hello-world">Hello, World</h2>
+<p>Here is the canonical &quot;Hello, World&quot; algorithm represented in DRAKON.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/hello.png" alt="Hello, World in DRAKON" style="max-width: 100%; width: 350px;"/>
+<p>Hello, World in DRAKON</p>
+</div>
+
+<p>Procedure calls and assignments are placed inside Action icons. The Action icon has the shape of a rectangle.</p>
+<h2 id="function-arguments">Function Arguments</h2>
+<p>To add arguments to a function, right-click on the diagram header and choose <strong>&quot;Properties&quot;</strong> from the context menu.</p>
+<p>Then add one argument per line, without commas.</p>
+<p>You can also set function flags such as <strong>export</strong> and <strong>async</strong> in the <strong>&quot;Properties&quot;</strong> dialog.</p>
+<div class="ill-block">
+<img class="ill" src="../en/assets/images/header-properties.png" alt="Function Arguments" style="max-width: 100%;"/>
+<p>Function Arguments</p>
+</div>
+
+<p>The function arguments and flags will be displayed in the <strong>&quot;Formal Parameters&quot;</strong> icon on the right side of the diagram header.</p>
+<h2 id="question">Question</h2>
+<p>The Question icon is the DRAKON equivalent of the <strong>if-else</strong> construct.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/question.png" alt="Question Icon" style="max-width: 100%; width: 460px;"/>
+<p>The "Question" Icon</p>
+</div>
+
+<p>Follow the rule: &quot;the farther to the right, the worse.&quot;</p>
+<ul>
+<li>The happy path should go down the skewer (the main vertical line).</li>
+<li>Less successful scenarios should branch to the right.</li>
+<li>Error handling should definitely go to the right.</li>
+<li>If both scenarios are equally successful, the most expected and most frequent one should go down the skewer. The less frequent one should go to the right.</li>
+</ul>
+<p>Note that the <strong>Yes</strong> and <strong>No</strong> exits can be swapped. To do that, right-click on a Question icon and choose <strong>&quot;Swap Yes and No&quot;</strong> from the context menu.</p>
+<div class="ill-block">
+<img class="ill" src="../en/assets/images/swap-yes-no.png" alt="Swap Yes and No" style="max-width: 100%;"/>
+<p>Swap Yes and No</p>
+</div>
+
+<p>Since the exits can be swapped, the <strong>NOT</strong> logical operator and the <strong>NOT EQUAL (!=)</strong> operator are redundant in DRAKON.</p>
+<p>Do not use <strong>NOT</strong> and <strong>NOT EQUAL</strong> operators when programming in DRAKON because they add unnecessary complexity.</p>
+<h2 id="visual-logical-formulas">Visual Logical Formulas</h2>
+<p>DRAKON does not encourage the use of logical <strong>AND</strong> and <strong>OR</strong> operators. They quickly get out of control, especially when the number of operands exceeds two.</p>
+<p>Instead, visual logical formulas should be used.</p>
+<p>Here is the visual formula for the <strong>AND</strong> operator.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/simpleAnd.png" alt="Visual Formula for AND" style="max-width: 100%; width: 360px;"/>
+<p>Visual Formula for AND</p>
+</div>
+
+<p>Here is the inverted formula for the <strong>AND</strong> operator.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/inversedAnd.png" alt="Inverted Formula for AND" style="max-width: 100%; width: 470px;"/>
+<p>Inverted Formula for AND</p>
+</div>
+
+<p>The <strong>OR</strong> operator can be transformed into visual logical formulas in a similar way.</p>
+<p>Here is the visual formula for the <strong>OR</strong> operator.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/simpleOr.png" alt="Visual Formula for OR" style="max-width: 100%; width: 430px;"/>
+<p>Visual Formula for OR</p>
+</div>
+
+<p>Here is the inverted formula for the <strong>OR</strong> operator.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/inversedOr.png" alt="Inverted Formula for OR" style="max-width: 100%; width: 380px;"/>
+<p>Inverted Formula for OR</p>
+</div>
+
+<p>As with simple conditions, there is no need to use the <strong>NOT</strong> and <strong>NOT EQUAL</strong> operators here.</p>
+<h2 id="select">Select</h2>
+<p>The Select icon is the DRAKON equivalent of the <strong>switch-case</strong> construct.</p>
+<p>The Case icons contain the case values.</p>
+<p>To add a default case, add an empty Case icon on the right.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/select.png" alt="Select Icon" style="max-width: 100%; width: 540px;"/>
+<p>The "Select" Icon</p>
+</div>
+
+<p>Whenever possible, it is recommended to arrange case values in ascending or descending order.</p>
+<h2 id="foreach-loop">Foreach Loop</h2>
+<p>The Foreach Loop icon is the DRAKON equivalent of <strong>for</strong> and <strong>foreach</strong> loops.</p>
+<p>The format of the Foreach Loop icon differs slightly depending on the target language.</p>
+<p>In DRAKON-JavaScript, there are three ways to specify a Foreach Loop.</p>
+<ol>
+<li>Iteration over an array. The construct <code>for (var item of array) { ... }</code> is written in the loop icon as <code>item; array</code>.</li>
+<li>Iteration over an object. The construct <code>for (var key in map) { var item = map[key]; ... }</code> is written as <code>key, item; map</code>.</li>
+<li>A for-style loop. The construct <code>for (var i = 0; i &lt; count; i++) { ... }</code> is written as <code>i = 0; i &lt; count; i++</code>.</li>
+</ol>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreachArray.png" alt="Array Iteration in JavaScript and Lua" style="max-width: 100%; width: 340px;"/>
+<p>Array Iteration in JavaScript and Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreachMap.png" alt="Object Iteration in JavaScript and Lua" style="max-width: 100%; width: 350px;"/>
+<p>Object Iteration in JavaScript and Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/forArray.png" alt="For-Style Loop in JavaScript and Lua" style="max-width: 100%; width: 340px;"/>
+<p>For-Style Loop in JavaScript and Lua</p>
+</div>
+
+<p>The Lua generator works similarly to the JavaScript generator:</p>
+<ol>
+<li>Iteration over an array. The construct <code>for _, item in ipairs(array) do ... end</code> is written in the loop icon as <code>item; array</code>.</li>
+<li>Iteration over an object. The construct <code>for key, item in pairs(map) do ... end</code> is written as <code>key, item; map</code>.</li>
+<li>A for-style loop. The construct <code>i = 0; i &lt; count; i = i + 1</code> works the same way as in JavaScript.</li>
+</ol>
+<p>An important difference is that for Lua, the generator does not add <code>pairs()</code> or <code>ipairs()</code> in certain cases:</p>
+<ol>
+<li>When the collection is a function call, for example: <code>x, y; fun.iter(some_object)</code>.</li>
+<li>When the collection is an iterator expression, for example: <code>i, code; utf8.next, text</code>.</li>
+</ol>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/fun-iter.png" alt="Looping Over a Value Returned by a Function in Lua" style="max-width: 100%; width: 420px;"/>
+<p>Looping Over a Value Returned by a Function in Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/iterator.png" alt="Iterator Loop in Lua" style="max-width: 100%; width: 700px;"/>
+<p>Iterator Loop in Lua</p>
+</div>
+
+<p>The Foreach Loop is not supported by the Clojure generator.</p>
+<p>It is possible to exit a Foreach Loop early using a Question icon.</p>
+<p>Note that the exit can only be directed to the point immediately after the loop.</p>
+<p>This will not work:</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/earlyExit-bad.png" alt="Early Loop Exit That Causes an Error" style="max-width: 100%; width: 480px;"/>
+<p>Early Loop Exit That Causes an Error</p>
+</div>
+
+<p>This is the correct way to exit:</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/earlyExit.png" alt="Correct Early Loop Exit" style="max-width: 100%; width: 480px;"/>
+<p>Correct Early Loop Exit</p>
+</div>
+
+<p>It is also acceptable to terminate the function with a <code>return</code> statement. In that case, there is no need to direct the exit outside the loop construct.</p>
+<p>However, do not use the <code>break</code> keyword, because the code generator does not support it.</p>
+<h2 id="arrow-loop">Arrow Loop</h2>
+<p>DRAKON replaces arrows in flowcharts with ordinary lines.</p>
+<p>There is, however, one case where DRAKON uses an arrow: the Arrow Loop.</p>
+<p>This makes loops instantly visible on a diagram.</p>
+<p>If there is an arrow, there is a loop.</p>
+<p>The Arrow Loop is the DRAKON equivalent of the <strong>while</strong> and <strong>do-while</strong> constructs.</p>
+<p>Here is how a <strong>while</strong> construct looks in DRAKON. First, the loop condition is checked. Then the loop body follows.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/whileDo.png" alt="While Loop in DRAKON" style="max-width: 100%; width: 302px;"/>
+<p>While Loop in DRAKON</p>
+</div>
+
+<p>Here is how a <strong>do-while</strong> construct looks in DRAKON. First, the loop body is executed. Then the loop condition is checked.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/doWhile.png" alt="Do-While Loop in DRAKON" style="max-width: 100%; width: 290px;"/>
+<p>Do-While Loop in DRAKON</p>
+</div>
+
+<p>In this example, the loop implements the <strong>action-check-action</strong> pattern:</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/doWhiledo.png" alt="Do-While-Do Loop in DRAKON" style="max-width: 100%; width: 302px;"/>
+<p>Do-While-Do Loop in DRAKON</p>
+</div>
+
+<p>The Arrow Loop is not supported by the Clojure generator.</p>
+<h2 id="silhouette">Silhouette</h2>
+<p>There are two types of DRAKON diagrams: primitives and silhouettes.</p>
+<p>A silhouette consists of several branches. A silhouette divides a complex algorithm into logical parts without decomposition.</p>
+<p>To convert a primitive into a silhouette and back, click the <strong>&quot;Silhouette/Primitive&quot;</strong> button on the toolbar.</p>
+<div class="ill-block">
+<img class="ill" src="../en/assets/images/silhouette-button.png" alt="How to Create a Silhouette in DrakonTech" style="max-width: 100%;"/>
+<p>How to Create a Silhouette in DrakonTech</p>
+</div>
+
+<p>Decomposition is a useful technique, but it comes at a cost. Very often, it is better to use a silhouette instead of decomposition.
+The key advantage of a silhouette is that it does not require excessive passing of function arguments and return values. At the same time, the entire algorithm remains on a single diagram.</p>
+<p>The silhouette branches are the chapters of your function. Therefore, it is important to give them meaningful names.
+Good branch names help explain the algorithm.</p>
+<p>The first silhouette branch is on the left.
+The last branch is on the right.
+Between these boundaries, branches may follow in any order. However, arranging them from left to right is considered good practice.</p>
+<div class="wide-scroll">
+<img class="ill" src="../ru/assets/images/fibonacci.png" alt="Silhouette DRAKON Diagram" style="width: 1002px;"/>
+<p>Silhouette DRAKON Diagram</p>
+</div>
+
+<p>Use Address icons to control which branch will execute next.</p>
+<p>A single silhouette branch may contain several Address icons.</p>
+<h2 id="silhouette-loop">Silhouette Loop</h2>
+<p>One or more branches can be executed repeatedly. This is called a silhouette loop.</p>
+<p>To create a silhouette loop, direct a transition from an Address icon to the same branch that contains the loop body.</p>
+<p>Do not forget to add an exit condition. Otherwise, you will end up with an infinite loop.</p>
+<p>DrakonTech marks the branch headers and the Address icons involved in the loop with special loop markers.</p>
+<div class="wide-scroll">
+<img class="ill" src="../ru/assets/images/fibonacciSil.png" alt="Silhouette Loop" style="width: 1102px;"/>
+<p>Silhouette Loop</p>
+</div>
+
+<p>This is another technique DRAKON uses to make loops immediately stand out.</p>
+<h2 id="catch-branch">Catch Branch</h2>
+<p>For JavaScript, DrakonTech supports a special branch with the reserved name <strong>catch</strong>. A <strong>catch</strong> branch generates an exception handler of the form <code>catch (ex) { ... }</code>.</p>
+<p>To access the caught exception object, call the <code>getHandlerData()</code> function.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/catch.png" alt="Catch Branch" style="max-width: 100%; width: 414px;"/>
+<p>Catch Branch</p>
+</div>
+
+<p>Other branches are not allowed to reference the <strong>catch</strong> branch.</p>
+
+        <h2>Feedback</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

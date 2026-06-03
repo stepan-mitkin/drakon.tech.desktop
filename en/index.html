@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>DrakonTech</title>
+        <meta name="description" content="DrakonTech is a development environment for creating software from flowcharts. Draw DRAKON diagrams and get working source code automatically." >
+        <meta property="og:title" content="DrakonTech" >
+        <meta property="og:description" content="DrakonTech is a development environment for creating software from flowcharts. Draw DRAKON diagrams and get working source code automatically." >
+        <meta property="og:image" content="../ru/assets/images/addChild.png" >
+        <meta property="og:url" content="https://drakon.tech/en/" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../">
+        <img src="../ru/assets/images/favicon.png" alt="DrakonTech">
+    </a>
+
+    <div class="top-block-header">DrakonTech</div>
+
+    <a class="download-link" href="../en/download">Download</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Close</span>
+        </div>
+        <ul>
+            <li><a href="../">Main</a></li>
+            <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
+            <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
+            <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/download">Download</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Menu</span>
+        </div>
+        <h1 id="drakontech">DrakonTech</h1>
+<p><a href="ru">RU</a></p>
+<img src="../ru/assets/images/drakon-ulyb.png" style="max-width:100%; width:200px; display:inline-block; vertical-align:middle; margin:10px;" alt="Little Dragon">
+
+<p>DrakonTech is an experimental development environment that generates source code from flowcharts in the DRAKON visual language.</p>
+<p>DrakonTech works as follows: you create diagrams, and the code generator transforms those diagrams into functions in the target programming language.</p>
+<img src="../ru/assets/images/addChild.png" style="max-width:100%; width:880px; display:inline-block; vertical-align:middle; margin-bottom:20px;" alt="Example DRAKON diagram">
+
+<p>A DrakonTech project consists of many diagrams. Each diagram is transformed into a function. DrakonTech saves these functions in a source code file that you can include in your program.</p>
+<h2 id="advantages-of-the-drakon-language">Advantages of the DRAKON Language</h2>
+<p>The problem with ordinary flowcharts is that drawing them requires artistic talent. Without that talent, a flowchart can easily turn into a tangled mess of arrows.</p>
+<p>To avoid this problem, flowcharts in DrakonTech are built according to the rules of the <strong>DRAKON</strong> visual language. Thanks to these rules, diagrams are cleaner and more organized. For example, DRAKON prohibits one of the biggest problems of traditional flowcharts: crossing lines.</p>
+<p>More importantly, DRAKON diagrams are predictable. For example, algorithm steps always go from top to bottom, and branching always goes to the right. This predictability makes it easier to understand the algorithm itself because there is no need to decipher the diagram&#39;s structure. All DRAKON diagrams follow a similar structure. You can read more about DRAKON <a href="https://drakonhub.com/en/drakon">here</a>.</p>
+<h2 id="ultra-fast-flowchart-editor">Ultra-Fast Flowchart Editor</h2>
+<p>The key feature of DrakonTech is a flowchart editor that builds diagrams automatically. The user does not draw. The editor draws the diagram. The user only specifies where to place the next element or where to switch a connecting line. The editor arranges diagram elements on the canvas automatically.</p>
+<p>In addition, you can copy, cut, and paste not only individual elements but entire sections of a diagram. The editor preserves the integrity of the diagram. You never end up with a dangling arrow pointing nowhere.</p>
+<h2 id="eliminating-pixel-hunting">Eliminating Pixel Hunting</h2>
+<p>And of course, DrakonTech completely eliminates so-called pixel hunting—the frustration of trying to connect diagram elements precisely using tiny mouse movements. In DrakonTech, the user simply clicks, and the diagram grows by itself.</p>
+<h2 id="automatic-enforcement-of-drakon-rules">Automatic Enforcement of DRAKON Rules</h2>
+<p>You do not need to memorize the DRAKON language to use DrakonTech. DrakonTech knows the DRAKON rules and automatically ensures that your diagrams follow them.</p>
+<h2 id="working-with-large-projects">Working with Large Projects</h2>
+<p>In addition to the flowchart editor itself, DrakonTech provides tools for working with large projects. Thanks to the project tree and folders, a DrakonTech project can contain hundreds or even thousands of diagrams. There is also search and replace, go to definition, and find references. In other words, DrakonTech is not just a drawing tool—it is a development environment.</p>
+<h2 id="programming-in-drakontech">Programming in DrakonTech</h2>
+<p>Programming in the DRAKON visual language with DrakonTech works as follows. First, you insert empty elements into a diagram. Then you write small pieces of linear code inside those elements. You do not need to write if statements or loop statements—the structure of the DRAKON diagram handles that.</p>
+<p>The code fragments are written in the selected programming language, for example JavaScript. In that case, you are programming in the hybrid language DRAKON-JavaScript.</p>
+<p>DRAKON provides visual equivalents for the main structured programming constructs:</p>
+<ul>
+<li>For &quot;if–else&quot; — the &quot;Question&quot; icon.</li>
+<li>For &quot;switch–case&quot; — the &quot;Select&quot; icon.</li>
+<li>For &quot;for&quot;, &quot;foreach&quot;, and &quot;while&quot; — the &quot;For Loop&quot; icon, the Arrow Loop, and the Silhouette Loop.</li>
+</ul>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/question.png" alt="Question Icon" style="max-width: 100%; width: 460px;"/>
+<p>The "Question" icon</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/select.png" alt="Select Icon" style="max-width: 100%; width: 540px;"/>
+<p>The "Select" icon</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreach.png" alt="For Loop Icon" style="max-width: 100%; width: 265px;"/>
+<p>The "For Loop" icon</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/arrow.png" alt="Arrow Loop" style="max-width: 100%; width: 282px;"/>
+<p>Arrow Loop</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/sil-loop.png" alt="Silhouette Loop" style="max-width: 100%; width: 352px;"/>
+<p>Silhouette Loop</p>
+</div>
+
+<p>Thus, DRAKON expresses branching and loops visually. Program logic becomes easier to read because every possible path through the algorithm can be traced with a finger. This is visual and much easier to understand than source code, where structure is represented only by indentation.</p>
+<h2 id="supported-languages">Supported Languages</h2>
+<p>DrakonTech generates source code in several programming languages:</p>
+<ul>
+<li>JavaScript</li>
+<li>Lua</li>
+<li>Clojure</li>
+<li>Perfolenta.Net</li>
+<li>OneScript / 1C:Enterprise</li>
+</ul>
+<p>DrakonTech was used to develop the <a href="https://github.com/stepan-mitkin/drakonwidget">DrakonWidget</a> library and the applications <a href="https://drakonhub.com/">DrakonHub</a> and <a href="https://drakonpro.ru/">DrakonPro</a>.</p>
+<p>For some programming languages, such as JavaScript and Lua, DrakonTech generates not only functions but also classes and finite-state machines.</p>
+<h2 id="understandable-software">Understandable Software</h2>
+<p>The main goal of DrakonTech is to make software easier to understand. With DrakonTech, you create programs as organized visual structures. This helps other people understand your software. And not only other people—even you will be able to understand your own program after a long break.</p>
+
+        <h2>Feedback</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

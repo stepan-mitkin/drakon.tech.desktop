@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>ДраконТех</title>
+        <meta name="description" content="ДраконТех — среда разработки для создания программ из блок-схем. Рисуйте диаграммы ДРАКОН и получайте работающий программный код автоматически." >
+        <meta property="og:title" content="ДраконТех" >
+        <meta property="og:description" content="ДраконТех — среда разработки для создания программ из блок-схем. Рисуйте диаграммы ДРАКОН и получайте работающий программный код автоматически." >
+        <meta property="og:image" content="/ru/assets/images/addChild.png" >
+        <meta property="og:url" content="https://drakon.tech/ru/" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../ru">
+        <img src="../ru/assets/images/favicon.png" alt="ДраконТех">
+    </a>
+
+    <div class="top-block-header">ДраконТех</div>
+
+    <a class="download-link" href="../ru/skachat">Скачать</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Закрыть</span>
+        </div>
+        <ul>
+            <li><a href="../ru">Главная</a></li>
+            <li><a href="../ru/syntax-jazyka-drakon">Синтакс языка ДРАКОН</a></li>
+            <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
+            <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
+            <li><a href="../ru/skachat">Скачать</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Меню</span>
+        </div>
+        <h1 id="драконтех">ДраконТех</h1>
+<p><a href="../">EN</a></p>
+<img src="/ru/assets/images/drakon-ulyb.png" style="max-width:100%; width:200px; display:inline-block; vertical-align:middle; margin:10px;" alt="Дракончик">
+
+<p>ДраконТех — экспериментальная среда разработки, которая генерирует программный код из блок-схем на визуальном языке ДРАКОН.
+ДраконТех работает так: вы составляете диаграммы, а генератор кода превращает диаграммы в функции на указанном языке программирования.</p>
+<img src="/ru/assets/images/addChild.png" style="max-width:100%; width:880px; display:inline-block; vertical-align:middle; margin-bottom:20px;" alt="Пример дракон-схемы">
+
+<p>Проект в ДраконТех состоит из множества диаграмм. Каждая диаграмма превращается в функцию. ДраконТех сохраняет эти функции в файле исходного кода, который вы включаете в вашу программу.</p>
+<h2 id="преимущества-языка-дракон">Преимущества языка ДРАКОН</h2>
+<p>Проблема с обычными блок-схемами заключается в том, что для рисования нужен талант художника. Если такого таланта нет, блок-схема легко превращается в безумный клубок стрелок.
+Чтобы избежать этой проблемы, блок-схемы в ДраконТех строятся по правилам визуального языка <strong>ДРАКОН</strong>. Благодаря этим правилам диаграммы получаются более опрятными. Например, в ДРАКОНе запрещён бич диаграмм — пересечение линий.</p>
+<p>Но ещё важнее то, что дракон-схемы предсказуемы. Например, шаги алгоритма всегда идут сверху вниз, а ветвление всегда идёт вправо. Благодаря предсказуемости лучше видно суть алгоритма, так как не нужно разбираться в структуре диаграммы. Структура всех дракон-схем похожа. Более подробно о языке ДРАКОН можно прочитать <a href="https://drakonpro.ru/ru/drakon">здесь</a>.</p>
+<h2 id="сверх-быстрый-редактор-блок-схем">Сверх-быстрый редактор блок-схем</h2>
+<p>Ключевая особенность ДраконТех — редактор блок-схем, который строит диаграмму автоматически. Пользователю не нужно рисовать. Редактор сам рисует диаграмму. Пользователь только указывает, где поместить следующий элемент или куда переключить соединяющую линию. Редактор располагает элементы диаграммы на холсте самостоятельно.</p>
+<p>Кроме того, можно копировать, вырезать и вставлять не только отдельные элементы, но и целые участки диаграммы. При этом редактор сохраняет целостность диаграммы. Не бывает такого, чтобы осталась какая-то стрелочка, которая указывает в пустоту.</p>
+<h2 id="устранение-пиксел-хантинга">Устранение пиксел-хантинга</h2>
+<p>И конечно, ДраконТех полностью устраняет так называемый пиксел-хантинг, то есть мучения пользователя, который пытается микродвижениями мыши точно соединить элементы на диаграмме. В ДраконТех пользователь только щёлкает мышкой, а диаграмма «растёт» сама.</p>
+<h2 id="автоматическое-соблюдение-правил-дракона">Автоматическое соблюдение правил ДРАКОНа</h2>
+<p>Для работы в ДраконТех не нужно помнить язык ДРАКОН. ДраконТех «знает» правила языка ДРАКОН и делает так, что ваши диаграммы автоматически следуют этим правилам.</p>
+<h2 id="работа-с-большими-проектами">Работа с большими проектами</h2>
+<p>Кроме собственно редактора блок-схем, в ДраконТех есть средства, которые помогают работать с большими проектами. Благодаря дереву проектов и папкам проект в ДраконТех может содержать сотни или даже тысячи диаграмм. Есть также поиск, замена, переход к определению функции и поиск мест, где функция встречается. То есть ДраконТех — это не рисовалка, а среда разработки.</p>
+<h2 id="как-программировать-в-среде-драконтех">Как программировать в среде ДраконТех</h2>
+<p>Программирование на визуальном языке ДРАКОН в ДраконТех происходит следующим образом. Сначала в дракон-схему вставляют пустые элементы. Потом внутри элементов пишут маленькие кусочки линейного кода. Операторы «если—то» и операторы цикла писать не надо — за это отвечает структура дракон-схемы.</p>
+<p>Кусочки кода надо писать на выбранном языке программирования, например JavaScript. В таком случае мы будем писать на гибридном языке ДРАКОН-JavaScript.</p>
+<p>Для основных конструкций структурного программирования в ДРАКОНе есть свои аналоги:</p>
+<ul>
+<li>Для «if—else» — икона «Вопрос».</li>
+<li>Для «switch—case» — икона «Выбор».</li>
+<li>Для «for», «foreach» и «while» — икона «Цикл для», цикл со стрелкой и силуэтный цикл.</li>
+</ul>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/question.png" alt="Икона Вопрос" style="max-width: 100%; width: 460px;"/>
+<p>Икона "Вопрос"</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/select.png" alt="Икона Выбор" style="max-width: 100%; width: 540px;"/>
+<p>Икона "Выбор"</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/foreach.png" alt="Икона Цикл ДЛЯ" style="max-width: 100%; width: 265px;"/>
+<p>Икона "Цикл ДЛЯ"</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/arrow.png" alt="Цикл со стрелкой" style="max-width: 100%; width: 282px;"/>
+<p>Цикл со стрелкой</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/sil-loop.png" alt="Силуэтный цикл" style="max-width: 100%; width: 352px;"/>
+<p>Силуэтный цикл</p>
+</div>
+
+<p>Таким образом, ДРАКОН выражает ветвление и циклы визуально. При этом логика программы легче читается, потому что каждый возможный путь через алгоритм можно проследить пальцем. Это наглядно и гораздо понятнее, чем программный код, где структура имитируется глубиной отступа.</p>
+<h2 id="поддерживаемые-языки">Поддерживаемые языки</h2>
+<p>ДраконТех генерирует исходный код на нескольких языках:</p>
+<ul>
+<li>JavaScript</li>
+<li>Lua</li>
+<li>Clojure</li>
+<li>Перфолента.Net</li>
+<li>OneScript/1С:Предприятие</li>
+</ul>
+<p>При помощи ДраконТех была разработана библиотека <a href="https://github.com/stepan-mitkin/drakonwidget">DrakonWidget</a> и основанные на ней приложения <a href="https://drakonhub.com/">DrakonHub</a> и <a href="https://drakonpro.ru/">ДраконПро</a>.</p>
+<p>Для некоторых языков программирования, например JavaScript и Lua, ДраконТех генерирует не только функции, но и классы, а также конечные автоматы.</p>
+<h2 id="понятные-программы">Понятные программы</h2>
+<p>Главная цель ДраконТех — сделать программы более понятными. При помощи ДраконТех вы создаёте программу в виде упорядоченных визуальных образов. Это помогает разобраться в вашей программе другим людям. Да что говорить о других! Даже вы поймёте свою программу после долгого перерыва.</p>
+
+        <h2>Обратная связь</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>Генерация кода на языке JavaScript</title>
+        <meta name="description" content="Детальное описание формата кода на языке JavaScript, который генерирует ДраконТех." >
+        <meta property="og:title" content="Генерация кода на языке JavaScript" >
+        <meta property="og:description" content="Детальное описание формата кода на языке JavaScript, который генерирует ДраконТех." >
+        <meta property="og:image" content="/ru/assets/images/JavaScript-logo.png" >
+        <meta property="og:url" content="https://drakon.tech/ru/drakon-javascript" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../ru">
+        <img src="../ru/assets/images/favicon.png" alt="ДраконТех">
+    </a>
+
+    <div class="top-block-header">ДраконТех</div>
+
+    <a class="download-link" href="../ru/skachat">Скачать</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Закрыть</span>
+        </div>
+        <ul>
+            <li><a href="../ru">Главная</a></li>
+            <li><a href="../ru/syntax-jazyka-drakon">Синтакс языка ДРАКОН</a></li>
+            <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
+            <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
+            <li><a href="../ru/skachat">Скачать</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Меню</span>
+        </div>
+        <h1 id="генерация-кода-на-языке-javascript">Генерация кода на языке JavaScript</h1>
+<img src="/ru/assets/images/JavaScript-logo.png" style="max-width:100%; width:250px; display:inline-block; vertical-align:middle; margin-bottom:20px; border-radius:20px;" alt="Логотип JavaScript">
+
+
+
+<p>На языке JavaScript легко и приятно программировать, но при одном условии. Это условие таково: применяй хорошие возможности языка и избегай плохих.</p>
+<p>При генерации кода на языке JavaScript ДраконТех старается избегать плохих возможностей. Например, он не использует ключевые слова <strong>new</strong>, <strong>class</strong>, <strong>this</strong>.</p>
+<p>Вместо этого генератор кода производит обычные функции, которые, наверное, одобрил бы Дуглас Крокфорд.</p>
+<p>ДраконТех поддерживает классы и объектно-ориентированное программирование, но без ключевого слова <strong>class</strong>.</p>
+<h2 id="функция-module">Функция module</h2>
+<p>В функцию с особым именем <strong>module</strong> помещают любой код, который будет вставлен в начало выходного JavaScript-файла.</p>
+<p>Пример — константы и глобальные переменные, выражения <strong>require</strong> а также инициализация модуля.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/module.png" alt="Пример специальной функции module" style="max-width: 100%; width: 240px;"/>
+<p>Пример специальной функции module</p>
+</div>
+
+<p>В данном примере явно объявляется переменная <strong>nextId</strong> и неявно объявляется переменная <strong>secretValue</strong>.</p>
+<h2 id="автоматическое-объявление-переменных">Автоматическое объявление переменных</h2>
+<p>Во всех JavaScript-функциях, кроме особой функции <strong>module</strong>, запрещены объявления переменных. Иными словами, нельзя применять ключевые слова <strong>var</strong>, <strong>const</strong> и <strong>let</strong>.</p>
+<p>Генератор кода объявляет переменные автоматически, в стиле Питона. Если вам нужна переменная, просто присвойте ей значение. Генератор автоматически создаст объявление переменной в теле функции при помощи ключевого слова <strong>var</strong>.</p>
+<p>В функции <strong>module</strong> объявлять переменные разрешено.</p>
+<p>Если нужно объявить константу, поместите её в функцию <strong>module</strong>.</p>
+<p>Автоматическое объявление переменных действует во всех типах модулей.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/add.png" alt="Автоматическое объявление переменных" style="max-width: 100%; width: 360px;"/>
+<p>Автоматическое объявление переменных</p>
+</div>
+
+<p>Для диаграммы выше ДраконТех сгенерирует функцию, в которой автоматически объявит локальную переменную <strong>result</strong>.</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; "><span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">add</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;">left, right</span>) {
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> result;
+    result = <span style="color: rgb(136, 0, 0); font-weight: 700;">addCore</span>(left, right);
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> result;
+}</pre>
+
+<p>ДраконТех создаёт локальные переменные не только в теле функций, но и внутри замыканий.</p>
+<h2 id="форматы-модулей">Форматы модулей</h2>
+<p>ДраконТех поддерживает три формата модулей на языке JavaScript:</p>
+<ul>
+<li>CommonJS</li>
+<li>IIFE</li>
+<li>unit</li>
+</ul>
+<p>Формат модуля задаётся при создании проекта.</p>
+<p>Для имеющегося проекта формат можно изменить в свойствах проекта. Для этого нужно щёлкнуть правой кнопкой мыши на корневой папке в дереве проекта слева и выбрать <strong>«Свойства проекта»</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/project-props.png" alt="Свойства проекта" style="max-width: 100%; width: 472px;"/>
+<p>Свойства проекта</p>
+</div>
+
+
+<p>Главное отличие между типами модулей заключается в том, как экспортируются функции.</p>
+<p>Чтобы экспортировать функцию, откройте соответствующую диаграмму, щёлкните по заголовку правой кнопкой мыши и выберите <strong>«Свойства»</strong> в контекстном меню. Далее нужно поставить галочку в чекбоксе <strong>«Экспорт»</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/diagram-props.png" alt="Экспорт функции" style="max-width: 100%; width: 713px;"/>
+<p>Экспорт функции</p>
+</div>
+
+
+<h2 id="commonjs">CommonJS</h2>
+<p><strong>CommonJS</strong> — это формат, который изначально создавался для NodeJs, но может применяться и в браузере. Чтобы использовать CommonJS-модули в браузере, необходимо подвергнуть их обработке инструментами типа <strong>browserify</strong>. Модули <strong>IIFE</strong> и <strong>unit</strong> готовы к загрузке в браузер без доработки.</p>
+<p>Сгенерированный в формате <strong>CommonJS</strong> модуль выглядит так:</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; "><span style="color: rgb(136, 0, 0); font-weight: 700;">privateMethod</span>();
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">hello</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> <span style="color: rgb(136, 0, 0); font-weight: 400;">'hello'</span>;
+}
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">privateMethod</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+    <span style="color: rgb(171, 86, 86); font-weight: 400;">console</span>.<span style="color: rgb(136, 0, 0); font-weight: 700;">log</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'meou'</span>);
+}
+
+<span style="color: rgb(171, 86, 86); font-weight: 400;">module</span>.<span style="color: rgb(68, 68, 68); font-weight: 400;">exports</span> = { hello };</pre>
+
+<p>Здесь функция <strong>hello()</strong> экспортируется через <strong>module.exports</strong>.</p>
+<p>Функция <strong>privateMethod()</strong> вызывается в функции <strong>module()</strong> и поэтому её вызов расположен в начале файла.</p>
+<p>Для того чтобы импортировать модули, нужно в тело функции module добавить икону «Действие». В эту икону вставьте нужные выражения <strong>require()</strong>.</p>
+<h2 id="iife">IIFE</h2>
+<p><strong>IIFE</strong> (Immediately Invoked Function Expression) — это идиома, которая позволяет выполнить код в браузере и при этом не засорить глобальный объект window нежелательными переменными.</p>
+<p>Модуль, сгенерированный в формате <strong>IIFE</strong>, выглядит так. Это анонимная функция, которая вызывается сразу после объявления.</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">(<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+
+<span style="color: rgb(136, 0, 0); font-weight: 700;">privateMethod</span>();
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">hello</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> <span style="color: rgb(136, 0, 0); font-weight: 400;">'hello'</span>;
+}
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">privateMethod</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+    <span style="color: rgb(171, 86, 86); font-weight: 400;">console</span>.<span style="color: rgb(136, 0, 0); font-weight: 700;">log</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'meou'</span>);
+}
+
+<span style="color: rgb(171, 86, 86); font-weight: 400;">window</span>.<span style="color: rgb(68, 68, 68); font-weight: 400;">hello</span> = hello;
+})();</pre>
+
+<p>Функция <strong>privateMethod()</strong> так же вызывается в начале файла.</p>
+<p>Здесь функция <strong>hello()</strong> экспортирована путём записи в объект window.</p>
+<h2 id="unit">unit</h2>
+<p>Модуль типа <strong>unit</strong> создаёт одну большую функцию, в которую заключён весь модуль. Эта функция находится в глобальном объекте и доступна везде.</p>
+<p>Функция создаёт и возвращает объект, который содержит экспортируемые функции.</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; "><span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">JsModuleExample</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+<span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> unit = {};
+
+<span style="color: rgb(136, 0, 0); font-weight: 700;">privateMethod</span>();
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">hello</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> <span style="color: rgb(136, 0, 0); font-weight: 400;">'hello'</span>;
+}
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">privateMethod</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;"></span>) {
+    <span style="color: rgb(171, 86, 86); font-weight: 400;">console</span>.<span style="color: rgb(136, 0, 0); font-weight: 700;">log</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'meou'</span>);
+}
+
+unit.<span style="color: rgb(68, 68, 68); font-weight: 400;">hello</span> = hello;
+<span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> unit;
+}
+<span style="color: rgb(68, 68, 68); font-weight: 700;">if</span> (<span style="color: rgb(68, 68, 68); font-weight: 700;">typeof</span> <span style="color: rgb(171, 86, 86); font-weight: 400;">module</span> !== <span style="color: rgb(136, 0, 0); font-weight: 400;">"undefined"</span> &amp;&amp; <span style="color: rgb(171, 86, 86); font-weight: 400;">module</span>.<span style="color: rgb(68, 68, 68); font-weight: 400;">exports</span>) {
+    <span style="color: rgb(171, 86, 86); font-weight: 400;">module</span>.<span style="color: rgb(68, 68, 68); font-weight: 400;">exports</span> = {
+        <span style="color: rgb(136, 0, 0); font-weight: 700;">JsModuleExample</span>
+    };
+}
+</pre>
+
+<p>Для модуля в формате <strong>unit</strong> можно задать зависимости. Зависимость — это переменная внутри модуля, доступная во всех функциях модуля. Это может быть значение конфигурации или ссылка на какой-либо объект, например другой модуль. Чтобы поместить значение в такую переменную, нужно записать значение в свойство модуля с таким же именем. ДраконТех сгенерирует сеттер, который запишет в переменную значение, передаваемое в свойство.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/dependency.png" alt="Добавление зависимости в модуль" style="max-width: 100%;"/>
+<p>Добавление зависимости в модуль</p>
+</div>
+
+<p>Здесь в модуль была добавлена зависимость <strong>foo</strong>.</p>
+<p>Пример: удовлетворение зависимостей (в коде инициализации приложения).</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; "><span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> foo = <span style="color: rgb(136, 0, 0); font-weight: 700;">FooModule</span>();
+<span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> example = <span style="color: rgb(136, 0, 0); font-weight: 700;">JsModuleExample</span>();
+example.<span style="color: rgb(68, 68, 68); font-weight: 400;">foo</span> = foo;</pre>
+
+<p>Пример: использование зависимостей (внутри модуля <strong>JsModuleExample</strong>).</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">foo.<span style="color: rgb(136, 0, 0); font-weight: 700;">greetings</span>();</pre>
+
+<p>Зависимости могут быть циклическими, поскольку зависимости задаются через позднее присваивание.</p>
+<p>Формат <strong>unit</strong> имеет несколько преимуществ:</p>
+<ol>
+<li>Он работает как в CommonJS, так и в браузере без дополнительных доработок.</li>
+<li><strong>unit</strong> позволяет создавать несколько экземпляров модуля и иметь над ними полный контроль.</li>
+<li>Зависимостями модулей можно управлять во время запуска программы. Это гораздо удобнее, чем жёсткая схема <strong>require()</strong> или <strong>import</strong>.</li>
+</ol>
+
+        <h2>Обратная связь</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

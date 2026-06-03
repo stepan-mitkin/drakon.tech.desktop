@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>Синтаксис языка ДРАКОН</title>
+        <meta name="description" content="Основные конструкции языка ДРАКОН для программистов." >
+        <meta property="og:title" content="Синтаксис языка ДРАКОН" >
+        <meta property="og:description" content="Основные конструкции языка ДРАКОН для программистов." >
+        <meta property="og:image" content="/ru/assets/images/hello.png" >
+        <meta property="og:url" content="https://drakon.tech/ru/syntax-jazyka-drakon" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../ru">
+        <img src="../ru/assets/images/favicon.png" alt="ДраконТех">
+    </a>
+
+    <div class="top-block-header">ДраконТех</div>
+
+    <a class="download-link" href="../ru/skachat">Скачать</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Закрыть</span>
+        </div>
+        <ul>
+            <li><a href="../ru">Главная</a></li>
+            <li><a href="../ru/syntax-jazyka-drakon">Синтакс языка ДРАКОН</a></li>
+            <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
+            <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
+            <li><a href="../ru/skachat">Скачать</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Меню</span>
+        </div>
+        <h1 id="синтаксис-языка-дракон">Синтаксис языка ДРАКОН</h1>
+<p>Здесь описаны основные конструкции языка ДРАКОН, применяемые в ДраконТех для программирования.</p>
+<h2 id="привет-мир">Привет, мир</h2>
+<p>Вот представление канонического алгоритма &quot;Привет, мир&quot; на ДРАКОНе.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/hello.png" alt="Привет, мир на ДРАКОНе" style="max-width: 100%; width: 350px;"/>
+<p>Привет, мир на ДРАКОНе</p>
+</div>
+
+<p>Вызовы процедур и присваивания помещают в иконы «Действие». Икона «Действие» имеет форму прямоугольника.</p>
+<h2 id="аргументы-функции">Аргументы функции</h2>
+<p>Чтобы добавить аргументы к функции, щёлкните правой кнопкой мыши по заголовку диаграммы и выберите пункт <strong>«Свойства»</strong> в контекстном меню.</p>
+<p>Затем добавьте по одному аргументу на строку, без запятых.</p>
+<p>В диалоге <strong>«Свойства»</strong> также можно задать флаги функции, например <strong>export</strong> и <strong>async</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/header-properties.png" alt="Аргументы функции" style="max-width: 100%; width: 470px;"/>
+<p>Аргументы функции</p>
+</div>
+
+<p>Аргументы функции и флаги будут отображаться в иконе <strong>«Формальные параметры»</strong> справа от заголовка диаграммы.</p>
+<h2 id="вопрос">Вопрос</h2>
+<p>Икона «Вопрос» в ДРАКОНе является аналогом конструкции <strong>if-else</strong>. </p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/question.png" alt="Икона Вопрос" style="max-width: 100%; width: 460px;"/>
+<p>Икона "Вопрос"</p>
+</div>
+
+<p>Следуйте правилу &quot;чем правее, тем хуже&quot;:</p>
+<ul>
+<li>Царская дорога (happy path) должна идти вниз по шампуру (главной вертикальной линии).</li>
+<li>Менее удачные сценарии должны уходить вправо.</li>
+<li>Обработка ошибок должна однозначно уходить вправо.</li>
+<li>Если оба сценария одинаково успешны, вниз по шампуру должен идти наиболее ожидаемый и наиболее частый вариант. Менее частый вариант должен уходить вправо.</li>
+</ul>
+<p>Обратите внимание, что выходы <strong>Да</strong> и <strong>Нет</strong> можно поменять местами. Для этого щёлкните правой кнопкой мыши по иконе «Вопрос» и выберите пункт <strong>Поменять местами Да и Нет</strong> в контекстном меню.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/swap-yes-no.png" alt="Поменять местами Да и Нет" style="max-width: 100%; width: 410px;"/>
+<p>Поменять местами Да и Нет</p>
+</div>
+
+<p>Поскольку выходы можно менять местами, логический оператор <strong>НЕ</strong> и оператор <strong>НЕ РАВНО (!=)</strong> в ДРАКОНе являются избыточными.</p>
+<p>Не используйте операторы <strong>НЕ</strong> и <strong>НЕ РАВНО</strong> при программировании на ДРАКОНе, потому что они добавляют ненужную сложность.</p>
+<h2 id="визуальные-логические-формулы">Визуальные логические формулы</h2>
+<p>ДРАКОН не поощряет использование логических операторов <strong>И</strong> и <strong>ИЛИ</strong>. Они быстро выходят из-под контроля, особенно когда количество операндов превышает два.</p>
+<p>Вместо этого следует использовать визуальные логические формулы.</p>
+<p>Вот визуальная формула для оператора <strong>И</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/simpleAnd.png" alt="Визуальная формула для оператора И" style="max-width: 100%; width: 360px;"/>
+<p>Визуальная формула для оператора И</p>
+</div>
+
+<p>Вот инвертированная формула для оператора <strong>И</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/inversedAnd.png" alt="Инвертированная формула для оператора И" style="max-width: 100%; width: 470px;"/>
+<p>Инвертированная формула для оператора И</p>
+</div>
+
+<p>Оператор <strong>ИЛИ</strong> аналогичным образом преобразуется в визуальные логические формулы.</p>
+<p>Вот визуальная формула для оператора <strong>ИЛИ</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/simpleOr.png" alt="Визуальная формула для оператора ИЛИ" style="max-width: 100%; width: 430px;"/>
+<p>Визуальная формула для оператора И</p>
+</div>
+
+<p>Вот инвертированная формула для оператора <strong>ИЛИ</strong>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/inversedOr.png" alt="Инвертированная формула для оператора ИЛИ" style="max-width: 100%; width: 380px;"/>
+<p>Инвертированная формула для оператора И</p>
+</div>
+
+
+<p>Как и в случае с простыми условиями, здесь нет необходимости использовать операторы <strong>НЕ</strong> и <strong>НЕ РАВНО</strong>.</p>
+<h2 id="выбор">Выбор</h2>
+<p>Икона «Выбор» в ДРАКОНе является аналогом конструкции <strong>switch-case</strong>.</p>
+<p>Иконы «Вариант» содержат значения вариантов.</p>
+<p>Чтобы добавить вариант по умолчанию, добавьте справа пустую икону «Вариант».</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/select.png" alt="Икона Выбор" style="max-width: 100%; width: 540px;"/>
+<p>Икона "Выбор"</p>
+</div>
+
+<p>По возможности рекомендуется располагать значения вариантов по возрастанию или по убыванию.</p>
+<h2 id="цикл-«для-каждого»">Цикл «Для каждого»</h2>
+<p>Икона цикла «Для каждого» является аналогом циклов <strong>for</strong> и <strong>foreach</strong>.</p>
+<p>Формат иконы цикла «Для каждого» немного отличается в зависимости от целевого языка.</p>
+<p>В ДРАКОН-JavaScript существует три способа задать цикл «Для каждого».</p>
+<ol>
+<li>Перебор массива. Конструкция <code>for (var item of array) { ... }</code> записывается в иконе цикла как <code>item; array</code>.</li>
+<li>Перебор объекта. Конструкция <code>for (var key in map) { var item = map[key]; ... }</code> записывается как <code>key, item; map</code>.</li>
+<li>Цикл в стиле for. Конструкция <code>for (var i = 0; i &lt; count; i++) { ... }</code> записывается как <code>i = 0; i &lt; count; i++</code>.</li>
+</ol>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/foreachArray.png" alt="Перебор массива в JavaScript и Lua" style="max-width: 100%; width: 340px;"/>
+<p>Перебор массива в JavaScript и Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/foreachMap.png" alt="Перебор объекта в JavaScript и Lua" style="max-width: 100%; width: 350px;"/>
+<p>Перебор объекта в JavaScript и Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/forArray.png" alt="Цикл в стиле for в JavaScript и Lua" style="max-width: 100%; width: 340px;"/>
+<p>Цикл в стиле for в JavaScript и Lua</p>
+</div>
+
+<p>Генератор Lua работает аналогично генератору JavaScript:</p>
+<ol>
+<li>Перебор массива. Конструкция <code>for _, item in ipairs(array) do ... end</code> записывается в иконе цикла как <code>item; array</code>.</li>
+<li>Перебор объекта. Конструкция <code>for key, item in pairs(map) do ... end</code> записывается как <code>key, item; map</code>.</li>
+<li>Цикл в стиле for. Конструкция <code>i = 0; i &lt; count; i = i + 1</code> работает так же, как и в JavaScript.</li>
+</ol>
+<p>Важное отличие состоит в том, что для Lua генератор в некоторых случаях не добавляет <code>pairs()</code> или <code>ipairs()</code>:</p>
+<ol>
+<li>Когда коллекция является вызовом функции, например: <code>x, y; fun.iter(some_object)</code>.</li>
+<li>Когда коллекция является выражением-итератором, например: <code>i, code; utf8.next, text</code>.</li>
+</ol>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/fun-iter.png" alt="Цикл по значению, возвращаемому функцией в Lua" style="max-width: 100%; width: 420px;"/>
+<p>Цикл по значению, возвращаемому функцией в Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/iterator.png" alt="Цикл по итератору в Lua" style="max-width: 100%; width: 700px;"/>
+<p>Цикл по итератору в Lua</p>
+</div>
+
+<p>Для других языков, таких как OneScript и Перфолента, текст в иконе цикла «Для каждого» копируется в сгенерированный код без изменений. Например:</p>
+<p><code>Для Каждого элемент Из коллекция Цикл</code></p>
+<p>или</p>
+<p><code>Для номер = 0 По колвоКлючей Цикл</code></p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/ДляПоМассиву.png" alt="Цикл Для Каждого в OneScript" style="max-width: 100%; width: 460px;"/>
+<p>Цикл Для Каждого в OneScript</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/ДляПоШаг.png" alt="Цикл Для По в OneScript" style="max-width: 100%; width: 480px;"/>
+<p>Цикл Для По в OneScript</p>
+</div>
+
+<p>Цикл «Для каждого» не поддерживается генератором Clojure.</p>
+<p>Можно выйти из цикла «Для каждого» раньше времени при помощи иконы «Вопрос».</p>
+<p>Обратите внимание, что выход можно направить только в точку сразу после цикла.</p>
+<p>Это не будет работать:</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/earlyExit-bad.png" alt="Ранний выход из цикла, который вызовет ошибку" style="max-width: 100%; width: 480px;"/>
+<p>Ранний выход из цикла, который вызовет ошибку</p>
+</div>
+
+<p>А вот так выход оформлен правильно:</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/earlyExit.png" alt="Правильный ранний выход из цикла" style="max-width: 100%; width: 480px;"/>
+<p>Правильный ранний выход из цикла</p>
+</div>
+
+<p>Также допустимо завершить функцию оператором <code>return</code>. В этом случае выводить выход за пределы конструкции цикла не требуется.</p>
+<p>Однако не используйте ключевое слово <code>break</code>, так как генератор кода его не поддерживает.</p>
+<h2 id="цикл-со-стрелкой">Цикл со стрелкой</h2>
+<p>ДРАКОН заменяет стрелки на блок-схемах обычными линиями.</p>
+<p>Однако существует один случай, когда в ДРАКОНе используется стрелка — цикл со стрелкой.</p>
+<p>Это делает циклы мгновенно заметными на диаграмме.</p>
+<p>Если есть стрелка — значит, есть цикл.</p>
+<p>Цикл со стрелкой является аналогом конструкций <strong>while</strong> и <strong>do-while</strong>.</p>
+<p>Вот как выглядит конструкция <strong>while</strong> в ДРАКОНе. Сначала выполняется проверка условия цикла. Затем следует тело цикла.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/whileDo.png" alt="Цикл while в ДРАКОНе" style="max-width: 100%; width: 302px;"/>
+<p>Цикл while в ДРАКОНе</p>
+</div>
+
+<p>Вот как выглядит конструкция <strong>do-while</strong> в ДРАКОНе. Сначала выполняется тело цикла. Затем следует проверка условия цикла.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/doWhile.png" alt="Цикл do-while в ДРАКОНе" style="max-width: 100%; width: 290px;"/>
+<p>Цикл do-while в ДРАКОНе</p>
+</div>
+
+<p>В этом примере цикл реализует шаблон <strong>действие-проверка-действие</strong>:</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/doWhiledo.png" alt="Цикл do-while-do в ДРАКОНе" style="max-width: 100%; width: 302px;"/>
+<p>Цикл do-while-do в ДРАКОНе</p>
+</div>
+
+<p>Цикл со стрелкой не поддерживается генератором Clojure.</p>
+<h2 id="силуэт">Силуэт</h2>
+<p>Существует два типа дракон-схем: примитивы и силуэты.</p>
+<p>Силуэт состоит из нескольких веток. Силуэт делит сложный алгоритм на логические части без декомпозиции.</p>
+<p>Чтобы преобразовать примитив в силуэт и обратно, нажмите на кнопку <strong>«Силуэт/примитив»</strong> на панели инструментов.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/silhouette-button.png" alt="Как создать силуэт в ДраконТех" style="max-width: 100%; width: 280px;"/>
+<p>Как создать силуэт в ДраконТех</p>
+</div>
+
+<p>Декомпозиция — полезный приём, но она имеет свою цену. Очень часто вместо декомпозиции лучше использовать силуэт.
+Главное преимущество силуэта состоит в том, что он не требует чрезмерной передачи аргументов функций и возвращаемых значений. При этом весь алгоритм остаётся на одной диаграмме.</p>
+<p>Ветки силуэта — это главы вашей функции. Поэтому важно давать им хорошие названия.
+Удачные названия веток помогают объяснить алгоритм.</p>
+<p>Первая ветка силуэта находится слева.
+Последняя ветка находится справа.
+Между этими границами ветки могут следовать в любом порядке. Однако хорошей практикой считается располагать их слева направо.</p>
+<div class="wide-scroll">
+<img class="ill" src="/ru/assets/images/fibonacci.png" alt="Дракон-схема силуэт" style="width: 1002px;"/>
+<p>Дракон-схема силуэт</p>
+</div>
+
+<p>Используйте иконы «Адрес», чтобы управлять тем, какая ветка будет выполнена следующей.
+На одной ветке силуэта может быть несколько икон «Адрес».</p>
+<h2 id="силуэтный-цикл">Силуэтный цикл</h2>
+<p>Одну или несколько веток можно выполнять многократно. Это называется циклом в силуэте.
+Чтобы создать цикл в силуэте, направьте переход из иконы «Адрес» на ту же ветку, в которой находится тело цикла.</p>
+<p>Не забудьте добавить условие выхода. Иначе получится бесконечный цикл.</p>
+<p>ДраконТех помечает заголовки веток и иконы «Адрес», участвующие в цикле, специальными маркерами цикла.</p>
+<div class="wide-scroll">
+<img class="ill" src="/ru/assets/images/fibonacciSil.png" alt="Силуэтный цикл" style="width: 1102px;"/>
+<p>Силуэтный цикл</p>
+</div>
+
+<p>Это ещё один приём, который ДРАКОН использует для того, чтобы циклы сразу бросались в глаза.</p>
+<h2 id="ветка-catch">Ветка catch</h2>
+<p>Для JavaScript ДраконТех поддерживает особую ветку с ключевым именем <strong>catch</strong>. Ветка <strong>catch</strong> генерирует обработчик ошибок <code>catch (ex) { ... }</code>.</p>
+<p>Чтобы получить доступ к пойманному объекту исключения, вызовите функцию <code>getHandlerData()</code>.</p>
+<div class="ill-block">
+<img class="ill" src="/ru/assets/images/catch.png" alt="Ветка catch" style="max-width: 100%; width: 414px;"/>
+<p>Ветка catch</p>
+</div>
+
+<p>На ветку <strong>catch</strong> запрещено ссылаться из других веток.</p>
+
+        <h2>Обратная связь</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>
