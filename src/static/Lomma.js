@@ -9412,6 +9412,7 @@ function lexInit() {
     addLongOp("=>")
     addLongOp("++")
     addLongOp("--")
+    addLongOp("<>")
     addLongOp("<<")
     addLongOp(">>")
     addLongOp("<<<")
