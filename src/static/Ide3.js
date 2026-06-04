@@ -5158,11 +5158,17 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
       extended.item = item;
       var current = self.logic.getCurrent();
       var spaceId = current.spaceId;
-      var calls = tryGetFunctionNames(item);
+      var calls = [];
       var needle = item.text;
-      if (calls.length !== 0) {
-        needle = calls.map((call) => call.name).join(" ");
-        item.tokens = calls.map((call) => call.name);
+      var language = getProgrammingLanguage();
+      if (language === "KUMIR2606") {
+        item.tokens = getKumirTokens(item)
+      } else {
+        calls = tryGetFunctionNames(item);
+        if (calls.length !== 0) {
+          needle = calls.map((call) => call.name).join(" ");
+          item.tokens = calls.map((call) => call.name);
+        }
       }
 
       var onSuccess = function (data) {
@@ -5174,12 +5180,57 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
         tokens: item.tokens,
         text: needle,
       };
-      var target = {
-        onData: onSuccess,
-        onError: function () {},
-      };
-      backend.searchDefinitions(body).then(target.onData);
+      backend.searchDefinitions(body).then(onSuccess);
     }
+  }
+
+  function addKumirTokensFromLine(line, result) {
+      let buffer = "";
+
+      for (const ch of line) {
+          if (isPunctuation(ch)) {
+              addBuffer(buffer, result);
+              buffer = "";
+          } else {
+              buffer += ch;
+          }
+      }
+
+      addBuffer(buffer, result);
+  }
+
+  function addBuffer(buffer, result) {
+      if (!buffer) {
+          return;
+      }
+
+      const trimmed = buffer.trim();
+
+      if (!trimmed) {
+          return;
+      }
+
+      if (/^\d/.test(trimmed)) {
+          return;
+      }
+
+      result.push(trimmed);
+  }
+
+  function isPunctuation(ch) {
+      return "\"()[]{}.,:;+-*/=<>\t".includes(ch);
+  }
+
+  function getKumirTokens(item) {
+    if (!item.text) {
+      return [];
+    }
+    var result = []
+    var lines = item.text.split("\n")
+    for (var line of lines) {
+      addKumirTokensFromLine(line, result)
+    }
+    return result
   }
 
   function tryGetFunctionNames(item) {
