@@ -1,0 +1,71 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "9",
+            "content": "result = 1000"
+        },
+        "4": {
+            "type": "question",
+            "one": "3",
+            "two": "5",
+            "flag1": 1,
+            "content": "x > 0"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "x = -x"
+        },
+        "6": {
+            "type": "question",
+            "one": "3",
+            "two": "7",
+            "flag1": 1,
+            "content": "y > 0"
+        },
+        "7": {
+            "type": "action",
+            "one": "1",
+            "content": "return -1"
+        },
+        "8": {
+            "type": "loopend",
+            "one": "11",
+            "content": ""
+        },
+        "9": {
+            "type": "loopbegin",
+            "one": "10",
+            "content": "i = 0; i < x + y; i = i + 1"
+        },
+        "10": {
+            "type": "action",
+            "one": "8",
+            "content": "result = result + i"
+        },
+        "11": {
+            "type": "action",
+            "one": "1",
+            "content": "return result"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "x\ny"
+}

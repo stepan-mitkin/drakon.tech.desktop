@@ -1,0 +1,71 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "9",
+            "content": "результат = 1000;"
+        },
+        "4": {
+            "type": "question",
+            "one": "3",
+            "two": "5",
+            "flag1": 1,
+            "content": "икс > 0"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "икс = -икс;"
+        },
+        "6": {
+            "type": "question",
+            "one": "3",
+            "two": "7",
+            "flag1": 1,
+            "content": "игрек > 0"
+        },
+        "7": {
+            "type": "action",
+            "one": "1",
+            "content": "Возврат -1;"
+        },
+        "8": {
+            "type": "loopend",
+            "one": "11",
+            "content": ""
+        },
+        "9": {
+            "type": "loopbegin",
+            "one": "10",
+            "content": "Для номер = 0 По икс + игрек Цикл"
+        },
+        "10": {
+            "type": "action",
+            "one": "8",
+            "content": "результат = результат + номер;"
+        },
+        "11": {
+            "type": "action",
+            "one": "1",
+            "content": "Возврат результат;"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "икс\nигрек"
+}

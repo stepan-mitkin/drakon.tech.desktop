@@ -1,0 +1,63 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "12"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "Возврат \"десять\";"
+        },
+        "10": {
+            "type": "case",
+            "one": "13",
+            "two": "",
+            "content": "30"
+        },
+        "11": {
+            "type": "case",
+            "one": "3",
+            "two": "14",
+            "content": "10"
+        },
+        "12": {
+            "type": "select",
+            "one": "11",
+            "two": "",
+            "content": "значение"
+        },
+        "13": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "Возврат \"тридцать\";"
+        },
+        "14": {
+            "one": "15",
+            "type": "case",
+            "two": "10",
+            "content": "20"
+        },
+        "15": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "Возврат \"двадцать\";"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "значение"
+}

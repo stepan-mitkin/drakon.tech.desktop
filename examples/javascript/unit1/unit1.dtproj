@@ -1,0 +1,6 @@
+{
+    "language": "JS2604",
+    "outputFile": "../unit1.js",
+    "format": "unit",
+    "dependencies": "name"
+}

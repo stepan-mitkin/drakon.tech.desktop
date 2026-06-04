@@ -1,0 +1,60 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "question",
+            "one": "15",
+            "two": "14",
+            "flag1": 1,
+            "content": "значениеА"
+        },
+        "5": {
+            "type": "question",
+            "one": "6",
+            "two": "14",
+            "flag1": 1,
+            "content": "значениеБ"
+        },
+        "6": {
+            "type": "question",
+            "one": "13",
+            "two": "14",
+            "flag1": 1,
+            "content": "значениеВ"
+        },
+        "13": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "знач := да"
+        },
+        "14": {
+            "type": "action",
+            "one": "1",
+            "two": "",
+            "content": "знач := нет"
+        },
+        "15": {
+            "type": "action",
+            "one": "5",
+            "content": "|"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "лог значениеА\nлог значениеБ\nлог значениеВ\n\nзнач лог"
+}

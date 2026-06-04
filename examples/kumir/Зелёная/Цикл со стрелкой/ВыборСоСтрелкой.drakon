@@ -1,0 +1,68 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "9",
+            "content": "цел результат = 0"
+        },
+        "5": {
+            "type": "case",
+            "one": "13",
+            "two": null
+        },
+        "6": {
+            "type": "case",
+            "one": "10",
+            "two": "11",
+            "content": "10"
+        },
+        "7": {
+            "type": "select",
+            "one": "6",
+            "content": "результат"
+        },
+        "9": {
+            "type": "arrow-loop",
+            "one": "7"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "content": "знач := результат"
+        },
+        "11": {
+            "one": "12",
+            "type": "case",
+            "two": "5",
+            "content": "5"
+        },
+        "12": {
+            "type": "action",
+            "one": "9",
+            "content": "результат := результат + 2"
+        },
+        "13": {
+            "type": "action",
+            "one": "9",
+            "content": "результат := результат + 1"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "знач цел"
+}

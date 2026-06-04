@@ -1,0 +1,66 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "Сообщить(\"Значение найдено по индексу \" + индекс);"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "9",
+            "content": ""
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "6",
+            "content": "Для номер = 0 По коллекция.Количество() - 1 Цикл"
+        },
+        "6": {
+            "type": "question",
+            "one": "4",
+            "two": "8",
+            "flag1": 0,
+            "content": "коллекция[номер] = значение"
+        },
+        "7": {
+            "type": "action",
+            "one": "5",
+            "content": "индекс = -1;"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "content": "индекс = номер;"
+        },
+        "9": {
+            "type": "question",
+            "one": "3",
+            "two": "12",
+            "flag1": 0,
+            "content": "индекс = -1"
+        },
+        "12": {
+            "type": "action",
+            "one": "1",
+            "content": "Сообщить(\"Значение не найдено\");"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "коллекция\nзначение ",
+    "type": "drakon"
+}

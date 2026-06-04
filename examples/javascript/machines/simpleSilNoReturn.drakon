@@ -1,0 +1,44 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "6",
+            "content": "Ветка1"
+        },
+        "4": {
+            "type": "sinput",
+            "one": "14",
+            "content": "nudge(amount)"
+        },
+        "6": {
+            "type": "action",
+            "one": "4",
+            "content": "total = 1"
+        },
+        "12": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 2,
+            "content": "Exit"
+        },
+        "14": {
+            "type": "action",
+            "one": "12",
+            "content": "me.amount = total + amount + left + right"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "left\nright",
+    "type": "drakon"
+}

@@ -1,0 +1,47 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "9"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "1",
+            "content": ""
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "10",
+            "content": "i = 0; i < count; i++"
+        },
+        "8": {
+            "type": "action",
+            "one": "4",
+            "content": "console.log(item)"
+        },
+        "9": {
+            "type": "action",
+            "one": "5",
+            "content": "count = array.length"
+        },
+        "10": {
+            "type": "action",
+            "one": "8",
+            "content": "item = array[i]"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "array",
+    "type": "drakon"
+}

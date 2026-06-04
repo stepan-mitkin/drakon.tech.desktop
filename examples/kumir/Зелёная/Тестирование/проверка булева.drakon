@@ -1,0 +1,49 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "question",
+            "one": "7",
+            "two": "8",
+            "flag1": 1,
+            "content": "ожидание = реальность"
+        },
+        "5": {
+            "type": "action",
+            "one": "1",
+            "content": "вывод \"ОШИБКА: ПроверкаБулева: Ожидалось \" + лог_в_лит(ожидание) + \", а оказалось \" + лог_в_лит(реальность), нс"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "вывод \"ПроверкаБулева: Ожидалось и оказалось \" + лог_в_лит(реальность), нс"
+        },
+        "7": {
+            "type": "action",
+            "one": "6",
+            "content": "удачных := удачных + 1"
+        },
+        "8": {
+            "type": "action",
+            "one": "5",
+            "content": "неудачных := неудачных + 1"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "лог ожидание\nлог реальность"
+}

@@ -1,0 +1,72 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "8",
+            "content": "First"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "result += right"
+        },
+        "4": {
+            "type": "branch",
+            "one": "9",
+            "branchId": 4,
+            "content": "Exit"
+        },
+        "5": {
+            "type": "branch",
+            "one": "10",
+            "branchId": 2,
+            "content": "Second"
+        },
+        "6": {
+            "type": "question",
+            "one": "3",
+            "two": "7",
+            "flag1": 1,
+            "content": "left === 3"
+        },
+        "7": {
+            "type": "branch",
+            "branchId": 3,
+            "one": "11",
+            "content": "Third"
+        },
+        "8": {
+            "type": "action",
+            "one": "6",
+            "content": "result = 0"
+        },
+        "9": {
+            "type": "action",
+            "one": "1",
+            "content": "return result"
+        },
+        "10": {
+            "type": "action",
+            "one": "7",
+            "content": "result += 2"
+        },
+        "11": {
+            "type": "action",
+            "one": "4",
+            "content": "result += 10"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "export": true,
+        "function": true,
+        "scenario": false,
+        "async": false,
+        "algoprop": false
+    },
+    "params": "left  \n\n right"
+}

@@ -1,0 +1,66 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "10",
+            "content": "Перем результат тип Целое"
+        },
+        "4": {
+            "type": "question",
+            "one": "8",
+            "two": "5",
+            "flag1": 1,
+            "content": "левый"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "результат = результат + 1"
+        },
+        "6": {
+            "type": "question",
+            "one": "8",
+            "two": "7",
+            "flag1": 1,
+            "content": "правый"
+        },
+        "7": {
+            "type": "action",
+            "one": "9",
+            "content": "результат = результат + 5"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "content": "результат = результат + 10"
+        },
+        "9": {
+            "type": "action",
+            "one": "1",
+            "content": "Возврат результат"
+        },
+        "10": {
+            "type": "action",
+            "one": "4",
+            "content": "результат = 0"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "левый тип Булево\nправый тип Булево\n\nтип Целое"
+}

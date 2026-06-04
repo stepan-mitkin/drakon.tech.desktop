@@ -1,0 +1,156 @@
+{
+    "type": "drakon",
+    "items": {
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "3",
+            "content": "Init"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "x = arg1 + 2"
+        },
+        "5": {
+            "type": "branch",
+            "one": "11",
+            "branchId": 2,
+            "content": "Black state"
+        },
+        "6": {
+            "type": "branch",
+            "branchId": 3,
+            "one": "20",
+            "content": "Inter-transitional"
+        },
+        "9": {
+            "type": "case",
+            "one": "19",
+            "two": null,
+            "content": "right(value)"
+        },
+        "10": {
+            "type": "case",
+            "one": "28",
+            "two": "9",
+            "content": "left(value)"
+        },
+        "11": {
+            "type": "select",
+            "one": "10",
+            "content": "receive"
+        },
+        "12": {
+            "type": "branch",
+            "branchId": 4,
+            "one": "13",
+            "content": "Red state"
+        },
+        "13": {
+            "type": "select",
+            "one": "14",
+            "content": "receive"
+        },
+        "14": {
+            "type": "case",
+            "one": "21",
+            "two": "15",
+            "content": "left(value)"
+        },
+        "15": {
+            "type": "case",
+            "one": "30",
+            "two": null,
+            "content": "right(value)"
+        },
+        "17": {
+            "type": "branch",
+            "branchId": 5,
+            "one": "27",
+            "content": "Grey state"
+        },
+        "18": {
+            "type": "action",
+            "one": "6",
+            "content": "arg1 = arg1 + value"
+        },
+        "19": {
+            "type": "action",
+            "one": "12",
+            "content": "arg2 = arg2 + value"
+        },
+        "20": {
+            "type": "action",
+            "one": "12",
+            "content": "arg1 = arg1 + 1"
+        },
+        "21": {
+            "type": "action",
+            "one": "17",
+            "content": "arg1 = arg1 + value * 2"
+        },
+        "22": {
+            "type": "action",
+            "one": "5",
+            "content": "arg2 = arg2 + value * 2"
+        },
+        "25": {
+            "type": "sinput",
+            "one": "29",
+            "content": "print(what)"
+        },
+        "26": {
+            "type": "action",
+            "one": "33",
+            "content": "me.a1 = arg1 + x\nme.a2 = arg2"
+        },
+        "27": {
+            "type": "action",
+            "one": "25",
+            "content": "x = x + 1"
+        },
+        "28": {
+            "type": "question",
+            "one": "18",
+            "two": "19",
+            "flag1": 0,
+            "content": "value < 0"
+        },
+        "29": {
+            "type": "action",
+            "one": "26",
+            "content": "print(what)"
+        },
+        "30": {
+            "type": "question",
+            "one": "22",
+            "two": "31",
+            "flag1": 0,
+            "content": "value == \"7777\""
+        },
+        "31": {
+            "type": "action",
+            "one": "22",
+            "content": "error(\"Bad right value\")"
+        },
+        "32": {
+            "type": "end"
+        },
+        "33": {
+            "type": "branch",
+            "branchId": 6,
+            "one": "32",
+            "content": "Exit"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "arg1\narg2"
+}

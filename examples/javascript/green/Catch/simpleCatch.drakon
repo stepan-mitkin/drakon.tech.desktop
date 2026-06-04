@@ -1,0 +1,55 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "3",
+            "content": "Do"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "result = arg.getTime()"
+        },
+        "4": {
+            "type": "branch",
+            "one": "6",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "5": {
+            "type": "branch",
+            "one": "8",
+            "branchId": 2,
+            "content": "catch"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "return result"
+        },
+        "7": {
+            "type": "action",
+            "one": "4",
+            "content": "return -1"
+        },
+        "8": {
+            "type": "action",
+            "one": "7",
+            "content": "console.log(getHandlerData().message)"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "arg"
+}

@@ -1,0 +1,52 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "return true"
+        },
+        "4": {
+            "type": "question",
+            "one": "3",
+            "two": "8",
+            "flag1": 1,
+            "content": "valueA"
+        },
+        "8": {
+            "type": "question",
+            "one": "11",
+            "two": "12",
+            "flag1": 0,
+            "content": "valueB"
+        },
+        "11": {
+            "type": "question",
+            "one": "3",
+            "two": "12",
+            "flag1": 1,
+            "content": "valueC"
+        },
+        "12": {
+            "type": "action",
+            "one": "1",
+            "content": "return false"
+        }
+    },
+    "keywords": {
+        "export": true,
+        "function": true,
+        "scenario": false,
+        "async": false,
+        "algoprop": false
+    },
+    "params": "valueA\nvalueB\nvalueC",
+    "type": "drakon"
+}

@@ -1,0 +1,23 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "multiply = require(\"exampleslua2604.ops\")\n.multiply"
+        },
+        "4": {
+            "type": "action",
+            "one": "1",
+            "content": "local secretValue = 23;\nlocal nextId = 1"
+        }
+    },
+    "type": "drakon"
+}

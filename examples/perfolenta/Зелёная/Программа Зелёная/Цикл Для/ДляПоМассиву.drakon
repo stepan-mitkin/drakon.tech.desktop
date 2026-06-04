@@ -1,0 +1,42 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "7"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "1",
+            "content": ""
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "6",
+            "content": "Для элемент Из коллекция"
+        },
+        "6": {
+            "type": "action",
+            "one": "4",
+            "content": "ВыводСтроки элемент"
+        },
+        "7": {
+            "type": "action",
+            "one": "5",
+            "content": "Перем элемент тип Строка = Неопределено"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "коллекция тип Строка[]"
+}

@@ -1,0 +1,79 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "13",
+            "content": "Ветка1"
+        },
+        "3": {
+            "type": "action",
+            "one": "6",
+            "content": "фу = значение * 10"
+        },
+        "4": {
+            "type": "question",
+            "one": "9",
+            "two": "7",
+            "flag1": 1,
+            "content": "значение >= 0"
+        },
+        "5": {
+            "type": "branch",
+            "one": "12",
+            "branchId": 3,
+            "content": "Завершение"
+        },
+        "6": {
+            "type": "branch",
+            "one": "11",
+            "branchId": 2,
+            "content": "Ветка2"
+        },
+        "7": {
+            "type": "action",
+            "one": "6",
+            "content": "фу = значение * 30"
+        },
+        "9": {
+            "type": "question",
+            "one": "3",
+            "two": "10",
+            "flag1": 1,
+            "content": "значение % 10 = 0"
+        },
+        "10": {
+            "type": "action",
+            "one": "6",
+            "content": "фу = значение * 20"
+        },
+        "11": {
+            "type": "action",
+            "one": "5",
+            "content": "фу = фу + 5"
+        },
+        "12": {
+            "type": "action",
+            "one": "1",
+            "content": "Возврат фу"
+        },
+        "13": {
+            "type": "action",
+            "one": "4",
+            "content": "Перем фу тип Целое"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "значение тип Целое\n\nтип Целое"
+}

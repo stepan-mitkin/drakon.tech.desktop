@@ -14,8 +14,9 @@ DrakonTech generates source code in several languages:
 - JavaScript
 - Lua
 - Clojure
-- Перфолента.Net
+- Perfolenta.Net
 - OneScript/1C:Enterprise
+- Kumir
 
 DrakonTech generates not only functions but also classes and finite state machines.
 

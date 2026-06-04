@@ -1,0 +1,37 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "me.hello = moo"
+        },
+        "4": {
+            "type": "sinput",
+            "one": "3",
+            "content": "bar(moo)"
+        },
+        "5": {
+            "type": "action",
+            "one": "1",
+            "content": "self.value = foo + moo"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "foo"
+}

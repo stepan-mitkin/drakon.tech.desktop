@@ -1,0 +1,49 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "question",
+            "one": "7",
+            "two": "8",
+            "flag1": 1,
+            "content": "ожидание = реальность"
+        },
+        "5": {
+            "type": "action",
+            "one": "1",
+            "content": "Сообщить(\"ОШИБКА: ПроверкаЦелого: Ожидалось \" + ожидание + \", а оказалось \" + реальность);"
+        },
+        "6": {
+            "type": "action",
+            "one": "1",
+            "content": "Сообщить(\"ПроверкаЦелого: Ожидалось и оказалось \" + реальность);"
+        },
+        "7": {
+            "type": "action",
+            "one": "6",
+            "content": "КолвоУдачных = КолвоУдачных + 1;"
+        },
+        "8": {
+            "type": "action",
+            "one": "5",
+            "content": "КолвоНеудачных = КолвоНеудачных + 1;"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "ожидание\nреальность"
+}

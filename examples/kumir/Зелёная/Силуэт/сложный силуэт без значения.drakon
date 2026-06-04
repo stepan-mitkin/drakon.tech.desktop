@@ -1,0 +1,73 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "12",
+            "content": "Первый"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "результат := результат + правый"
+        },
+        "4": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 4,
+            "content": "Завершение"
+        },
+        "5": {
+            "type": "branch",
+            "one": "10",
+            "branchId": 2,
+            "content": "Второй"
+        },
+        "6": {
+            "type": "question",
+            "one": "3",
+            "two": "7",
+            "flag1": 1,
+            "content": "левый = 3"
+        },
+        "7": {
+            "type": "branch",
+            "branchId": 3,
+            "one": "11",
+            "content": "Третий"
+        },
+        "8": {
+            "type": "action",
+            "one": "6",
+            "content": "результат := 0"
+        },
+        "10": {
+            "type": "action",
+            "one": "7",
+            "content": "вывод результат + 2, нс"
+        },
+        "11": {
+            "type": "action",
+            "one": "4",
+            "content": "вывод результат + 10, нс"
+        },
+        "12": {
+            "type": "action",
+            "one": "8",
+            "content": "цел результат"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "цел левый\nцел правый"
+}

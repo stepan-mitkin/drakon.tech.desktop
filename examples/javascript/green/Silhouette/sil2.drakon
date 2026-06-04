@@ -1,0 +1,74 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "4",
+            "content": "Ветка1"
+        },
+        "3": {
+            "type": "action",
+            "one": "6",
+            "content": "foo = value * 10"
+        },
+        "4": {
+            "type": "question",
+            "one": "9",
+            "two": "7",
+            "flag1": 1,
+            "content": "value >= 0"
+        },
+        "5": {
+            "type": "branch",
+            "one": "12",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "6": {
+            "type": "branch",
+            "one": "11",
+            "branchId": 2,
+            "content": "Ветка2"
+        },
+        "7": {
+            "type": "action",
+            "one": "6",
+            "content": "foo = value * 10"
+        },
+        "9": {
+            "type": "question",
+            "one": "3",
+            "two": "10",
+            "flag1": 1,
+            "content": "value % 10 === 0"
+        },
+        "10": {
+            "type": "action",
+            "one": "6",
+            "content": "foo = value * 10"
+        },
+        "11": {
+            "type": "action",
+            "one": "5",
+            "content": "foo += 5"
+        },
+        "12": {
+            "type": "action",
+            "one": "1",
+            "content": "return foo"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "value"
+}

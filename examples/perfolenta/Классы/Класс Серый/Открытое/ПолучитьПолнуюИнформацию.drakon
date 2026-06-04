@@ -1,0 +1,42 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "5"
+        },
+        "4": {
+            "type": "action",
+            "one": "1",
+            "content": "Возврат результат"
+        },
+        "5": {
+            "type": "action",
+            "one": "7",
+            "content": "Лог(\"ПолучитьПолнуюИнформацию\")"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "Перем результат тип ПолнаяИнформация = Новый ПолнаяИнформация"
+        },
+        "8": {
+            "type": "action",
+            "one": "4",
+            "content": "результат.Имя = Имя\nрезультат.Цвет = Цвет\nрезультат.Адрес = Адрес"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "тип ПолнаяИнформация"
+}
