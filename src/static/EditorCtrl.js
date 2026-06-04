@@ -3709,6 +3709,12 @@ function EditorCtrl(window, document, elementId, userId) {
     }
   }
 
+  function onSearchChangeLight(options) {
+    if (globals.search) {
+      applySearchOutput(options);
+    }
+  }  
+
   function onShadowChanged(evt) {
     var dialogs = globals.dialogs;
     dialogs.shadow = evt.target.checked;
@@ -4489,7 +4495,7 @@ function EditorCtrl(window, document, elementId, userId) {
     editor.setCallback("changeYesNo", changeYesNo);
     editor.setCallback("showContextMenu", showContextMenu);
     editor.setCallback("findReferences", globals.findReferences);
-    editor.setCallback("onSearchChange", onSearchChange);
+    editor.setCallback("onSearchChange", onSearchChangeLight);
     editor.setCallback("showChangeDiaProps", globals.showChangeDiaProps);
     editor.setCallback("hideCentral", globals.hideCentral);
     globals.editor = editor;
