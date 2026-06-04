@@ -162,6 +162,8 @@
             return ".пфл";
         } else if (language === "OS2605") {
             return ".os";
+        } else if (language === "KUMIR2606") {
+            return ".kum";            
         } else {
             // Error: Unexpected case value language
             return ".js";
@@ -399,6 +401,7 @@
         addComboboxOption(languageCombo, "clojure", "Clojure");
         addComboboxOption(languageCombo, "PFL2605", "Перфолента");
         addComboboxOption(languageCombo, "OS2605", "OneScript");
+        addComboboxOption(languageCombo, "KUMIR2606", "Кумир");
         setValue(languageCombo, globalOptions.language || "JS2604");
         
         // Format

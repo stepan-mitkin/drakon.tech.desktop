@@ -4840,7 +4840,7 @@ function validateModuleName(name, language) {
                     return "ERR_NAME_TOO_LONG"
                 } else {
                     // item 3510
-                    if (language === "LANG_HUMAN") {
+                    if (language === "LANG_HUMAN" || language == "KUMIR2606" || language == "KUMIR") {
                         // item 3424
                         return null
                     } else {
