@@ -45,7 +45,7 @@ var Config = {
 	FREE_WIDTH: 100,
 	FREE_HEIGHT: 30,
 	FONT_FAMILY_1: "Liberation Sans",
-	FONT_SIZE_1: 16,
+	FONT_SIZE_1: 15,
 	FONT_FAMILY: "Liberation Sans",
 	FONT_SIZE: 14,
 	HEADER_SIZE: 22,
@@ -61,7 +61,7 @@ var Config = {
 	FONT_TIMEOUT: 15,
 	SEARCH_PERIOD: 200,
 	DIAGRAM_VERSION: 20190320,
-	EDITOR_FONT: "JetBrainsMono"
+	EDITOR_FONT: "RobotoMono"
 };
 
 var Const = {

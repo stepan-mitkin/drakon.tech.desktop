@@ -101,6 +101,30 @@ td {
 }
 
 @font-face {
+	font-family: 'RobotoMono';
+	src: url('../fonts/RobotoMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'RobotoMono';
+	src: url('../fonts/RobotoMono-Italic.ttf') format('truetype');
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'RobotoMono';
+	src: url('../fonts/RobotoMono-Bold.ttf') format('truetype');
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'RobotoMono';
+	src: url('../fonts/RobotoMono-BoldItalic.ttf') format('truetype');
+	font-style: italic;
+	font-weight: bold;
+}
+
+@font-face {
 	font-family: 'JetBrainsMono';
 	src: url('../fonts/JetBrainsMono-Medium.ttf') format('truetype');
 }
