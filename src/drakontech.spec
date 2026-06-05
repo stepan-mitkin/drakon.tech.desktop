@@ -1,12 +1,12 @@
 Name: drakontech
-Version: 2026.05.24
+Version: 2026.06.04
 Release: 1
 License: Unlicense
-Summary: A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, OneScript, or Clojure code
+Summary: A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, Kumir, OneScript, or Clojure code
 URL: undefined
 
 %description
-A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, OneScript, or Clojure code
+A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, Kumir, OneScript, or Clojure code
 %files
 /usr/bin/drakontech
 /usr/share/applications/drakontech.desktop
@@ -83,6 +83,7 @@ A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, 
 /usr/share/drakontech/resources/app/build_rpm.js
 /usr/share/drakontech/resources/app/config.json
 /usr/share/drakontech/resources/app/drakontech.html
+/usr/share/drakontech/resources/app/drakontech.spec
 /usr/share/drakontech/resources/app/drakosha.ico
 /usr/share/drakontech/resources/app/drakosha.png
 /usr/share/drakontech/resources/app/entitlements.mac.plist
@@ -151,6 +152,11 @@ A DRAKON-based IDE that transforms flowcharts into JavaScript, Lua, Perfolenta, 
 /usr/share/drakontech/resources/app/static/fonts/Cousine-Regular.ttf
 /usr/share/drakontech/resources/app/static/fonts/Cousine-Regular.woff
 /usr/share/drakontech/resources/app/static/fonts/Cousine-Regular.woff.b64
+/usr/share/drakontech/resources/app/static/fonts/JetBrainsMono-Bold.ttf
+/usr/share/drakontech/resources/app/static/fonts/JetBrainsMono-BoldItalic.ttf
+/usr/share/drakontech/resources/app/static/fonts/JetBrainsMono-Italic.ttf
+/usr/share/drakontech/resources/app/static/fonts/JetBrainsMono-Medium.ttf
+/usr/share/drakontech/resources/app/static/fonts/JetBrainsMono-Regular.ttf
 /usr/share/drakontech/resources/app/static/fonts/LiberationSans-Bold.ttf
 /usr/share/drakontech/resources/app/static/fonts/LiberationSans-Bold.woff
 /usr/share/drakontech/resources/app/static/fonts/LiberationSans-Bold.woff.b64
