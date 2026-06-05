@@ -7,17 +7,12 @@
         "2": {
             "type": "branch",
             "branchId": 0,
-            "one": "4"
+            "one": "3"
         },
         "3": {
             "type": "action",
             "one": "1",
-            "content": "return smarterAdd(self.value, 20)"
-        },
-        "4": {
-            "type": "action",
-            "one": "3",
-            "content": "log(\"getValue\")"
+            "content": "title = \"Dr.\""
         }
     },
     "keywords": {
@@ -28,5 +23,5 @@
         "algoprop": false,
         "lazy": false
     },
-    "params": ""
+    "params": "time"
 }

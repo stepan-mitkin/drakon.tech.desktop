@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>Object-Oriented Programming in JavaScript and Lua</title>
+        <meta name="description" content="A practical guide to creating and using classes in Lua and JavaScript with DrakonTech." >
+        <meta property="og:title" content="Object-Oriented Programming in JavaScript and Lua" >
+        <meta property="og:description" content="A practical guide to creating and using classes in Lua and JavaScript with DrakonTech." >
+        <meta property="og:image" content="../en/assets/images/class-function.png" >
+        <meta property="og:url" content="https://drakon.tech/en/oop-in-javascript-and-lua" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 250px;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../">
+        <img src="../ru/assets/images/favicon.png" alt="DrakonTech">
+    </a>
+
+    <div class="top-block-header">DrakonTech</div>
+
+    <a class="download-link" href="../en/download">Download</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Close</span>
+        </div>
+        <ul>
+            <li><a href="../">Main</a></li>
+            <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
+            <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
+            <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/oop-in-javascript-and-lua">Object-Oriented Programming in JavaScript and Lua</a></li>
+            <li><a href="../en/download">Download</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Menu</span>
+        </div>
+        <h1 id="object-oriented-programming-in-javascript-and-lua">Object-Oriented Programming in JavaScript and Lua</h1>
+<p>Even though some may perceive Lua as exotic, JavaScript and Lua are the same technology. If we strip all the garbage from these languages, we get the same excellent core.</p>
+<p>In JavaScript, we must avoid the <strong>prototype</strong> object and the keywords <strong>class</strong> and <strong>this</strong>. In Lua, one must stay away from <strong>metatable</strong> manipulations.</p>
+<p>This way, JavaScript and Lua converge into a clean, minimalistic language, with support for object-oriented programming.</p>
+<p>Here is DrakonTech&#39;s approach to working with classes.</p>
+<p>DrakonTech creates a factory function that creates a new object called <strong>self</strong>. In this object, the code generator inserts the public methods. All private methods remain inside the factory function. Private methods cannot be called directly from outside.</p>
+<p>The factory&#39;s parameters become the constructor parameters. The factory&#39;s local variables become the private fields of the class.</p>
+<p>The object&#39;s methods can write directly to the properties of <strong>self</strong> object if the developer decides to do so. This way, the developer can keep state private or deliberately expose it through <strong>self</strong>.</p>
+<p>Here is what generated class code looks like in JavaScript:</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; "><span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">Blue</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;">time</span>) {
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> self = { <span style="color: rgb(68, 68, 68); font-weight: 400;">_type</span>: <span style="color: rgb(136, 0, 0); font-weight: 400;">'Blue'</span> };
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> title;
+    title = <span style="color: rgb(136, 0, 0); font-weight: 400;">'Dr.'</span>;
+
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">buildGreeting</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;">name</span>) {
+        <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> <span style="color: rgb(136, 0, 0); font-weight: 400;">`Good <span style="color: rgb(136, 0, 0); font-weight: 400;">${ time }</span>, <span style="color: rgb(136, 0, 0); font-weight: 400;">${ title }</span> <span style="color: rgb(136, 0, 0); font-weight: 400;">${ name }</span>!`</span>;
+    }
+
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">greeting</span>(<span style="color: rgb(68, 68, 68); font-weight: 400;">name</span>) {
+        <span style="color: rgb(68, 68, 68); font-weight: 700;">var</span> message;
+        message = <span style="color: rgb(136, 0, 0); font-weight: 700;">buildGreeting</span>(name);
+        <span style="color: rgb(171, 86, 86); font-weight: 400;">console</span>.<span style="color: rgb(136, 0, 0); font-weight: 700;">log</span>(message);
+    }
+
+    self.<span style="color: rgb(68, 68, 68); font-weight: 400;">greeting</span> = greeting;
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> self;
+}
+<span style="color: rgb(171, 86, 86); font-weight: 400;">module</span>.<span style="color: rgb(68, 68, 68); font-weight: 400;">exports</span> = { <span style="color: rgb(136, 0, 0); font-weight: 700;">Blue</span> };</pre>
+
+<p>And here is the Lua equivalent:</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">
+<span style="color: rgb(68, 68, 68); font-weight: 400;"><span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">Blue</span><span style="color: rgb(68, 68, 68); font-weight: 400;">(time)</span></span>
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">local</span> <span style="color: rgb(57, 115, 0); font-weight: 400;">self</span> = {_type=<span style="color: rgb(136, 0, 0); font-weight: 400;">"Blue"</span>}
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">local</span> title
+    title = <span style="color: rgb(136, 0, 0); font-weight: 400;">"Dr."</span>
+
+    <span style="color: rgb(68, 68, 68); font-weight: 400;"><span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">buildGreeting</span><span style="color: rgb(68, 68, 68); font-weight: 400;">(name)</span></span>
+        <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> <span style="color: rgb(136, 0, 0); font-weight: 400;">"Good "</span> .. <span style="color: rgb(57, 115, 0); font-weight: 400;">time</span> .. <span style="color: rgb(136, 0, 0); font-weight: 400;">", "</span> .. title ..
+        <span style="color: rgb(136, 0, 0); font-weight: 400;">" "</span> .. name .. <span style="color: rgb(136, 0, 0); font-weight: 400;">"!"</span>
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">end</span>
+
+    <span style="color: rgb(68, 68, 68); font-weight: 400;"><span style="color: rgb(68, 68, 68); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">greeting</span><span style="color: rgb(68, 68, 68); font-weight: 400;">(name)</span></span>
+        <span style="color: rgb(68, 68, 68); font-weight: 700;">local</span> message
+        message = buildGreeting(name)
+        <span style="color: rgb(57, 115, 0); font-weight: 400;">print</span>(message)
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">end</span>
+
+    <span style="color: rgb(57, 115, 0); font-weight: 400;">self</span>.greeting = greeting
+    <span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> <span style="color: rgb(57, 115, 0); font-weight: 400;">self</span>
+<span style="color: rgb(68, 68, 68); font-weight: 700;">end</span>
+
+<span style="color: rgb(68, 68, 68); font-weight: 700;">return</span> {
+    Blue = Blue
+}</pre>
+
+<p>And here is how to use this class in both languages:</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">blueObj = Blue(<span style="color: rgb(136, 0, 0); font-weight: 400;">"Morning"</span>)
+blueObj.greeting(<span style="color: rgb(136, 0, 0); font-weight: 400;">"Luna"</span>)</pre>
+
+<p>Note that in Lua, one does not use the colon notation to call a method, such as <code>object:method()</code>. The dot operator is used instead, just like in JavaScript: <code>object.method()</code>.</p>
+<p>To create a class in a JavaScript or Lua project in DrakonTech:</p>
+<ol>
+<li>Create a new folder.</li>
+<li>Create a function called <strong>class</strong> in that folder. The <strong>class</strong> function tells the code generator to build a class. The arguments of the <strong>class</strong> function become the constructor arguments. All variables declared in the <strong>class</strong> function become private fields of the class.</li>
+<li>Add functions to the folder. All functions inside this folder and its subfolders become the methods of the class.</li>
+<li>To make a method public, mark it as exported.</li>
+</ol>
+<p>The name of the folder that contains the <strong>class</strong> function becomes the class name.</p>
+<div class="ill-block">
+<img class="ill" src="../en/assets/images/class-function.png" alt="The class function (the class constructor) in JavaScript and Lua" style="max-width: 100%; width: 540px;"/>
+<p>The class function (the class constructor) in JavaScript and Lua</p>
+</div>
+
+<p>The arguments and local variables of the <strong>class</strong> function are available to all methods of the class.</p>
+<div class="ill-block">
+<img class="ill" src="../en/assets/images/public-method.png" alt="Public method" style="max-width: 100%; width: 370px;"/>
+<p>Public method</p>
+</div>
+
+<p>The <strong>self</strong> object is available both to the methods and to the <strong>class</strong> function.</p>
+<p>If the <strong>class</strong> function is marked as exported, the class&#39;s factory function is exported. Then one can use the class outside of the module.</p>
+<p>Note that in DrakonTech, you do not need to declare variables explicitly in Lua and JavaScript. They are declared automatically.</p>
+
+        <h2>Feedback</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

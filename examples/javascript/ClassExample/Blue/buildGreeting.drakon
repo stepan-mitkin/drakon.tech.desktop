@@ -12,16 +12,16 @@
         "3": {
             "type": "action",
             "one": "1",
-            "content": "self.value = value"
+            "content": "return `Good ${time}, ${title} ${name}!`"
         }
     },
     "keywords": {
         "function": false,
         "machine": false,
         "async": false,
-        "export": true,
+        "export": false,
         "algoprop": false,
         "lazy": false
     },
-    "params": "value"
+    "params": "name"
 }
