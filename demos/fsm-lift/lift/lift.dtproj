@@ -1,0 +1,6 @@
+{
+    "language": "JS2604",
+    "outputFile": "../lift.js",
+    "format": "IIFE",
+    "dependencies": ""
+}

@@ -1,0 +1,83 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "found = undefined\ncabin = getCabinPos() - accelerationDistance"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "14",
+            "content": ""
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "6",
+            "content": "i = floorCount; i > 0; i--"
+        },
+        "6": {
+            "type": "action",
+            "one": "7",
+            "content": "floorY = floorToPosition(i)"
+        },
+        "7": {
+            "type": "question",
+            "one": "8",
+            "two": "14",
+            "flag1": 1,
+            "content": "floorY <= cabin"
+        },
+        "8": {
+            "type": "question",
+            "one": "12",
+            "two": "11",
+            "flag1": 0,
+            "content": "found"
+        },
+        "9": {
+            "type": "action",
+            "one": "4",
+            "content": "found = i"
+        },
+        "11": {
+            "type": "question",
+            "one": "9",
+            "two": "15",
+            "flag1": 1,
+            "content": "isFloorRequestedInner(i)"
+        },
+        "12": {
+            "type": "question",
+            "one": "13",
+            "two": "4",
+            "flag1": 1,
+            "content": "isFloorRequested(i)"
+        },
+        "13": {
+            "type": "action",
+            "one": "4",
+            "content": "found = i"
+        },
+        "14": {
+            "type": "action",
+            "one": "1",
+            "content": "return found"
+        },
+        "15": {
+            "type": "question",
+            "one": "9",
+            "two": "4",
+            "flag1": 1,
+            "content": "isFloorRequestedUp(i)"
+        }
+    }
+}

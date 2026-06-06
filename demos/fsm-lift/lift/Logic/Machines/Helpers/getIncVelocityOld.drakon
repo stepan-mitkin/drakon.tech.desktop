@@ -1,0 +1,76 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "13"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "m1 = self.startPos + accDistance"
+        },
+        "4": {
+            "type": "action",
+            "one": "7",
+            "content": "m2 = self.target - accDistance"
+        },
+        "6": {
+            "type": "action",
+            "one": "3",
+            "content": "distance = self.target - self.startPos"
+        },
+        "7": {
+            "type": "question",
+            "one": "11",
+            "two": "8",
+            "flag1": 1,
+            "content": "self.current < m1"
+        },
+        "8": {
+            "type": "question",
+            "one": "12",
+            "two": "10",
+            "flag1": 1,
+            "content": "self.current > m2"
+        },
+        "9": {
+            "type": "action",
+            "one": "1",
+            "content": "return result"
+        },
+        "10": {
+            "type": "action",
+            "one": "9",
+            "content": "result = maxVelocity"
+        },
+        "11": {
+            "type": "action",
+            "one": "9",
+            "content": "result = (\n    self.current - self.startPos + cutoff\n) / (accDistance + cutoff) * maxVelocity"
+        },
+        "12": {
+            "type": "action",
+            "one": "9",
+            "content": "result = (\n    self.target - self.current + cutoff\n) / (accDistance + cutoff) * maxVelocity"
+        },
+        "13": {
+            "type": "action",
+            "one": "6",
+            "content": "cutoff = accDistance * 0.1"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "self\nmaxVelocity\naccDistance"
+}

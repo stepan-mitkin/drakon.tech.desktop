@@ -1,0 +1,59 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "8"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "return undefined"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "3",
+            "content": ""
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "6",
+            "content": "button; globals.buttons"
+        },
+        "6": {
+            "type": "question",
+            "one": "4",
+            "two": "7",
+            "flag1": 0,
+            "content": "hitBox(\n    button.x,\n    button.y,\n    buttonSize,\n    buttonSize,\n    x,\n    y\n)"
+        },
+        "7": {
+            "type": "action",
+            "one": "4",
+            "content": "return button"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "content": "crect = globals.canvas.getBoundingClientRect()"
+        },
+        "9": {
+            "type": "action",
+            "one": "5",
+            "content": "x = evt.clientX - crect.left\ny = evt.clientY - crect.top"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "evt"
+}

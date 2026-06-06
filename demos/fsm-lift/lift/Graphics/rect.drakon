@@ -1,0 +1,37 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "5"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "x += 0.5\ny += 0.5"
+        },
+        "4": {
+            "type": "action",
+            "one": "1",
+            "content": "ctx.strokeRect(x, y, width, height)"
+        },
+        "5": {
+            "type": "action",
+            "one": "3",
+            "content": "ctx = globals.ctx"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "x\ny\nwidth\nheight"
+}

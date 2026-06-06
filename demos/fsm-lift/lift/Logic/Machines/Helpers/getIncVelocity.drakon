@@ -1,0 +1,76 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "14"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "m1 = self.startPos + accDistance"
+        },
+        "4": {
+            "type": "action",
+            "one": "7",
+            "content": "m2 = self.target - accDistance"
+        },
+        "7": {
+            "type": "question",
+            "one": "11",
+            "two": "8",
+            "flag1": 1,
+            "content": "self.current < m1"
+        },
+        "8": {
+            "type": "question",
+            "one": "16",
+            "two": "10",
+            "flag1": 1,
+            "content": "self.current > m2"
+        },
+        "9": {
+            "type": "action",
+            "one": "1",
+            "content": "return Math.max(\n    maxVelocity * 0.05,\n    Math.min(result, maxVelocity)\n)"
+        },
+        "10": {
+            "type": "action",
+            "one": "9",
+            "content": "result = maxVelocity"
+        },
+        "11": {
+            "type": "action",
+            "one": "9",
+            "content": "result = self.velocity + acc * globals.delta"
+        },
+        "14": {
+            "type": "action",
+            "one": "15",
+            "content": "accTime = 2 * accDistance / maxVelocity"
+        },
+        "15": {
+            "type": "action",
+            "one": "3",
+            "content": "acc = maxVelocity / accTime"
+        },
+        "16": {
+            "type": "action",
+            "one": "9",
+            "content": "result = self.velocity - acc * globals.delta"
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "self\nmaxVelocity\naccDistance"
+}

@@ -1,0 +1,209 @@
+{
+    "type": "drakon",
+    "items": {
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "41",
+            "content": "ClosedStill"
+        },
+        "5": {
+            "type": "branch",
+            "one": "69",
+            "branchId": 5,
+            "content": "Moving"
+        },
+        "10": {
+            "type": "select",
+            "one": "11",
+            "content": "receive"
+        },
+        "11": {
+            "type": "case",
+            "one": "17",
+            "two": "16",
+            "content": "update()"
+        },
+        "12": {
+            "type": "case",
+            "one": "18",
+            "two": null,
+            "content": "onCommand()"
+        },
+        "16": {
+            "one": "25",
+            "type": "case",
+            "two": "12",
+            "content": "onArrived()"
+        },
+        "17": {
+            "type": "action",
+            "one": "5",
+            "content": "me.motor.update()"
+        },
+        "18": {
+            "type": "action",
+            "one": "5",
+            "content": "updateDestination(me)"
+        },
+        "25": {
+            "type": "action",
+            "one": "74",
+            "content": "globals.currentFloor = me.target\nme.target = undefined"
+        },
+        "27": {
+            "type": "branch",
+            "branchId": 2,
+            "one": "30",
+            "content": "Opening"
+        },
+        "28": {
+            "type": "branch",
+            "branchId": 4,
+            "one": "42",
+            "content": "Closing"
+        },
+        "30": {
+            "type": "select",
+            "one": "31",
+            "content": "receive"
+        },
+        "31": {
+            "type": "case",
+            "one": "35",
+            "two": "32",
+            "content": "update()"
+        },
+        "32": {
+            "type": "case",
+            "one": "50",
+            "two": null,
+            "content": "onDoor()"
+        },
+        "35": {
+            "type": "action",
+            "one": "27",
+            "content": "me.door.update()"
+        },
+        "37": {
+            "type": "question",
+            "one": "40",
+            "two": "70",
+            "flag1": 0,
+            "content": "requestedCurrentFloor()"
+        },
+        "40": {
+            "type": "question",
+            "one": "2",
+            "two": "5",
+            "flag1": 0,
+            "content": "startMovement(me)"
+        },
+        "41": {
+            "type": "sinput",
+            "one": "37",
+            "content": "onCommand()"
+        },
+        "42": {
+            "type": "select",
+            "one": "43",
+            "content": "receive"
+        },
+        "43": {
+            "type": "case",
+            "one": "45",
+            "two": "55",
+            "content": "update()"
+        },
+        "44": {
+            "type": "case",
+            "one": "46",
+            "two": null,
+            "content": "onDoor()"
+        },
+        "45": {
+            "type": "action",
+            "one": "28",
+            "content": "me.door.update()"
+        },
+        "46": {
+            "type": "question",
+            "one": "2",
+            "two": "5",
+            "flag1": 0,
+            "content": "startMovement(me)"
+        },
+        "50": {
+            "type": "branch",
+            "branchId": 3,
+            "one": "51",
+            "content": "Open"
+        },
+        "51": {
+            "type": "action",
+            "one": "72",
+            "content": "setTimeout(me.onTimeout, doorTimeout)"
+        },
+        "53": {
+            "type": "action",
+            "one": "28",
+            "content": "closeDoor(me)"
+        },
+        "55": {
+            "one": "60",
+            "type": "case",
+            "two": "44",
+            "content": "onCommand()"
+        },
+        "60": {
+            "type": "question",
+            "one": "28",
+            "two": "73",
+            "flag1": 0,
+            "content": "requestedCurrentFloor()"
+        },
+        "69": {
+            "type": "action",
+            "one": "10",
+            "content": "globals.currentFloor = undefined"
+        },
+        "70": {
+            "type": "action",
+            "one": "27",
+            "two": "",
+            "content": "openDoor(me)"
+        },
+        "71": {
+            "type": "action",
+            "one": "27",
+            "two": "",
+            "content": "openDoor(me)"
+        },
+        "72": {
+            "type": "sinput",
+            "one": "53",
+            "content": "onTimeout()"
+        },
+        "73": {
+            "type": "action",
+            "one": "27",
+            "two": "",
+            "content": "openDoor(me)"
+        },
+        "74": {
+            "type": "action",
+            "one": "71",
+            "two": "",
+            "content": "resetFloorButtons()"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": ""
+}

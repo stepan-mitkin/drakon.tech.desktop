@@ -1,0 +1,89 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "5",
+            "content": "objLine = document.createElement(\"div\")"
+        },
+        "4": {
+            "type": "action",
+            "one": "1",
+            "content": "add(container, objLine)"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "objLine.style.margin = \"5px\""
+        },
+        "6": {
+            "type": "question",
+            "one": "7",
+            "two": "8",
+            "flag1": 1,
+            "content": "depth"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "indent = document.createElement(\"span\")\nindent.style.display = \"inline-block\"\nindent.style.verticalAlign = \"middle\"\nindent.style.width = 20 * depth + \"px\"\nadd(objLine, indent)"
+        },
+        "8": {
+            "type": "action",
+            "one": "15",
+            "content": "nameEl = document.createElement(\"span\")\nnameEl.style.display = \"inline-block\"\nnameEl.style.verticalAlign = \"middle\"\naddText(nameEl, name + \": \")\nnameEl.style.minWidth = \"100px\"\nadd(objLine, nameEl)"
+        },
+        "9": {
+            "type": "action",
+            "one": "17",
+            "content": "valueEl = document.createElement(\"span\")\nvalueEl.style.display = \"inline-block\"\nvalueEl.style.verticalAlign = \"middle\"\naddText(valueEl, valueStr)\nadd(objLine, valueEl)"
+        },
+        "11": {
+            "type": "action",
+            "one": "9",
+            "content": "valueStr = formatValue(value)"
+        },
+        "14": {
+            "type": "question",
+            "one": "11",
+            "two": "4",
+            "flag1": 0,
+            "content": "value === undefined"
+        },
+        "15": {
+            "type": "question",
+            "one": "14",
+            "two": "16",
+            "flag1": 0,
+            "content": "bold"
+        },
+        "16": {
+            "type": "action",
+            "one": "14",
+            "two": "",
+            "content": "nameEl.style.fontWeight = \"bold\""
+        },
+        "17": {
+            "type": "action",
+            "one": "4",
+            "content": "valueEl.style.fontWeight = \"bold\""
+        }
+    },
+    "keywords": {
+        "function": true,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "depth\ncontainer\nname\nvalue\nbold"
+}
