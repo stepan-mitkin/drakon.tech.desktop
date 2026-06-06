@@ -209,7 +209,8 @@ pre {
         left: 0;
         top: 70px;
         z-index: -1;
-        width: 250px;
+        width: 350px;
+        max-width: 100%;
         height: auto;
         opacity: 0;
         transform: translateX(-20px);
@@ -261,10 +262,12 @@ pre {
         </div>
         <ul>
             <li><a href="../ru">Главная</a></li>
-            <li><a href="../ru/syntax-jazyka-drakon">Синтакс языка ДРАКОН</a></li>
+            <li><a href="../ru/syntax-jazyka-drakon">Синтаксис языка ДРАКОН</a></li>
             <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
             <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
-            <li><a href="../ru/oop-na-javascript-i-lua">Объектно-ориентированное программирование на JavaScript и Lua</a></li>
+            <li><a href="../ru/oop-na-javascript-i-lua">ООП на JavaScript и Lua</a></li>
+            <li><a href="../ru/konechnye-avtomaty">Конечные автоматы</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Исходный код</a></li>
             <li><a href="../ru/skachat">Скачать</a></li>
         </ul>
     </aside>
@@ -280,7 +283,7 @@ pre {
         <h1 id="объектно-ориентированное-программирование-на-javascript-и-lua">Объектно-ориентированное программирование на JavaScript и Lua</h1>
 <p>Хотя некоторые считают Lua экзотическим языком, JavaScript и Lua — это одна и та же технология. Если убрать из этих языков весь мусор, останется одно и то же превосходное ядро.</p>
 <p>В JavaScript следует избегать объекта <strong>prototype</strong> и ключевых слов <strong>class</strong> и <strong>this</strong>. В Lua нужно держаться подальше от манипуляций с <strong>metatable</strong>.</p>
-<p>Таким образом, JavaScript и Lua превращаются в единый минималистичный язык с поддержкой объектно-ориентированного программирования.</p>
+<p>Таким образом JavaScript и Lua превращаются в единый минималистичный язык с поддержкой объектно-ориентированного программирования.</p>
 <p>DrakonTech работает с классами так.</p>
 <p>DrakonTech генерирует фабричную функцию, которая создаёт новый объект с именем <strong>self</strong>. В этот объект генератор кода помещает публичные методы. Все приватные методы остаются внутри фабричной функции. Приватные методы нельзя вызвать напрямую извне.</p>
 <p>Параметры фабричной функции становятся параметрами конструктора. Локальные переменные фабричной функции становятся приватными полями класса.</p>

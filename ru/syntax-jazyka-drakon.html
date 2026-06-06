@@ -209,7 +209,8 @@ pre {
         left: 0;
         top: 70px;
         z-index: -1;
-        width: 250px;
+        width: 350px;
+        max-width: 100%;
         height: auto;
         opacity: 0;
         transform: translateX(-20px);
@@ -261,10 +262,12 @@ pre {
         </div>
         <ul>
             <li><a href="../ru">Главная</a></li>
-            <li><a href="../ru/syntax-jazyka-drakon">Синтакс языка ДРАКОН</a></li>
+            <li><a href="../ru/syntax-jazyka-drakon">Синтаксис языка ДРАКОН</a></li>
             <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
             <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
-            <li><a href="../ru/oop-na-javascript-i-lua">Объектно-ориентированное программирование на JavaScript и Lua</a></li>
+            <li><a href="../ru/oop-na-javascript-i-lua">ООП на JavaScript и Lua</a></li>
+            <li><a href="../ru/konechnye-avtomaty">Конечные автоматы</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Исходный код</a></li>
             <li><a href="../ru/skachat">Скачать</a></li>
         </ul>
     </aside>
@@ -322,20 +325,20 @@ pre {
 <h2 id="визуальные-логические-формулы">Визуальные логические формулы</h2>
 <p>ДРАКОН не поощряет использование логических операторов <strong>И</strong> и <strong>ИЛИ</strong>. Они быстро выходят из-под контроля, особенно когда количество операндов превышает два.</p>
 <p>Вместо этого следует использовать визуальные логические формулы.</p>
-<p>Вот визуальная формула для оператора <strong>И</strong>.</p>
+<p>Вот визуальная формула для оператора <strong>И</strong>: <code>valueA И valueB И valueC</code>.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/simpleAnd.png" alt="Визуальная формула для оператора И" style="max-width: 100%; width: 360px;"/>
 <p>Визуальная формула для оператора И</p>
 </div>
 
-<p>Вот инвертированная формула для оператора <strong>И</strong>.</p>
+<p>Вот инвертированная формула для оператора <strong>И</strong>: <code>one === 1 И two === 2 И three === 3</code>. Используйте инвертированную формулу, если хотите выразить намерение <code>если (one === 1 И two === 2 И three === 3) { ... }</code>, а ветка <strong>то</strong> на блок-схеме должна идти вправо.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/inversedAnd.png" alt="Инвертированная формула для оператора И" style="max-width: 100%; width: 470px;"/>
 <p>Инвертированная формула для оператора И</p>
 </div>
 
 <p>Оператор <strong>ИЛИ</strong> аналогичным образом преобразуется в визуальные логические формулы.</p>
-<p>Вот визуальная формула для оператора <strong>ИЛИ</strong>.</p>
+<p>Вот визуальная формула для оператора <strong>ИЛИ</strong>: <code>valueA ИЛИ valueB ИЛИ valueC</code>.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/simpleOr.png" alt="Визуальная формула для оператора ИЛИ" style="max-width: 100%; width: 430px;"/>
 <p>Визуальная формула для оператора И</p>

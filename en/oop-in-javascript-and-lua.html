@@ -209,7 +209,8 @@ pre {
         left: 0;
         top: 70px;
         z-index: -1;
-        width: 250px;
+        width: 350px;
+        max-width: 100%;
         height: auto;
         opacity: 0;
         transform: translateX(-20px);
@@ -264,7 +265,9 @@ pre {
             <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
             <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
             <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
-            <li><a href="../en/oop-in-javascript-and-lua">Object-Oriented Programming in JavaScript and Lua</a></li>
+            <li><a href="../en/oop-in-javascript-and-lua">OOP in JavaScript and Lua</a></li>
+            <li><a href="../en/state-machines">State machines</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Source code</a></li>
             <li><a href="../en/download">Download</a></li>
         </ul>
     </aside>
@@ -280,9 +283,9 @@ pre {
         <h1 id="object-oriented-programming-in-javascript-and-lua">Object-Oriented Programming in JavaScript and Lua</h1>
 <p>Even though some may perceive Lua as exotic, JavaScript and Lua are the same technology. If we strip all the garbage from these languages, we get the same excellent core.</p>
 <p>In JavaScript, we must avoid the <strong>prototype</strong> object and the keywords <strong>class</strong> and <strong>this</strong>. In Lua, one must stay away from <strong>metatable</strong> manipulations.</p>
-<p>This way, JavaScript and Lua converge into a clean, minimalistic language, with support for object-oriented programming.</p>
+<p>This way, JavaScript and Lua converge into a single minimalistic language, with support for object-oriented programming.</p>
 <p>Here is DrakonTech&#39;s approach to working with classes.</p>
-<p>DrakonTech creates a factory function that creates a new object called <strong>self</strong>. In this object, the code generator inserts the public methods. All private methods remain inside the factory function. Private methods cannot be called directly from outside.</p>
+<p>DrakonTech generates a factory function that creates a new object called <strong>self</strong>. In this object, the code generator inserts the public methods. All private methods remain inside the factory function. Private methods cannot be called directly from outside.</p>
 <p>The factory&#39;s parameters become the constructor parameters. The factory&#39;s local variables become the private fields of the class.</p>
 <p>The object&#39;s methods can write directly to the properties of <strong>self</strong> object if the developer decides to do so. This way, the developer can keep state private or deliberately expose it through <strong>self</strong>.</p>
 <p>Here is what generated class code looks like in JavaScript:</p>

@@ -209,7 +209,8 @@ pre {
         left: 0;
         top: 70px;
         z-index: -1;
-        width: 250px;
+        width: 350px;
+        max-width: 100%;
         height: auto;
         opacity: 0;
         transform: translateX(-20px);
@@ -264,7 +265,9 @@ pre {
             <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
             <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
             <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
-            <li><a href="../en/oop-in-javascript-and-lua">Object-Oriented Programming in JavaScript and Lua</a></li>
+            <li><a href="../en/oop-in-javascript-and-lua">OOP in JavaScript and Lua</a></li>
+            <li><a href="../en/state-machines">State machines</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Source code</a></li>
             <li><a href="../en/download">Download</a></li>
         </ul>
     </aside>
@@ -322,20 +325,20 @@ pre {
 <h2 id="visual-logical-formulas">Visual Logical Formulas</h2>
 <p>DRAKON does not encourage the use of logical <strong>AND</strong> and <strong>OR</strong> operators. They quickly get out of control, especially when the number of operands exceeds two.</p>
 <p>Instead, visual logical formulas should be used.</p>
-<p>Here is the visual formula for the <strong>AND</strong> operator.</p>
+<p>Here is the visual formula for the <strong>AND</strong> operator: <code>valueA AND valueB AND valueC</code>.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/simpleAnd.png" alt="Visual Formula for AND" style="max-width: 100%; width: 360px;"/>
 <p>Visual Formula for AND</p>
 </div>
 
-<p>Here is the inverted formula for the <strong>AND</strong> operator.</p>
+<p>Here is the inverted formula for the <strong>AND</strong> operator: <code>one === 1 AND two === 2 AND three === 3</code>. Use the inverted formula when you want to express the intention <code>if (one === 1 AND two === 2 AND three === 3) { ... }</code> and the <strong>then</strong> clause must go to the right on the flowchart.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/inversedAnd.png" alt="Inverted Formula for AND" style="max-width: 100%; width: 470px;"/>
 <p>Inverted Formula for AND</p>
 </div>
 
 <p>The <strong>OR</strong> operator can be transformed into visual logical formulas in a similar way.</p>
-<p>Here is the visual formula for the <strong>OR</strong> operator.</p>
+<p>Here is the visual formula for the <strong>OR</strong> operator: <code>valueA OR valueB OR valueC</code>.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/simpleOr.png" alt="Visual Formula for OR" style="max-width: 100%; width: 430px;"/>
 <p>Visual Formula for OR</p>

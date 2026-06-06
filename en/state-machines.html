@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>State Machines in DrakonTech</title>
+        <meta name="description" content="State machines (finite automata) in DRAKON diagrams — states, messages, transitions, visualization of state machines, and code generation in DrakonTech for JavaScript and Lua." >
+        <meta property="og:title" content="State Machines in DrakonTech" >
+        <meta property="og:description" content="State machines (finite automata) in DRAKON diagrams — states, messages, transitions, visualization of state machines, and code generation in DrakonTech for JavaScript and Lua." >
+        <meta property="og:image" content="../ru/assets/images/mily-robot-lo.png" >
+        <meta property="og:url" content="https://drakon.tech/en/state-machines" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 350px;
+        max-width: 100%;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../">
+        <img src="../ru/assets/images/favicon.png" alt="DrakonTech">
+    </a>
+
+    <div class="top-block-header">DrakonTech</div>
+
+    <a class="download-link" href="../en/download">Download</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Close</span>
+        </div>
+        <ul>
+            <li><a href="../">Main</a></li>
+            <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
+            <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
+            <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/oop-in-javascript-and-lua">OOP in JavaScript and Lua</a></li>
+            <li><a href="../en/state-machines">State machines</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Source code</a></li>
+            <li><a href="../en/download">Download</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Menu</span>
+        </div>
+        <h1 id="state-machines-in-drakontech">State Machines in DrakonTech</h1>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/mily-robot-lo.png" alt="State machine smiling" style="max-width: 100%; width: 250px;"/>
+</div>
+
+<p>DrakonTech generates state machine code in JavaScript and Lua.</p>
+<h2 id="what-state-machines-are-for">What State Machines Are For</h2>
+<p>State machines (finite automata) are an excellent tool for developing control algorithms.</p>
+<p>Algorithms can be divided into two large groups: computational algorithms and control algorithms. An example of a computational algorithm is calculating the roots of a quadratic equation. A common property of computational algorithms is that they have an end. If such an algorithm contains no errors, it always terminates.</p>
+<p>The second group consists of control algorithms. Their defining characteristic is that they deal with processes that are stretched out over time. Many control algorithms have no end. For example, the algorithm that controls a heartbeat.</p>
+<p>The problem of creating understandable and reliable control algorithms is extremely important. Our entire technological civilization depends on it. Moreover, complex computational algorithms are also processes. Complex computations must also be controlled. Even simple software objects, such as user interface elements, require control logic. All this makes control algorithms extremely important and widespread.</p>
+<h2 id="what-is-a-state-machine">What Is a State Machine</h2>
+<p>A state machine is an object that can switch between several states. The number of such states is finite, hence the name &quot;finite state machine.&quot; A state machine accepts a finite number of message types. Its reaction to messages depends on the state it is currently in.</p>
+<p>Imagine a class that has several methods. The difference between a state machine and a class is that the machine&#39;s methods behave differently depending on the current state. For example, an elevator can move up, move down, or stand still. Depending on the state of the elevator controller, the elevator responds differently to button presses. If the doors are open, pressing a button will not start movement.</p>
+<p>It turns out that state machines are a convenient way to model control algorithms. A state machine is useful because it reduces complex behavior to a small number of scenarios. These scenarios are easy to identify and test.</p>
+<h2 id="how-to-represent-a-state-machine-in-drakontech">How to Represent a State Machine in DrakonTech</h2>
+<p>The main difficulty in creating state machines is visualizing them clearly. Existing state machine diagrams have drawbacks. One drawback is the lack of visible transition logic between states. Another drawback is the chaotic arrangement of states on the diagram.</p>
+<p>DRAKON offers a way to represent state machines that eliminates these drawbacks. DRAKON allows all essential information about a state machine to be placed on a single visual scene. This information includes the logic for selecting the next state. In addition, state machines appear in an orderly and uniform style.</p>
+<p>The proposed representation is as follows.</p>
+<ul>
+<li>Each state of the machine corresponds to one branch of the silhouette.</li>
+<li>A <strong>Select</strong> icon with the keyword <strong>receive</strong> is placed on the branch. The <strong>Case</strong> icons under the <strong>Select</strong> icon represent the types of messages that the machine processes in that state.</li>
+<li>Below comes the logic that contains the actions performed when processing the message, as well as the selection of the next state.</li>
+<li>The next state is selected using an <strong>Address</strong> icon. The <strong>Address</strong> icon points to the next state.</li>
+</ul>
+<p>Each silhouette branch may contain several <strong>Address</strong> icons. In other words, depending on the situation, after receiving a message, the machine may choose among several possible next states.</p>
+<p>For every <strong>Case</strong> icon on every silhouette branch, DrakonTech generates a handler method. The handler signature (its name and parameters) is taken from the <strong>Case</strong> icon. A machine may expect the same message in one or several states. In that case, the message signature must be identical in all states.</p>
+<p>If a state expects only one type of message, a <strong>Simple Input</strong> icon can be used. The <strong>Simple Input</strong> icon specifies the handler signature in the same format as the <strong>Select</strong> icon.</p>
+<p>The <strong>Simple Input</strong> and <strong>Select</strong> icons with the <strong>receive</strong> keyword are the points where the state machine pauses and waits for incoming messages.</p>
+<p>Here is an example of a state machine from the demo application <a href="https://drakon.tech/demos/fsm-lift/lift">&quot;Lift&quot;</a>. This machine controls the elevator cabin.</p>
+<div class="wide-scroll">
+<img class="ill" src="../ru/assets/images/CabinMachine.png" alt="Example of a state machine in the DRAKON language" style="width: 3042px;"/>
+<p>Example of a state machine in the DRAKON language</p>
+</div>
+
+<p>The <strong>CabinMachine</strong> state machine has several states:</p>
+<ul>
+<li><strong>ClosedStill</strong>. In this state, the machine waits for a single message: <strong>onCommand</strong>.</li>
+<li><strong>Opening</strong>. Expected messages: <strong>update</strong>, <strong>onDoor</strong>.</li>
+<li><strong>Open</strong>. Expected message: <strong>onTimeout</strong>.</li>
+<li><strong>Closing</strong>. Expected messages: <strong>update</strong>, <strong>onCommand</strong>, <strong>onDoor</strong>.</li>
+<li><strong>Moving</strong>. Expected messages: <strong>update</strong>, <strong>onArrived</strong>, <strong>onCommand</strong>.</li>
+</ul>
+<p>The expressions in the <strong>Case</strong> and <strong>Simple Input</strong> icons look like function calls: <code>onTimeout()</code>, <code>onDoor()</code>. However, these are declarations of handler methods. They can be called from outside the machine like this: <code>cabin.onDoor()</code>.</p>
+<p>In this machine, the handlers do not accept arguments. Arguments can be added, and then the corresponding handler method will accept those arguments. Handler arguments remain available inside the machine until the next <strong>Simple Input</strong> icon or <strong>Select</strong> icon with the <strong>receive</strong> keyword.</p>
+<p>For example, if we place <code>onDoor(info)</code> in a <strong>Case</strong> icon, the <strong>info</strong> argument will be added to the handler method. The value of <strong>info</strong> will remain available until the next waiting point.</p>
+<p>The machine object itself is available inside a state machine diagram under the name <strong>me</strong>. This can be used to access the machine object&#39;s fields.</p>
+<p>Another use of the <strong>me</strong> object is obtaining a specific event handler method as a callback. The usage pattern is as follows: first, pass the handler as a callback to some function, then wait for the corresponding event.</p>
+<p>An example of this pattern can be found in the <strong>CabinMachine</strong> state machine. In the <strong>Open</strong> branch, we first pass the <strong>onTimeout</strong> event handler: <code>setTimeout(me.onTimeout, doorTimeout)</code>. Then we wait for the <strong>onTimeout</strong> event: <code>onTimeout()</code>.</p>
+<h2 id="advantages-of-representing-state-machines-with-drakon-silhouettes">Advantages of Representing State Machines with DRAKON Silhouettes</h2>
+<p>A quick glance at the diagram immediately shows which states are possible for the state machine. It is enough to look at the branch headers. Since all branch headers are located on the same horizontal line at the top of the diagram, there is no need to scan the entire diagram to find them.</p>
+<p>For each state, it is easy to determine which message types the machine expects. To do this, simply inspect the <strong>Select</strong> icons. These icons are also arranged on a horizontal line.</p>
+<p>Below the <strong>Select</strong> icons are the decision trees that determine the machine&#39;s actions and the transition to the next state. Transitions are shown by <strong>Address</strong> icons, which are also aligned horizontally. Therefore, a single glance at a silhouette branch is enough to see which states can follow the current one.</p>
+<h2 id="forced-machine-shutdown">Forced Machine Shutdown</h2>
+<p>One advantage of these state machines is that they can be forcibly stopped using the <strong>stop()</strong> method. In other words, client code can turn off a state machine. If the machine is waiting for external events, such as network events or user actions, those events will be ignored when they arrive.</p>
+<p>This kind of &quot;soft&quot; shutdown prevents errors that occur when events arrive after the program no longer expects them. A stopped machine ignores all events and never throws exceptions.</p>
+<h2 id="state-machines-as-asynchronous-functions">State Machines as Asynchronous Functions</h2>
+<p>To start a state machine generated in JavaScript, call its <strong>run()</strong> method.</p>
+<p>The <strong>run()</strong> method returns a <strong>Promise</strong> object. Because of this, you can wait for the state machine to finish by using the <strong>await</strong> keyword. In other words, the <strong>run()</strong> method is an asynchronous function.</p>
+<p>A state machine diagram may use the <strong>return</strong> keyword with a value. This value can then be obtained from client code via <strong>await</strong>, just as with ordinary asynchronous functions.</p>
+<p>The result is a convenient construct. On one hand, it has the properties of a state machine. On the other hand, it allows the caller to wait for completion using <strong>await</strong>. In this case, the state machine algorithm must have an end.</p>
+<p>DrakonTech can also generate state machines for algorithms that never terminate, but awaiting such a machine will block forever.</p>
+<p>Thus, for JavaScript, DrakonTech generates asynchronous functions on steroids that react to external events. In addition, such asynchronous functions can be stopped from the outside.</p>
+<h2 id="state-machine-code-generation-for-javascript">State Machine Code Generation for JavaScript</h2>
+<p>DrakonTech supports code generation for state machines in JavaScript and Lua.</p>
+<p>To tell the code generator that a DRAKON diagram describes a state machine, insert at least one <strong>Select</strong> icon with the <strong>receive</strong> keyword or a <strong>Simple Input</strong> icon. Both standalone functions and class methods can be turned into state machines.</p>
+<p>For a state machine diagram, DrakonTech generates a factory function that creates a machine object. The machine object has a <strong>run()</strong> method that starts the machine and a <strong>stop()</strong> method that forcibly stops it while it is running.</p>
+<p>The <strong>run()</strong> and <strong>stop()</strong> methods cannot be called from inside the machine. The <strong>run()</strong> method can only be called once.</p>
+<p>There are two ways to use a state machine in JavaScript:</p>
+<ul>
+<li>Explicit machine object creation and a call to <strong>run()</strong>.</li>
+<li>Implicit machine object creation and waiting for the result with <strong>await</strong>.</li>
+</ul>
+<p><strong>Explicit creation.</strong> To create a machine instance, call the factory function named <strong>MachineName_create</strong>. Then call the <strong>run()</strong> method.</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">machine = <span style="color: rgb(136, 0, 0); font-weight: 700;">SomeMachine</span>_create(x, y)
+machine.<span style="color: rgb(136, 0, 0); font-weight: 700;">run</span>()
+machine.<span style="color: rgb(136, 0, 0); font-weight: 700;">someMethod</span>(z)
+</pre>
+
+<p><strong>Implicit creation.</strong> A state machine function can be called like a regular asynchronous function:</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">result = <span style="color: rgb(68, 68, 68); font-weight: 700;">await</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">SomeMachine</span>(x, y)
+</pre>
+
+<h2 id="state-machine-code-generation-for-lua">State Machine Code Generation for Lua</h2>
+<p>DrakonTech state machines in Lua support only explicit machine object creation:</p>
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; ">machine = <span style="color: rgb(136, 0, 0); font-weight: 700;">SomeMachine</span>(x, y)
+machine.<span style="color: rgb(136, 0, 0); font-weight: 700;">run</span>()
+machine.<span style="color: rgb(136, 0, 0); font-weight: 700;">someMethod</span>(z)
+</pre>
+
+<p>Note that the machine name does not need the <strong>_create</strong> suffix.</p>
+<h2 id="a-common-state-machine-programming-error-re-entrancy">A Common State Machine Programming Error: Re-Entrancy</h2>
+<p>When programming state machines, one must avoid situations where the machine re-enters its logic before it has finished processing the previous event.</p>
+<p>State machines generated by DrakonTech throw an error when re-entry is attempted. This unpleasant situation is detected immediately, making the bug easier to find and fix.</p>
+<p>To avoid re-entry, the architecture should be designed so that the machine never calls code that will in turn call machine methods, including <strong>stop()</strong>.</p>
+<p>If this cannot be avoided, machine methods should be called asynchronously. In other words, the call must be postponed until the next step of program execution. In JavaScript, this can be done with <strong>setTimeout()</strong>: <code>setTimeout(() =&gt; machine.method(), 0)</code>. DrakonTech can wrap machine method calls in <code>setTimeout()</code> automatically. To do this, place the method call inside a <strong>Simple Output</strong> icon.</p>
+<p>Many problems are solved with several state machines. To avoid re-entry into handlers, state machines should be organized into a hierarchy. In other words, build a tree of state machines. Then define rules according to which machines in the tree exchange messages.</p>
+<h2 id="rules-for-message-passing-between-state-machines">Rules for Message Passing Between State Machines</h2>
+<ul>
+<li>Only a parent machine may call methods of its child machines directly.</li>
+<li>In all other cases, machines call methods of other machines asynchronously. Examples: calling methods of a parent machine or sibling machines.</li>
+<li>A machine never calls its own methods.</li>
+</ul>
+<h2 id="the-silhouette-shows-the-machine-as-a-whole">The Silhouette Shows the Machine as a Whole</h2>
+<p>State machines can be programmed with DRAKON diagrams even without using silhouettes and <strong>Select</strong> icons with the <strong>receive</strong> keyword. For example, clear state machines can be built with decision trees. Primitive DRAKON diagrams are well suited for representing decision-making logic.</p>
+<p>The problem is that decision trees and other traditional implementations of state machines split the machine logic into separate fragments. The method proposed in DrakonTech does the opposite: it helps you see the state machine as a whole. A silhouette DRAKON diagram allows you to view the machine as a single flow of control circulating between states.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>State machines are not a new technology. They have existed for decades and have proven their effectiveness in many areas, from user interfaces to industrial control systems. The problem is usually not the state machines themselves, but the fact that as they grow in complexity, they become difficult to understand and maintain.</p>
+<p>The approach implemented in DrakonTech is aimed specifically at solving this problem. It allows states, messages, actions, and transitions to be viewed on a single visual scene and helps developers perceive the machine as a whole rather than as a collection of disconnected event handlers.</p>
+
+        <h2>Feedback</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>
