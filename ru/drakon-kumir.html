@@ -4,12 +4,12 @@
         <meta charset="UTF-8" >
         <meta name="viewport" content="width=device-width,initial-scale=1" >
         <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
-        <title>Генерация кода на языке OneScript</title>
-        <meta name="description" content="Детальное описание формата кода на языке OneScript/1С:Предприятие, который генерирует ДраконТех." >
-        <meta property="og:title" content="Генерация кода на языке OneScript" >
-        <meta property="og:description" content="Детальное описание формата кода на языке OneScript/1С:Предприятие, который генерирует ДраконТех." >
-        <meta property="og:image" content="../ru/assets/images/oscript-logo.png" >
-        <meta property="og:url" content="https://drakon.tech/ru/drakon-oscript" >
+        <title>Генерация кода на языке КуМир</title>
+        <meta name="description" content="Детальное описание формата кода на языке КуМир, который генерирует ДраконТех." >
+        <meta property="og:title" content="Генерация кода на языке КуМир" >
+        <meta property="og:description" content="Детальное описание формата кода на языке КуМир, который генерирует ДраконТех." >
+        <meta property="og:image" content="../ru/assets/images/kumir-logo-hi.jpeg" >
+        <meta property="og:url" content="https://drakon.tech/ru/drakon-kumir" >
         <meta property="og:type" content="website" >
         <style>
             *, *:before, *:after {
@@ -284,84 +284,48 @@ pre {
             </svg>
             <span>Меню</span>
         </div>
-        <h1 id="генерация-кода-на-языке-onescript">Генерация кода на языке OneScript</h1>
-<img src="../ru/assets/images/oscript-logo.png" style="max-width:100%; width:210px; display:inline-block; vertical-align:middle; margin-bottom:20px; border-radius:20px;" alt="Логотип OneScript">
+        <h1 id="генерация-кода-на-языке-кумир">Генерация кода на языке КуМир</h1>
+<img src="../ru/assets/images/kumir-logo-hi.jpeg" style="max-width:100%; display:inline-block; vertical-align:middle; margin-bottom:20px; border-radius:20px;" alt="Логотип OneScript">
 
-<p><a href="https://oscript.io/">oscript.io</a></p>
-<p>ДраконТех генерирует код для языка OneScript/1С:Предприятие. ДраконТех создаёт один os-модуль для каждого проекта.</p>
-<h2 id="структура-модуля">Структура модуля</h2>
-<p>Код модуля OneScript может иметь три части:</p>
-<ul>
-<li>Секция переменных.</li>
-<li>Секция методов.</li>
-<li>Секция тела модуля.</li>
-</ul>
-<p>Чтобы поместить код в секцию переменных, создайте функцию со специальным названием <strong>Заголовок</strong>. Тело функции <strong>Заголовок</strong> превратится в секцию переменных.</p>
-<p>Чтобы поместить код в тело модуля, создайте функцию со специальным названием <strong>Тело</strong>. ДраконТех запишет содержимое этой функции в конец модуля.</p>
-<p>Секция методов формируется генератором автоматически. Для каждой дракон-схемы генератор создаст метод.</p>
-<h2 id="экспортируемые-методы">Экспортируемые методы</h2>
-<p>Чтобы экспортировать метод:</p>
-<ul>
-<li>Щёлкните правой кнопкой мыши по заголовку диаграммы.</li>
-<li>Выберите “Свойства”.</li>
-<li>Поставьте галочку в графе “Экспорт”.</li>
-</ul>
-<div class="ill-block">
-<img class="ill" src="../ru/assets/images/diagram-prop-os.png" alt="Свойства диаграммы" style="max-width: 100%; width: 430px;"/>
-<p>Свойства диаграммы</p>
-</div>
 
+<p>ДраконТех генерирует код, который работает как в классической <a href="https://www.niisi.ru/kumir/">среде КуМир</a> от НИИСИ РАН, так и в <a href="https://qumir.dev/">qumir.dev</a>.</p>
+<h2 id="точка-входа">Точка входа</h2>
+<p>Точка входа в модуле на языке КуМир — это первый алгоритм в файле. В ДраконТех нельзя задать последовательность обычных функций.</p>
+<p>Чтобы задать точку входа, нужно создать функцию со специальным именем <strong>старт</strong>. ДраконТех поместит функцию <strong>старт</strong> перед остальными функциями.</p>
+<p>Функция <strong>старт</strong> — это и есть точка входа.</p>
+<h2 id="как-задать-заголовок-файла">Как задать заголовок файла</h2>
+<p>Чтобы поместить нужный код в начало файла, нужно в корневой папке проекта создать функцию со специальным названием <strong>заголовок</strong>. ДраконТех запишет содержимое этой функции в начало файла.</p>
+<p>Пример кода, который можно поместить в заголовок:</p>
+<pre>
+использовать Чертежник
+
+цел удачных = 0
+цел неудачных = 0
+</pre>
+
+<h2 id="тип-возвращаемого-значения-функции">Тип возвращаемого значения функции</h2>
+<p>Чтобы задать тип значения, которое возвращает функция, нужно поместить в свойствах диаграммы в поле &quot;Аргументы&quot; описание типа следующего вида: <code>знач &lt;тип&gt;</code>. Например: <code>знач лог</code>, <code>знач цел</code>, <code>знач лит</code>.</p>
+<p>Данная функция возвращает логический тип:</p>
 <div class="ill-block">
-<img class="ill" src="../ru/assets/images/props-os.png" alt="Экспорт метода" style="max-width: 100%; width: 331px;"/>
-<p>Экспорт метода</p>
+<img class="ill" src="../ru/assets/images/inv-and.png" alt="Аргументы функции и возвращаемое значение" style="max-width: 100%; width: 340px;"/>
+<p>Аргументы функции и возвращаемое значение</p>
 </div>
 
 <h2 id="цикл-для">Цикл Для</h2>
 <p>Икона &quot;Цикл Для&quot; является аналогом операторов цикла <strong>for</strong> и <strong>foreach</strong>.</p>
-<p>Текст в иконе &quot;Цикл Для&quot; копируется в сгенерированный код без изменений. Например:</p>
-<p><code>Для Каждого элемент Из коллекция Цикл</code></p>
+<p>Текст в иконе &quot;Цикл Для&quot; копируется в сгенерированный код, причём перед выражением помещается ключевое слово <strong>нц</strong>. Вручную ключевое слово <strong>нц</strong> писать не надо.</p>
+<p>Например:</p>
 <div class="ill-block">
-<img class="ill" src="../ru/assets/images/ДляПоМассиву.png" alt="Цикл Для Каждого в OneScript" style="max-width: 100%; width: 460px;"/>
-<p>Цикл Для Каждого в OneScript</p>
+<img class="ill" src="../ru/assets/images/poka.png" alt="Цикл Для — пока" style="max-width: 100%; width: 420px;"/>
+<p>Цикл Для — пока</p>
 </div>
 
 <p>или</p>
-<p><code>Для номер = 0 По колвоКлючей Цикл</code></p>
 <div class="ill-block">
-<img class="ill" src="../ru/assets/images/ДляПоШаг.png" alt="Цикл Для По в OneScript" style="max-width: 100%; width: 480px;"/>
-<p>Цикл Для По в OneScript</p>
+<img class="ill" src="../ru/assets/images/dlia.png" alt="Цикл Для — от-до" style="max-width: 100%; width: 330px;"/>
+<p>Цикл Для — от-до</p>
 </div>
 
-<h2 id="классы-и-модули">Классы и модули</h2>
-<p>Класс в OneScript используется так: сначала создаётся экзмемпляр класса, а потом вызываются его методы.</p>
-<pre>
-луня = Новый Кот("Луня");
-луня.мяу();
-</pre>
-
-<p>Методы модуля вызывают без создания экзмепляра.</p>
-<pre>
-Котики.мяу("Луня");
-</pre>
-
-
-<p>Как классы, так и модули имеют один и тот же формат в OneScript и в ДраконТех.</p>
-<p>Единственная разница: класс может иметь конструктор — особую функцию <strong>ПриСозданииОбъекта</strong>. В остальном структура модулей и классов неотличима.</p>
-<p>Если положить os-файл в папку <strong>Классы</strong>, то интерпретатор воспримет этот файл как класс. Если положить файл в папку <strong>Модули</strong> — то как модуль.</p>
-<h2 id="аннотации">Аннотации</h2>
-<p>Чтобы добавить одну или несколько аннотаций к методу, поместите их в поле &quot;Аргументы&quot; в свойствах диаграммы. Аннотации начинаются с символа <em>амперсанд</em> — &amp;.</p>
-<div class="ill-block">
-<img class="ill" src="../ru/assets/images/anno.png" alt="Аннотации методов" style="max-width: 100%; width: 333px;"/>
-<p>Аннотации методов</p>
-</div>
-
-
-<p>В данном примере метод <strong>ЗапускТестов</strong> получит следующие аннотации:</p>
-<pre>
-&Декоратор1
-&Декоратор2
-&Порядок(10)
-</pre>
         <h2>Обратная связь</h2>
         <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
         <div class="spacer-50"></div>
