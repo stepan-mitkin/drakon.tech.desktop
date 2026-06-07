@@ -265,6 +265,8 @@ pre {
             <li><a href="../ru/syntax-jazyka-drakon">Синтаксис языка ДРАКОН</a></li>
             <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
             <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
+            <li><a href="../ru/drakon-lua">ДРАКОН-Lua</a></li>
+            <li><a href="../ru/drakon-oscript">ДРАКОН-OneScript</a></li>
             <li><a href="../ru/oop-na-javascript-i-lua">ООП на JavaScript и Lua</a></li>
             <li><a href="../ru/konechnye-avtomaty">Конечные автоматы</a></li>
             <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Исходный код</a></li>
@@ -317,6 +319,30 @@ pre {
 }</pre>
 
 <p>ДраконТех создаёт локальные переменные не только в теле функций, но и внутри замыканий.</p>
+<h2 id="цикл-для">Цикл Для</h2>
+<p>Икона &quot;Цикл Для&quot; является аналогом операторов цикла <strong>for</strong> и <strong>foreach</strong>.</p>
+<p>В ДРАКОН-JavaScript существует три способа задать «Цикл Для»:</p>
+<ol>
+<li>Перебор массива. Конструкция <code>for (var item of array) { ... }</code> записывается в иконе цикла как <code>item; array</code>.</li>
+<li>Перебор объекта. Конструкция <code>for (var key in map) { var item = map[key]; ... }</code> записывается как <code>key, item; map</code>.</li>
+<li>Цикл в стиле for. Конструкция <code>for (var i = 0; i &lt; count; i++) { ... }</code> записывается как <code>i = 0; i &lt; count; i++</code>.</li>
+</ol>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreachArray.png" alt="Перебор массива в JavaScript" style="max-width: 100%; width: 340px;"/>
+<p>Перебор массива в JavaScript</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreachMap.png" alt="Перебор объекта в JavaScript" style="max-width: 100%; width: 350px;"/>
+<p>Перебор объекта в JavaScript</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/forArray.png" alt="Цикл в стиле for" style="max-width: 100%; width: 340px;"/>
+<p>Цикл в стиле for</p>
+</div>
+
+
 <h2 id="форматы-модулей">Форматы модулей</h2>
 <p>ДраконТех поддерживает три формата модулей на языке JavaScript:</p>
 <ul>

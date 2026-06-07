@@ -265,6 +265,7 @@ pre {
             <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
             <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
             <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/drakon-lua">DRAKON-Lua</a></li>
             <li><a href="../en/oop-in-javascript-and-lua">OOP in JavaScript and Lua</a></li>
             <li><a href="../en/state-machines">State machines</a></li>
             <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Source code</a></li>
@@ -315,6 +316,30 @@ pre {
 }</pre>
 
 <p>DrakonTech creates local variables not only in function bodies, but also inside closures.</p>
+<h2 id="foreach-loop">Foreach Loop</h2>
+<p>The Foreach Loop icon is the DRAKON equivalent of <strong>for</strong> and <strong>foreach</strong> loops.</p>
+<p>In DRAKON-JavaScript, there are three ways to specify a Foreach Loop:</p>
+<ol>
+<li>Iteration over an array. The construct <code>for (var item of array) { ... }</code> is written in the loop icon as <code>item; array</code>.</li>
+<li>Iteration over an object. The construct <code>for (var key in map) { var item = map[key]; ... }</code> is written as <code>key, item; map</code>.</li>
+<li>A for-style loop. The construct <code>for (var i = 0; i &lt; count; i++) { ... }</code> is written as <code>i = 0; i &lt; count; i++</code>.</li>
+</ol>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreachArray.png" alt="Array Iteration in JavaScript and Lua" style="max-width: 100%; width: 340px;"/>
+<p>Array Iteration in JavaScript and Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/foreachMap.png" alt="Object Iteration in JavaScript and Lua" style="max-width: 100%; width: 350px;"/>
+<p>Object Iteration in JavaScript and Lua</p>
+</div>
+
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/forArray.png" alt="For-Style Loop in JavaScript and Lua" style="max-width: 100%; width: 340px;"/>
+<p>For-Style Loop in JavaScript and Lua</p>
+</div>
+
+
 <h2 id="module-formats">Module Formats</h2>
 <p>DrakonTech supports three JavaScript module formats:</p>
 <ul>

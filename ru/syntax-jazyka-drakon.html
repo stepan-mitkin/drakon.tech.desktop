@@ -265,6 +265,8 @@ pre {
             <li><a href="../ru/syntax-jazyka-drakon">Синтаксис языка ДРАКОН</a></li>
             <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
             <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
+            <li><a href="../ru/drakon-lua">ДРАКОН-Lua</a></li>
+            <li><a href="../ru/drakon-oscript">ДРАКОН-OneScript</a></li>
             <li><a href="../ru/oop-na-javascript-i-lua">ООП на JavaScript и Lua</a></li>
             <li><a href="../ru/konechnye-avtomaty">Конечные автоматы</a></li>
             <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Исходный код</a></li>
@@ -362,15 +364,9 @@ pre {
 </div>
 
 <p>По возможности рекомендуется располагать значения вариантов по возрастанию или по убыванию.</p>
-<h2 id="цикл-«для-каждого»">Цикл «Для каждого»</h2>
-<p>Икона цикла «Для каждого» является аналогом циклов <strong>for</strong> и <strong>foreach</strong>.</p>
-<p>Формат иконы цикла «Для каждого» немного отличается в зависимости от целевого языка.</p>
-<p>В ДРАКОН-JavaScript существует три способа задать цикл «Для каждого».</p>
-<ol>
-<li>Перебор массива. Конструкция <code>for (var item of array) { ... }</code> записывается в иконе цикла как <code>item; array</code>.</li>
-<li>Перебор объекта. Конструкция <code>for (var key in map) { var item = map[key]; ... }</code> записывается как <code>key, item; map</code>.</li>
-<li>Цикл в стиле for. Конструкция <code>for (var i = 0; i &lt; count; i++) { ... }</code> записывается как <code>i = 0; i &lt; count; i++</code>.</li>
-</ol>
+<h2 id="цикл-для">Цикл Для</h2>
+<p>Икона &quot;Цикл Для&quot; является аналогом операторов цикла <strong>for</strong> и <strong>foreach</strong>.</p>
+<p>Формат иконы &quot;Цикл Для&quot; немного отличается в зависимости от целевого языка.</p>
 <div class="ill-block">
 <img class="ill" src="../ru/assets/images/foreachArray.png" alt="Перебор массива в JavaScript и Lua" style="max-width: 100%; width: 340px;"/>
 <p>Перебор массива в JavaScript и Lua</p>
@@ -386,41 +382,8 @@ pre {
 <p>Цикл в стиле for в JavaScript и Lua</p>
 </div>
 
-<p>Генератор Lua работает аналогично генератору JavaScript:</p>
-<ol>
-<li>Перебор массива. Конструкция <code>for _, item in ipairs(array) do ... end</code> записывается в иконе цикла как <code>item; array</code>.</li>
-<li>Перебор объекта. Конструкция <code>for key, item in pairs(map) do ... end</code> записывается как <code>key, item; map</code>.</li>
-<li>Цикл в стиле for. Конструкция <code>i = 0; i &lt; count; i = i + 1</code> работает так же, как и в JavaScript.</li>
-</ol>
-<p>Важное отличие состоит в том, что для Lua генератор в некоторых случаях не добавляет <code>pairs()</code> или <code>ipairs()</code>:</p>
-<ol>
-<li>Когда коллекция является вызовом функции, например: <code>x, y; fun.iter(some_object)</code>.</li>
-<li>Когда коллекция является выражением-итератором, например: <code>i, code; utf8.next, text</code>.</li>
-</ol>
-<div class="ill-block">
-<img class="ill" src="../ru/assets/images/fun-iter.png" alt="Цикл по значению, возвращаемому функцией в Lua" style="max-width: 100%; width: 420px;"/>
-<p>Цикл по значению, возвращаемому функцией в Lua</p>
-</div>
 
-<div class="ill-block">
-<img class="ill" src="../ru/assets/images/iterator.png" alt="Цикл по итератору в Lua" style="max-width: 100%; width: 700px;"/>
-<p>Цикл по итератору в Lua</p>
-</div>
-
-<p>Для других языков, таких как OneScript и Перфолента, текст в иконе цикла «Для каждого» копируется в сгенерированный код без изменений. Например:</p>
-<p><code>Для Каждого элемент Из коллекция Цикл</code></p>
-<p>или</p>
-<p><code>Для номер = 0 По колвоКлючей Цикл</code></p>
-<div class="ill-block">
-<img class="ill" src="../ru/assets/images/ДляПоМассиву.png" alt="Цикл Для Каждого в OneScript" style="max-width: 100%; width: 460px;"/>
-<p>Цикл Для Каждого в OneScript</p>
-</div>
-
-<div class="ill-block">
-<img class="ill" src="../ru/assets/images/ДляПоШаг.png" alt="Цикл Для По в OneScript" style="max-width: 100%; width: 480px;"/>
-<p>Цикл Для По в OneScript</p>
-</div>
-
+<p>Для других языков, таких как OneScript и Перфолента, текст в иконе &quot;Цикл Для&quot; копируется в сгенерированный код без изменений.</p>
 <p>Цикл «Для каждого» не поддерживается генератором Clojure.</p>
 <p>Можно выйти из цикла «Для каждого» раньше времени при помощи иконы «Вопрос».</p>
 <p>Обратите внимание, что выход можно направить только в точку сразу после цикла.</p>
