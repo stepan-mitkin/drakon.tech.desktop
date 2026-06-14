@@ -15,7 +15,6 @@ function ViewWidget(
 
 	var gOldBlock = null;
 	var gDebugMode = false;
-	var gRetina = 1;
 
 	var gOrigin = new Point(0, 0);
 	var gLeft = 0;
@@ -124,7 +123,6 @@ function colorFromCoord(row, column) {
 }
 
 function create() {
-    gRetina = HtmlUtils.getRetinaFactor()
     gTouch = new Multitouch(self);
     //detectPassive()
     bind("mousedown", mouseDown);
@@ -151,6 +149,7 @@ function diagramToClient(x, y) {
 }
 
 function drawPatch() {
+    var rfactor = getScreenScale()
     var background = gPayload.getBackground()
     background = background || Theme.get("back")
     if (canvas.style.background == background) {
@@ -162,13 +161,13 @@ function drawPatch() {
     var ctx = canvas.getContext("2d");
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var scale = gZoom * gRetina
+    var scale = gZoom * rfactor
     ctx.scale(scale, scale);
     ctx.translate(
     	origin.x,
     	origin.y
     );
-    gPayload.setTransform(origin.x, origin.y, gZoom, gRetina)
+    gPayload.setTransform(origin.x, origin.y, gZoom, rfactor)
     gPayload.draw(ctx)
 }
 
@@ -177,7 +176,8 @@ function finishScroll() {
 }
 
 function finishZoom() {
-    gPayload.setZoom(gZoom, gRetina);
+    var rfactor = getScreenScale()
+    gPayload.setZoom(gZoom, rfactor);
     gPayload.redrawCache();
     rebuild();
 }
@@ -208,8 +208,8 @@ function getOriginY() {
     return gOrigin.y
 }
 
-function getRetinaFactor() {
-    return gRetina;
+function getScreenScale() {
+    return HtmlUtils.getRetinaFactor();
 }
 
 function getTargetSize() {
@@ -385,6 +385,7 @@ function scrollBy(dx, dy) {
 }
 
 function selectBlock(box) {
+    var rfactor = getScreenScale()
     var ctx = over.getContext("2d");
     if (gOldBlock) {
         var width = gOldBlock.right - gOldBlock.left + 6;
@@ -399,11 +400,11 @@ function selectBlock(box) {
     if (box) {
         var leftTop = diagramToClient(box.left, box.top);
         var rightBottom = diagramToClient(box.right, box.bottom);
-        ctx.lineWidth = 2 * gRetina
-        leftTop.x *= gRetina
-        leftTop.y *= gRetina
-        rightBottom.x *= gRetina
-        rightBottom.y *= gRetina
+        ctx.lineWidth = 2 * rfactor
+        leftTop.x *= rfactor
+        leftTop.y *= rfactor
+        rightBottom.x *= rfactor
+        rightBottom.y *= rfactor
         var newBox = new Utils.Box(
         	leftTop.x,
         	leftTop.y,
@@ -439,14 +440,16 @@ function setOrigin(ox, oy) {
 }
 
 function setPayload(payload) {
+    var rfactor = getScreenScale()
     gPayload = payload;
     gTouch.setBeh(gPayload);
-    gPayload.setZoom(gZoom, gRetina);
+    gPayload.setZoom(gZoom, rfactor);
 }
 
 function setupCanvas(canvas, w, h) {
-    canvas.width = w * gRetina
-    canvas.height = h * gRetina
+    var rfactor = getScreenScale()
+    canvas.width = w * rfactor
+    canvas.height = h * rfactor
 }
 
 function showOver() {
@@ -627,7 +630,6 @@ function zoomTo(newZoom) {
 	this.getZoom = getZoom;
 	this.getOrigin = getOrigin;
 	this.zoomAt = zoomAt;
-	this.getRetinaFactor = getRetinaFactor;
 
 	this.showOver = showOver;
 	this.hideOver = hideOver;

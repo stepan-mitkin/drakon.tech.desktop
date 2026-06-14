@@ -4002,6 +4002,7 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
   function resizeEditor() {
     var rect = this.rect;
     globs.editor.resize(rect.left, rect.top, rect.width, rect.height);
+    globs.editor.redraw(true)
   }
 
   function runIfEditorVisible(evt, method) {

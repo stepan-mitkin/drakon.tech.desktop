@@ -3882,7 +3882,10 @@ function EditorCtrl(window, document, elementId, userId) {
     }
   }
 
-  function redraw() {
+  function redraw(deep) {
+    if (deep) {
+      globals.editor.redraw();
+    }
     globals.view.redraw();
   }
 
