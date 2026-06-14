@@ -5574,6 +5574,7 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
   }
 
   function showMainMenu(menus) {
+    destroyBuildWindow()
     var main = createPopup();
     main.style.background = "white";
     main.style.color = "black";
