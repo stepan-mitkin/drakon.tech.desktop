@@ -2987,7 +2987,7 @@ function arrowUp(ctrl, shift, visibleBox) {
 
 function autoFormat(type, text) {
     var tokens
-    if ((shouldAutoformat(type)) && (!(isHuman()))) {
+    if (((shouldAutoformat(type, text)) && (!(isHuman()))) && (!(isPreproc(text)))) {
         tokens = lexSource(text)
         tokens = prettify(tokens, type)
         return printTokens(tokens)
@@ -7187,7 +7187,7 @@ function flowSourceCode(render, node, source) {
     } else {
         tokens = lexSource(text)
     }
-    if ((source) && (shouldAutoformat(node.type))) {
+    if ((source) && (shouldAutoformat(node.type, text))) {
         tokens = prettify(tokens, node.type)
         node.text = printTokens(tokens)
     }
@@ -8939,6 +8939,20 @@ function isPart(haystack, start, needle) {
             }
             i++;
         }
+    }
+}
+
+function isPreproc(text) {
+    var lang
+    if (text) {
+        lang = module.syntax
+        if ((lang) && (lang.preproc)) {
+            return text.startsWith(lang.preproc)
+        } else {
+            return false
+        }
+    } else {
+        return false
     }
 }
 
@@ -12290,7 +12304,7 @@ function replaceText() {
 }
 
 function requestSourceFlow(render, node) {
-    if (isHuman()) {
+    if ((isHuman()) || (isPreproc(node.text))) {
         return flowText(
             render,
             node.text,
@@ -13275,7 +13289,7 @@ function shouldAlignWidth(node) {
     }
 }
 
-function shouldAutoformat(type) {
+function shouldAutoformat(type, text) {
     if ((((((((module.language === "clojure") || (type == "branch")) || (type == "address")) || (type == "params")) || (type == "header")) || (type == "end")) || (type == "input")) || (type == "pause")) {
         return false
     } else {
