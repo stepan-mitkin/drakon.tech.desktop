@@ -163,7 +163,9 @@
         } else if (language === "OS2605") {
             return ".os";
         } else if (language === "KUMIR2606") {
-            return ".kum";            
+            return ".kum";
+        } else if (language === "C2606") {
+            return ".c";                  
         } else {
             // Error: Unexpected case value language
             return ".js";
@@ -398,6 +400,7 @@
         addComboboxOption(languageCombo, "JS2604", "JavaScript");
         addComboboxOption(languageCombo, "JS", "JavaScript — Legacy");
         addComboboxOption(languageCombo, "LUA2604", "Lua");
+        addComboboxOption(languageCombo, "C2606", "C");
         addComboboxOption(languageCombo, "clojure", "Clojure");
         addComboboxOption(languageCombo, "PFL2605", "Перфолента");
         addComboboxOption(languageCombo, "OS2605", "OneScript");

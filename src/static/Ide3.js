@@ -2346,7 +2346,7 @@ function Ide3(window, document, translate, gUserId, pagePanic) {
         "MES_LAZY_ALGOPROP",
         node.algoprop && node.lazy,
       );
-    } else if (language === "JS2604" || language === "PFL2605") {
+    } else if (language === "JS2604" || language === "PFL2605" || language === "C2606") {
       addCheckbox(div, "export_checkbox", "MES_EXPORT", node.export);
       var s2 = make(div, "div");
       s2.style.height = "10px";

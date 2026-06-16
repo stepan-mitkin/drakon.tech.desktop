@@ -7,7 +7,7 @@ function CreateSyntaxHighlightingOptions() {
         }
         return set
     }
-
+    
     return {
         "JS": {
             prettify: true,
@@ -23,6 +23,68 @@ function CreateSyntaxHighlightingOptions() {
                 "void", "volatile", "while", "yield", "async", "await"]),
             values: arrayToSet(["true", "false", "null", "undefined", "this"])
         },
+        "C": {
+            prettify: true,
+            keywords: arrayToSet([
+    "alignas",
+    "alignof",
+    "auto",
+    "bool",
+    "break",
+    "case",
+    "char",
+    "const",
+    "constexpr",
+    "continue",
+    "default",
+    "do",
+    "double",
+    "else",
+    "enum",
+    "extern",
+    "float",
+    "for",
+    "goto",
+    "if",
+    "inline",
+    "int",
+    "long",
+    "register",
+    "restrict",
+    "return",
+    "short",
+    "signed",
+    "sizeof",
+    "static",
+    "static_assert",
+    "struct",
+    "switch",
+    "thread_local",
+    "typedef",
+    "typeof",
+    "typeof_unqual",
+    "union",
+    "unsigned",
+    "void",
+    "volatile",
+    "while",
+    "_Alignas",
+    "_Alignof",
+    "_Atomic",
+    "_BitInt",
+    "_Bool",
+    "_Complex",
+    "_Decimal128",
+    "_Decimal32",
+    "_Decimal64",
+    "_Generic",
+    "_Imaginary",
+    "_Noreturn",
+    "_Static_assert",
+    "_Thread_local"
+]),
+            values: arrayToSet(["true", "false", "nullptr"])
+        },        
         "LUA": {
             prettify: true,
             keywords: arrayToSet(["and", "break", "do", "else",
