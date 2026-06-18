@@ -2656,7 +2656,7 @@ function addSpacesToStatement(statement) {
                             item
                         )
                     } else {
-                        if (((_sw128220000_ === "++") || (_sw128220000_ === "#")) || (_sw128220000_ === "--")) {
+                        if ((((_sw128220000_ === "++") || (_sw128220000_ === "->")) || (_sw128220000_ === "#")) || (_sw128220000_ === "--")) {
                             addItemWithLength(
                                 result,
                                 item
@@ -9438,6 +9438,7 @@ function lexInit() {
     addLongOp("??")
     addLongOp("??=")
     addLongOp("~=")
+    addLongOp("->")
     module.keyOps = {}
     module.keyOps["in"] = true
     module.keyOps["instanceof"] = true
