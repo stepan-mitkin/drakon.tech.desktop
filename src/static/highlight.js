@@ -24,7 +24,7 @@ function CreateSyntaxHighlightingOptions() {
             values: arrayToSet(["true", "false", "null", "undefined", "this"])
         },
         "C": {
-            prettify: true,
+            prettify: false,
             preproc: "#",
             keywords: arrayToSet([
                 "alignas",
