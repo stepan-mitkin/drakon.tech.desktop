@@ -23,6 +23,7 @@ const {
     getProjectName,
     getRootHandle,
     saveGeneratedFile,
+    saveAuxData,
     getObjectByHandle,
     getFolderInfoByHandle,
     showGeneratedFile,
@@ -376,6 +377,7 @@ function registerMainCallbacks() {
 
     registerHandler(getRootHandle)
     registerHandler(saveGeneratedFile)
+    registerHandler(saveAuxData)
     registerHandler(getObjectByHandle)
     registerHandler(getFolderInfoByHandle)
     registerHandler(showGeneratedFile)

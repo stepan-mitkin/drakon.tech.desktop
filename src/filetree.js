@@ -1222,6 +1222,17 @@ async function saveGeneratedFile(winInfo, content) {
   await fs.writeFile(filename, content, "utf-8");
 }
 
+async function saveAuxData(winInfo, auxFilename, content) {
+  var original = getGeneratedFilename(winInfo);
+  var filename = makeAuxFilename(original, auxFilename)
+  await fs.writeFile(filename, content, "utf-8");
+}
+
+function makeAuxFilename(output, newName) {
+  return path.join(path.dirname(output), newName)
+}
+
+
 function isGoodName(filename) {
   if (filename.startsWith(".")) {
     return false;
@@ -1296,6 +1307,7 @@ module.exports = {
   getProjectName,
   getRootHandle,
   saveGeneratedFile,
+  saveAuxData,
   getObjectByHandle,
   getFolderInfoByHandle,
   showGeneratedFile,

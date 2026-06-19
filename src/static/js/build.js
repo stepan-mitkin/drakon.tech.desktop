@@ -156,6 +156,7 @@
       name = await backend.getProjectName();
       root = await backend.getRootHandle();
       onData = backend.saveGeneratedFile;
+      onAuxData = backend.saveAuxData;
       generator = drakontechgen.buildGenerator(
         name,
         root,
@@ -165,6 +166,7 @@
         folder.language,
         solution.mainFun,
         settings,
+        onAuxData
       );
     }
 

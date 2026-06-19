@@ -751,7 +751,8 @@ function VDock_setRect() {
     top = rect.top
     width = rect.width
     height = rect.height
-    div = get(this.id)
+    div = document.getElementById(this.id)
+    if (!div) { return }
     topHeight = this.top.measureHeight(width)
     bottomHeight = height - topHeight
     bottomHeight = Math.max(0, bottomHeight)
