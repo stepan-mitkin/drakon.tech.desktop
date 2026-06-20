@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>Генерация кода на языке Си</title>
+        <meta name="description" content="Детальное описание формата кода на языке Си, который генерирует ДраконТех." >
+        <meta property="og:title" content="Генерация кода на языке Си" >
+        <meta property="og:description" content="Детальное описание формата кода на языке Си, который генерирует ДраконТех." >
+        <meta property="og:image" content="../ru/assets/images/C_Programming_Language.png" >
+        <meta property="og:url" content="https://drakon.tech/ru/drakon-c" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 350px;
+        max-width: 100%;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../ru/">
+        <img src="../ru/assets/images/favicon.png" alt="ДраконТех">
+    </a>
+
+    <div class="top-block-header">ДраконТех</div>
+
+    <a class="download-link" href="../ru/skachat">Скачать</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Закрыть</span>
+        </div>
+        <ul>
+            <li><a href="../ru/">Главная</a></li>
+            <li><a href="../ru/syntax-jazyka-drakon">Синтаксис языка ДРАКОН</a></li>
+            <li><a href="../ru/kak-programmirovat-na-drakone">Как программировать на ДРАКОНе</a></li>
+            <li><a href="../ru/drakon-javascript">ДРАКОН-JavaScript</a></li>
+            <li><a href="../ru/drakon-lua">ДРАКОН-Lua</a></li>
+            <li><a href="../ru/drakon-c">ДРАКОН-Си</a></li>
+            <li><a href="../ru/drakon-oscript">ДРАКОН-OneScript</a></li>
+            <li><a href="../ru/drakon-perfolenta">ДРАКОН-Перфолента</a></li>
+            <li><a href="../ru/drakon-kumir">ДРАКОН-КуМир</a></li>
+            <li><a href="../ru/oop-na-javascript-i-lua">ООП на JavaScript и Lua</a></li>
+            <li><a href="../ru/konechnye-avtomaty">Конечные автоматы</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Исходный код</a></li>
+            <li><a href="../ru/skachat">Скачать</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Меню</span>
+        </div>
+        <h1 id="генерация-кода-на-языке-си">Генерация кода на языке Си</h1>
+<img src="../ru/assets/images/C_Programming_Language.png" style="max-width:100%; width:250px; display:inline-block; vertical-align:middle; margin-bottom:20px; border-radius:20px;" alt="Логотип Си">
+
+<h2 id="экспортируемые-функции-автоматически-добавляются-в-заголовок">Экспортируемые функции автоматически добавляются в заголовок</h2>
+<p>Для модуля на языке ДРАКОН-Си ДраконТех генерирует два файла: исходный <code>c</code>-файл и заголовочный <code>h</code>-файл. Тела функций помещаются в исходный файл. В заголовочный файл генератор вставляет объявления экспортируемых функций.</p>
+<h2 id="произвольный-код-в-начале-файла">Произвольный код в начале файла</h2>
+<p>Для того, чтобы поместить произвольный код в начало заголовочного файла, создайте функцию со специальным названием <strong>begin_header</strong>. Чтобы вставить произвольный код в начало исходного файла, создайте функцию с названием <strong>begin_source</strong>.</p>
+<h2 id="структуры">Структуры</h2>
+<p>Чтобы создать структуру (объект типа <strong>struct</strong>), создайте функцию и поместите ключевое слово <strong>struct</strong> в икону Формальные параметры справа от заголовка диаграммы. В диаграммах-структурах допускаются только иконы Действие. Содержимое икон Действие будет помещено в тело структуры.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/intarray.png" alt="Диаграмма-структура" style="max-width: 100%; width: 310px;"/>
+<p>Диаграмма-структура</p>
+</div>
+
+<pre style="font-family:monospace;color: rgb(68, 68, 68); background-color: rgb(243, 243, 243); font-weight: 400; "><span style="color: rgb(68, 68, 68); font-weight: 400;"><span style="color: rgb(68, 68, 68); font-weight: 700;">struct</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">intarray</span>
+{</span>
+    <span style="color: rgb(136, 0, 0); font-weight: 400;">int</span> * elements;
+    <span style="color: rgb(136, 0, 0); font-weight: 400;">int</span> size;
+};</pre>
+
+<p>По умолчанию структуры попадают в исходный файл перед функциями. Если пометить диаграмму-структуру как экспортируемую, генератор поместит соответствующую структуру в заголовочный файл перед объявлением экспортируемых функций.</p>
+<h2 id="цикл-для">Цикл Для</h2>
+<p>Генератор кода автоматически добавляет ключевое слово <strong>for</strong> перед выражением, которое находится в иконе Цикл Для. Писать слово <strong>for</strong> вручную не требуется.</p>
+<p>Достаточно написать <code>i = 0; i &lt; count; i++</code>, и генератор кода сформирует выражение <code>for (i = 0; i &lt; count; i++) { … }</code>.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/c-for.png" alt="Цикл Для в ДРАКОН-Си" style="max-width: 100%; width: 320px;"/>
+<p>Цикл Для в ДРАКОН-Си</p>
+</div>
+
+<p>Если выражение в иконе Цикл Для заканчивается на круглую скобку, ДраконТех не будет добавлять ключевое слово <strong>for</strong>. Это полезно для итерации по контейнерам с применением макросов, например <code>FOREACH_ARRAY(val, my_data, length)</code>.</p>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/for-macro.png" alt="Цикл с макросом" style="max-width: 100%;"/>
+<p>Цикл с макросом</p>
+</div>
+
+
+<h2 id="объявление-переменных">Объявление переменных</h2>
+<p>Переменные в диаграммах ДРАКОН-Си нужно объявлять в начале функции. На диаграммах типа &quot;силуэт&quot; лучше всего помещать объявления переменных в самой первой ветке силуэта. Если логика требует того, чтобы первая ветка выполнялась несколько раз, сделайте специальную ветку только для объявления переменных. На такую ветку нельзя ссылаться из других веток силуэта.</p>
+<h2 id="освобождение-ресурсов-и-памяти">Освобождение ресурсов и памяти</h2>
+<p>Программирование на чистом Си, в отличие от Си++ и многих других языков, приятно из-за ощущения полного управления компьютером. Компьютер сделает точно то, что вы ему скажете. Си освобождает программиста от необходимости визуализировать магический код, который обильно помещают в программу большинство других языков.</p>
+<p>Платой за удовольствие от контроля является дополнительная ответственность. Нужно вручную освобождать память и ресурсы. Нужно помечать указатели как собственные и заимствованные.</p>
+<p>Обычный паттерн для освобождения ресурсов в Си: блок в конце функции под меткой <strong>cleanup</strong>. На эту метку должны переходить все пути через алгоритм.</p>
+<p>В ДРАКОН-Си этот паттерн выглядит иначе. Если в функции есть обязательное освобождение ресурсов, эту функцию надо преобразовать в силуэт и в правой части силуэта, перед выходом, создать ветку <strong>cleanup</strong>. Все пути через диаграмму должны оканчиваться иконой Адрес, которая указывает на ветку <strong>cleanup</strong>.</p>
+<div class="wide-scroll">
+<img class="ill" src="../ru/assets/images/resourcesExample.png" alt="Освобождение ресурсов в ветке cleanup" style="width: 942px;"/>
+<p>Освобождение ресурсов в ветке cleanup</p>
+</div>
+
+        <h2>Обратная связь</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>

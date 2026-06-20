@@ -13,6 +13,7 @@ DrakonTech generates source code in several languages:
 
 - JavaScript
 - Lua
+- C
 - Clojure
 - Perfolenta.Net
 - OneScript/1C:Enterprise
