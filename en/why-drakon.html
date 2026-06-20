@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" >
+        <meta name="viewport" content="width=device-width,initial-scale=1" >
+        <link rel="icon" type="image/png" href="../ru/assets/images/favicon.png" >
+        <title>Why Programming in DRAKON is Cool</title>
+        <meta name="description" content="Most programmers think source code is the program. DRAKON starts with a different assumption — algorithms should be seen, not deciphered. Why visual programming may be more practical than you think." >
+        <meta property="og:title" content="Why Programming in DRAKON is Cool" >
+        <meta property="og:description" content="Most programmers think source code is the program. DRAKON starts with a different assumption — algorithms should be seen, not deciphered. Why visual programming may be more practical than you think." >
+        <meta property="og:image" content="../ru/assets/images/mily-robot-lo.png" >
+        <meta property="og:url" content="https://drakon.tech/en/why-drakon" >
+        <meta property="og:type" content="website" >
+        <style>
+            *, *:before, *:after {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: white;
+    color: black;
+    font: 17px Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 15px;
+    margin-bottom: 1em;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 17px;
+    margin-bottom: 1em;
+}
+
+li {
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+blockquote  {
+    background: #eeeeff;
+    border-left: solid 4px #9999ff;
+    padding: 5px;
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+
+blockquote p {
+    margin: 0px;
+}
+
+.top-block {
+    width: 100%;
+    height: 70px;
+    padding-left: 10px;
+    padding-right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-link {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.logo-link img {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.top-block-header {
+    margin-left: 15px;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.download-link {
+    margin-left: auto;
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.download-link:hover {
+    border-bottom: solid 2px blue;
+}
+
+.main-block {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.left-pane {
+    width: 250px;
+    padding: 20px;
+    flex-shrink: 0;
+    background: white;
+}
+
+.central-pane {
+    width: calc(100% - 250px);
+    padding: 20px;
+}
+
+.menu-action {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-action svg {
+    width: 22px;
+    height: 22px;
+}
+
+.left-pane ul {
+    list-style: none;
+}
+
+.left-pane li {
+    margin-bottom: 10px;
+}
+
+.left-pane a {
+    color: black;
+    text-decoration: none;
+    border-bottom: solid 2px white;
+}
+
+.left-pane a:hover {
+    border-bottom: solid 2px blue;
+}
+
+p {
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+code {
+    background: #f0f0f0;
+    font-size: 14px;
+    padding: 5px;
+}
+
+h1 {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.ill-block {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;
+}
+
+.ill-block:last-child {
+    margin-right: 0px;
+}
+
+.ill-block p {
+    margin: 0px;
+    font-style: italic;
+    line-height: 1;
+}
+
+.wide-scroll {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+    text-align: center;
+    margin-right: 20px;    
+}
+
+.spacer-50 {
+    height: 50px;
+}
+
+pre {
+    padding: 10px;
+    font-size: 14px;
+    margin-bottom:20px;
+    margin-top:10px;
+}
+
+@media (max-width: 899px) {
+    .main-block {
+        display: block;
+    }
+
+    .left-pane {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 70px;
+        z-index: -1;
+        width: 350px;
+        max-width: 100%;
+        height: auto;
+        opacity: 0;
+        transform: translateX(-20px);
+        pointer-events: none;
+        box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.25);
+        transition:
+            opacity 400ms ease,
+            transform 400ms ease;
+    }
+
+    .left-pane.menu-open {
+        z-index: 10;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .central-pane {
+        width: 100%;
+    }
+
+    .menu-action {
+        display: flex;
+    }
+}
+
+        </style>
+    </head>
+<body>
+
+<header class="top-block">
+    <a class="logo-link" href="../">
+        <img src="../ru/assets/images/favicon.png" alt="DrakonTech">
+    </a>
+
+    <div class="top-block-header">DrakonTech</div>
+
+    <a class="download-link" href="../en/download">Download</a>
+</header>
+
+<main class="main-block">
+    <aside id="navigation" class="left-pane">
+        <div id="close-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="5" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+                <line x1="19" y1="5" x2="5" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Close</span>
+        </div>
+        <ul>
+            <li><a href="../">Main</a></li>
+            <li><a href="../en/drakon-syntax">DRAKON Language Syntax</a></li>
+            <li><a href="../en/why-drakon">Why Programming in DRAKON is Cool</a></li>
+            <li><a href="../en/programming-in-drakon">Programming in DRAKON</a></li>
+            <li><a href="../en/drakon-javascript">DRAKON-JavaScript</a></li>
+            <li><a href="../en/drakon-lua">DRAKON-Lua</a></li>
+            <li><a href="../en/drakon-c">DRAKON-C</a></li>
+            <li><a href="../en/oop-in-javascript-and-lua">OOP in JavaScript and Lua</a></li>
+            <li><a href="../en/state-machines">State machines</a></li>
+            <li><a href="https://github.com/stepan-mitkin/drakon.tech.desktop">Source code</a></li>
+            <li><a href="../en/download">Download</a></li>
+        </ul>
+    </aside>
+    <section class="central-pane">
+        <div id="open-menu" class="menu-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="4" y1="6" x2="20" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="2"/>
+                <line x1="4" y1="18" x2="20" y2="18" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Menu</span>
+        </div>
+        <h1 id="why-programming-in-drakon-is-cool">Why Programming in DRAKON is Cool</h1>
+<div class="ill-block">
+<img class="ill" src="../ru/assets/images/see-algo-drakon.png" alt="DRAKON advantages" style="max-width: 100%;"/>
+</div>
+
+
+<p>If someone woke me up in the middle of the night and asked, &quot;Why do you program in DRAKON?&quot;, I could give the standard textbook answer.</p>
+<p>DRAKON combines strictness and consistency with excellent readability. The language has several objective properties that make algorithms easier to understand: lines are not allowed to cross, diagram structure is predictable, and all DRAKON diagrams share a common visual style.</p>
+<p>All of that is true, of course. But DRAKON is more than a collection of formal rules about box sizes, alignment, and diagram layout.</p>
+<p>My encounter with DRAKON happened like this.</p>
+<p>Back in 2003, I had the good fortune to work with an exceptionally skilled programmer. Let&#39;s call him K. He wasn&#39;t just talented. To be honest, he was a genius.</p>
+<p>K. spent a lot of time teaching me modern software development. One day he said something that stuck with me:</p>
+<blockquote>
+<p>&quot;The problem with modern programming languages is that they are too textual. A program is a multidimensional entity. That&#39;s why programming needs a graphical representation.&quot;</p>
+</blockquote>
+<p>At the time, I didn&#39;t think much of it. But over the years, the meaning of those words slowly began to sink in.</p>
+<p>I could not see programs as deeply as K. did, but I started noticing some oddities in the traditional textual representation of code.</p>
+<p>Take the humble <code>if</code> statement. When a program is small and contains only a single <code>if</code>, everything is fine.</p>
+<p>But once branching starts happening in several stages, things get messy. Nested <code>if</code> statements are represented by increasing indentation. Indentation, by the way, is already a graphical element. It&#39;s just a very primitive one.</p>
+<p>It forces the reader to mentally calculate where execution continues after diving deep into several layers of nested conditions.</p>
+<p>Flowcharts solve this problem. You can simply follow an arrow from one box to the next.</p>
+<p>Unfortunately, flowcharts have a problem of their own: drawing one that another person can easily understand is surprisingly difficult. Every flowchart tends to become a unique work of art. They belong in a museum, not in source code.</p>
+<p>In technical terms, traditional flowcharts lack formality and consistency. Textual programming, on the other hand, has plenty of consistency.</p>
+<p>And consistency matters more than beauty.</p>
+<p>Eventually I gave up on graphical programming altogether. I turned my attention to other paradigms such as logic programming and functional programming.</p>
+<p>Then came 2011.</p>
+<p>I remembered reading years earlier about a Soviet programming language developed for the space industry. Curious, I searched the web and found DRAKON.</p>
+<p>I followed a link and started reading an article by Vladimir Parondzhanov explaining the foundations of the language.</p>
+<p>I hadn&#39;t even finished the article before I realized: This is it. This is what I&#39;ve been looking for all these years. I felt a surge of excitement and energy.</p>
+<p>Soon I became obsessed with the idea of creating my own DRAKON editor. Fortunately, Vladimir Parondzhanov himself noticed my work and began supporting me.</p>
+<p>He taught me many of the finer points of the language. Just as importantly, he taught me how a DRAKON editor should be designed.</p>
+<p>That is how DrakonTech, DrakonWidget, and several related projects came into existence.</p>
+<p>As soon as I had a working editor and code generator, I started programming in DRAKON.</p>
+<p>What&#39;s interesting is that programming in DRAKON no longer feels special to me. It feels natural. What feels unusual is going back to traditional text-based programming.</p>
+<p>Whenever I have to write code the conventional way, I feel a certain discomfort. It&#39;s like driving a car for years and then being told to walk everywhere instead.</p>
+<p>That&#39;s an emotional reaction rather than a logical argument.</p>
+<p>To me, a text program feels like a collection of folded paper boats squeezed between the pages of a book. You want to pull them out, unfold them, and arrange them neatly on a table.</p>
+<p>That&#39;s exactly what DRAKON does to algorithms. It untangles them and lays them out in front of you.</p>
+<p>I&#39;ve also heard other people describe their experiences with DRAKON.</p>
+<p>One electronics engineer told me that DRAKON diagrams helped him find bugs in a very unusual way. He would simply look at the diagram, and suddenly he would know that something was wrong in a particular place.</p>
+<p>Another developer explained his love of DRAKON differently.</p>
+<p>Writing a traditional program, he said, feels like writing a school essay. Necessary perhaps, but not very exciting.</p>
+<p>Programming in DRAKON feels more like playing a game. You&#39;re not writing software anymore. You&#39;re building a virtual world. Like Minecraft, but with a purpose.</p>
+<p>And here&#39;s another opinion.</p>
+<p>Science-fiction movies often show us the inside of alien spacecraft. The aliens never seem to operate their ships through plain text consoles. They always have enormous computers with beautiful visual interfaces.</p>
+<p>DRAKON feels a little bit like that. Especially when you use a dark theme.</p>
+<p>In recent years, powerful AI systems have changed programming dramatically.</p>
+<p>Today you can simply say:</p>
+<blockquote>
+<p>&quot;Generate a C++ compiler for ARM.&quot;</p>
+</blockquote>
+<p>The AI thinks for ten or fifteen seconds and produces something useful. Of course, reality is more complicated than that. But this is clearly the direction we are moving in.</p>
+<p>At first glance, it seems like the problem of programming has been solved. The real difficulties begin when you need to create something genuinely new. Something that has never existed before.</p>
+<p>The friendly conversation with the AI gradually turns into an argument. The vibe coder starts looking for clever ways to persuade a mechanical superintelligence to do exactly what is needed.</p>
+<p>Little by little, a high-level request such as &quot;make everything work nicely&quot; turns into pseudocode:</p>
+<pre><code class="language-text">X = A + B</code></pre>
+<p>Even then, the advantages of AI are obvious. It catches many trivial mistakes and generates all the routine syntax for you: indentation, semicolons, braces, and so on.</p>
+<p>Nobody really objects to using AI in that role. The problem is the trade-offs.</p>
+<p>First, it can be slow. Sometimes you wait tens of seconds for a response.</p>
+<p>Second, it is nondeterministic. The same prompt may produce one program in the morning and a different program in the evening. The bugs will be different too.</p>
+<p>Third, it requires an internet connection. Not only on your side, but also on Claude&#39;s side. What happens if the connection drops?</p>
+<p>And finally, AI can be expensive. A somewhat gloomy picture.</p>
+<p>Fortunately, DRAKON exists. DRAKON sits somewhere between fully manual programming and fully automated programming.</p>
+<p>Yes, it is much closer to the manual end of the spectrum. A modern AI can do far more than even the best DRAKON code generator.</p>
+<p>Nevertheless, DRAKON code generation completely eliminates some of the most tedious parts of programming:</p>
+<ul>
+<li>indentation;</li>
+<li>braces;</li>
+<li>maintaining the overall structure of source files.</li>
+</ul>
+<p>The challenge is not writing indentation and braces once. The challenge is keeping them correct every time you add, remove, copy, move, or paste code.</p>
+<p>A DRAKON editor takes care of that automatically. Like an AI assistant, except fast and predictable.</p>
+<ul>
+<li>The editor inserts the necessary keywords.</li>
+<li>You don&#39;t need to track nesting levels.</li>
+<li>You cannot accidentally break the structure of a program by copying and pasting fragments.</li>
+</ul>
+<p>And as an added bonus, the developers of large language models never get a chance to laugh at your code. Your code stays on your machine.</p>
+<p>So here&#39;s another way to describe DRAKON:</p>
+<p><strong>DRAKON is fast, disciplined vibe coding with no cloud required.</strong></p>
+
+        <h2>Feedback</h2>
+        <p><a href="mailto:drakon.editor@gmail.com">drakon.editor@gmail.com</a></p>
+        <div class="spacer-50"></div>
+    </section>
+</main>
+
+
+<script>
+(function () {
+    var openMenu = document.getElementById("open-menu");
+    var closeMenu = document.getElementById("close-menu");
+    var menu = document.getElementById("navigation");
+
+    openMenu.addEventListener("click", function () {
+        menu.classList.add("menu-open");
+    });
+
+    closeMenu.addEventListener("click", function () {
+        menu.classList.remove("menu-open");
+    });
+})();
+</script>
+
+</body>
+</html>
