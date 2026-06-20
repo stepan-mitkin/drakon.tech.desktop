@@ -1,0 +1,110 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "23",
+            "content": "Simple case"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "result = ordinal;"
+        },
+        "4": {
+            "type": "branch",
+            "one": "10",
+            "branchId": 3,
+            "content": "Exit"
+        },
+        "5": {
+            "type": "branch",
+            "one": "19",
+            "branchId": 2,
+            "content": "Fibonacci loop"
+        },
+        "6": {
+            "type": "case",
+            "one": "17"
+        },
+        "7": {
+            "type": "case",
+            "one": "3",
+            "two": "6",
+            "content": "1"
+        },
+        "8": {
+            "type": "case",
+            "one": "3",
+            "two": "7",
+            "content": "0"
+        },
+        "9": {
+            "type": "select",
+            "one": "8",
+            "content": "ordinal"
+        },
+        "10": {
+            "type": "action",
+            "one": "1",
+            "content": "return result;"
+        },
+        "17": {
+            "type": "action",
+            "one": "18",
+            "content": "i_2 = 0;\ni_1 = 1;"
+        },
+        "18": {
+            "type": "action",
+            "one": "5",
+            "content": "i = 2;"
+        },
+        "19": {
+            "type": "question",
+            "one": "20",
+            "two": "4",
+            "flag1": 0,
+            "content": "i > ordinal"
+        },
+        "20": {
+            "type": "action",
+            "one": "21",
+            "two": "",
+            "content": "result = i_2 + i_1;"
+        },
+        "21": {
+            "type": "action",
+            "one": "22",
+            "two": "",
+            "content": "i_2 = i_1;\ni_1 = result;"
+        },
+        "22": {
+            "type": "action",
+            "one": "5",
+            "content": "i++;"
+        },
+        "23": {
+            "type": "action",
+            "one": "24",
+            "content": "int result,\ni,\ni_1,\ni_2;"
+        },
+        "24": {
+            "type": "action",
+            "one": "9",
+            "content": "result = 0;"
+        }
+    },
+    "type": "drakon",
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "int ordinal\n\nreturn int"
+}

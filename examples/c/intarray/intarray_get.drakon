@@ -1,0 +1,46 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "return obj->elements[index];"
+        },
+        "4": {
+            "type": "question",
+            "one": "5",
+            "two": "6",
+            "flag1": 1,
+            "content": "index >= 0"
+        },
+        "5": {
+            "type": "question",
+            "one": "3",
+            "two": "6",
+            "flag1": 1,
+            "content": "index < obj->size"
+        },
+        "6": {
+            "type": "action",
+            "one": "3",
+            "content": "abort();"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "intarray const * obj\nint index\n\nreturn int"
+}

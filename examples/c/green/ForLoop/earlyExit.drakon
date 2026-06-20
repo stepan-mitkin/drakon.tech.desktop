@@ -1,0 +1,76 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "12"
+        },
+        "3": {
+            "type": "action",
+            "one": "1",
+            "content": "intarray_set(array, index, 0);"
+        },
+        "4": {
+            "type": "loopend",
+            "one": "11",
+            "content": ""
+        },
+        "5": {
+            "type": "loopbegin",
+            "one": "6",
+            "content": "i = 0; i < count; i++"
+        },
+        "6": {
+            "type": "question",
+            "one": "4",
+            "two": "8",
+            "flag1": 0,
+            "content": "intarray_get(array, i) == value"
+        },
+        "7": {
+            "type": "action",
+            "one": "13",
+            "content": "index = -1;"
+        },
+        "8": {
+            "type": "action",
+            "one": "11",
+            "content": "index = i;"
+        },
+        "9": {
+            "type": "question",
+            "one": "3",
+            "two": "1",
+            "flag1": 0,
+            "content": "index == -1"
+        },
+        "11": {
+            "type": "action",
+            "one": "9",
+            "content": "printf(\"index=%d\\n\", index);"
+        },
+        "12": {
+            "type": "action",
+            "one": "7",
+            "content": "int i,\nindex,\ncount;"
+        },
+        "13": {
+            "type": "action",
+            "one": "5",
+            "content": "count = intarray_length(array);"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "intarray * array\nint value",
+    "type": "drakon"
+}

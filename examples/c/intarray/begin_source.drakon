@@ -1,0 +1,23 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "one": "5",
+            "content": "#include <stdlib.h>"
+        },
+        "5": {
+            "type": "action",
+            "one": "1",
+            "content": "#include <string.h>"
+        }
+    }
+}

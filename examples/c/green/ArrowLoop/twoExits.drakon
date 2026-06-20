@@ -1,0 +1,75 @@
+{
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "17"
+        },
+        "4": {
+            "type": "question",
+            "one": "10",
+            "two": "7",
+            "flag1": 0,
+            "content": "i < intarray_length(array)"
+        },
+        "7": {
+            "type": "action",
+            "one": "8",
+            "content": "item = intarray_get(array, i);"
+        },
+        "8": {
+            "type": "question",
+            "one": "9",
+            "two": "11",
+            "flag1": 1,
+            "content": "item == value"
+        },
+        "9": {
+            "type": "action",
+            "one": "13",
+            "content": "index = i;"
+        },
+        "10": {
+            "type": "action",
+            "one": "13",
+            "content": "index = -1;"
+        },
+        "11": {
+            "type": "action",
+            "one": "12",
+            "content": "i++;"
+        },
+        "12": {
+            "type": "arrow-loop",
+            "one": "4"
+        },
+        "13": {
+            "type": "action",
+            "one": "1",
+            "content": "return index;"
+        },
+        "16": {
+            "type": "action",
+            "one": "12",
+            "content": "i = 0;"
+        },
+        "17": {
+            "type": "action",
+            "one": "16",
+            "content": "int i,\nindex,\nitem;"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "intarray const * array\nint value\n\nreturn int",
+    "type": "drakon"
+}

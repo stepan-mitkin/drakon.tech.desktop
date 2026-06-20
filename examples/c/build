@@ -1,0 +1,3 @@
+#!/bin/bash
+
+clang green.c intarray.c -o greenprog

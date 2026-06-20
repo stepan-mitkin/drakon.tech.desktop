@@ -1,5 +1,7 @@
 .DS_Store
 .drakontech
+greenprog
+.vs
 # Logs
 logs
 *.log

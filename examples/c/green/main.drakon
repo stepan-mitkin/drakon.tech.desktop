@@ -1,0 +1,355 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 2,
+            "one": "59",
+            "content": "Question"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "checkInt(1, inversedAnd(1, 2, 3));\ncheckInt(0, inversedAnd(4, 5, 6));\ncheckInt(0, inversedAnd(0, 2, 3));"
+        },
+        "4": {
+            "type": "action",
+            "one": "6",
+            "content": "checkInt(1, inversedOr(1, 2, 3));\ncheckInt(1, inversedOr(1, 2, 2));\ncheckInt(0, inversedOr(4, 5, 6));"
+        },
+        "6": {
+            "type": "action",
+            "one": "7",
+            "content": "checkInt(1, simpleAnd(1, 1, 1));\ncheckInt(0, simpleAnd(0, 0, 0));\ncheckInt(0, simpleAnd(0, 1, 1));\ncheckInt(0, simpleAnd(1, 1, 0));"
+        },
+        "7": {
+            "type": "action",
+            "one": "10",
+            "content": "checkInt(1, simpleOr(1, 1, 1));\ncheckInt(0, simpleOr(0, 0, 0));\ncheckInt(1, simpleOr(0, 1, 1));\ncheckInt(1, simpleOr(1, 1, 0));"
+        },
+        "8": {
+            "type": "branch",
+            "one": "66",
+            "branchId": 10,
+            "content": "cleanup"
+        },
+        "9": {
+            "type": "branch",
+            "one": "19",
+            "branchId": 3,
+            "content": "Choice"
+        },
+        "10": {
+            "type": "action",
+            "one": "11",
+            "content": "checkInt(10, questionMerge(1, 1));\ncheckInt(6, questionMerge(0, 0));\ncheckInt(11, questionMerge(0, 1));\ncheckInt(10, questionMerge(1, 0));"
+        },
+        "11": {
+            "type": "action",
+            "one": "12",
+            "content": "checkInt(1, complexAnd(1, 1, 1));\ncheckInt(0, complexAnd(0, 0, 0));\ncheckInt(1, complexAnd(0, 1, 1));\ncheckInt(0, complexAnd(1, 1, 0));"
+        },
+        "12": {
+            "type": "action",
+            "one": "13",
+            "content": "checkInt(1, complexOr(1, 1, 1));\ncheckInt(0, complexOr(0, 0, 0));\ncheckInt(0, complexOr(0, 1, 1));\ncheckInt(1, complexOr(1, 1, 0));"
+        },
+        "13": {
+            "type": "action",
+            "one": "20",
+            "content": "checkString(\"FizzBuzz\", fizzBuzz(0));\ncheckString(\"\", fizzBuzz(1));\ncheckString(\"Fizz\", fizzBuzz(3));\ncheckString(\"\", fizzBuzz(4));\ncheckString(\"Buzz\", fizzBuzz(5));\ncheckString(\"FizzBuzz\", fizzBuzz(15));"
+        },
+        "15": {
+            "type": "action",
+            "one": "16",
+            "content": "checkString(\n    \"ten\",\n    selectWithoutDefault(5)\n);\ncheckString(\n    \"twenty\",\n    selectWithoutDefault(15)\n);\ncheckString(\n    \"thirty\",\n    selectWithoutDefault(25)\n);"
+        },
+        "16": {
+            "type": "action",
+            "one": "17",
+            "content": "checkString(\n    \"good\",\n    selectShortCircuit(5)\n);\ncheckString(\n    \"good\",\n    selectShortCircuit(15)\n);\ncheckString(\n    \"bad\",\n    selectShortCircuit(25)\n);"
+        },
+        "17": {
+            "type": "action",
+            "one": "22",
+            "content": "checkString(\"ten\", selectWithDefault(10));\ncheckString(\n    \"twenty\",\n    selectWithDefault(20)\n);\ncheckString(\n    \"many\",\n    selectWithDefault(30)\n);"
+        },
+        "18": {
+            "type": "action",
+            "one": "3",
+            "content": "writeLine(\"Question\");"
+        },
+        "19": {
+            "type": "action",
+            "one": "15",
+            "content": "writeLine(\"Choice\");"
+        },
+        "20": {
+            "type": "action",
+            "one": "9",
+            "content": "writeLine(\"\");"
+        },
+        "21": {
+            "type": "action",
+            "one": "23",
+            "content": "writeLine(\"\");"
+        },
+        "22": {
+            "type": "action",
+            "one": "21",
+            "content": "checkString(\"ten\", degenerateSelect(10));\ncheckString(\"many\", degenerateSelect(20));\ncheckString(\"many\", degenerateSelect(30));"
+        },
+        "23": {
+            "type": "branch",
+            "branchId": 4,
+            "one": "24",
+            "content": "Math"
+        },
+        "24": {
+            "type": "action",
+            "one": "26",
+            "content": "writeLine(\"Math\");"
+        },
+        "25": {
+            "type": "action",
+            "one": "27",
+            "content": "writeLine(\"\");"
+        },
+        "26": {
+            "type": "action",
+            "one": "25",
+            "content": "checkInt(10, add(4, 6));\ncheckInt(6, add(1, 5));"
+        },
+        "27": {
+            "type": "branch",
+            "branchId": 5,
+            "one": "28",
+            "content": "Repeats"
+        },
+        "28": {
+            "type": "action",
+            "one": "30",
+            "content": "writeLine(\"Repeats\");"
+        },
+        "29": {
+            "type": "action",
+            "one": "31",
+            "content": "writeLine(\"\");"
+        },
+        "30": {
+            "type": "action",
+            "one": "29",
+            "content": "checkInt(1015, noDublicates(2, 4));\ncheckInt(1015, noDublicates(-2, 4));\ncheckInt(-1, noDublicates(-10, -20));"
+        },
+        "31": {
+            "type": "branch",
+            "branchId": 6,
+            "one": "32",
+            "content": "Silhouette"
+        },
+        "32": {
+            "type": "action",
+            "one": "34",
+            "content": "writeLine(\"Silhouette\");"
+        },
+        "33": {
+            "type": "action",
+            "one": "38",
+            "content": "writeLine(\"\");"
+        },
+        "34": {
+            "type": "action",
+            "one": "35",
+            "content": "checkInt(-95, sil2(-10));\ncheckInt(315, sil2(31));\ncheckInt(1005, sil2(100));"
+        },
+        "35": {
+            "type": "action",
+            "one": "36",
+            "content": "checkInt(17, complexSilhouette(3, 5));\ncheckInt(10, complexSilhouette(10, 5));"
+        },
+        "36": {
+            "type": "action",
+            "one": "37",
+            "content": "complexSilNoReturn(3, 5);\ncomplexSilNoReturn(10, 5);"
+        },
+        "37": {
+            "type": "action",
+            "one": "80",
+            "content": "checkInt(0, fibonacci(0));\ncheckInt(1, fibonacci(1));\ncheckInt(1, fibonacci(2));\ncheckInt(2, fibonacci(3));\ncheckInt(3, fibonacci(4));\ncheckInt(5, fibonacci(5));\ncheckInt(8, fibonacci(6));\ncheckInt(13, fibonacci(7));\ncheckInt(21, fibonacci(8));\ncheckInt(34, fibonacci(9));\ncheckInt(55, fibonacci(10));"
+        },
+        "38": {
+            "type": "branch",
+            "branchId": 7,
+            "one": "40",
+            "content": "ForLoop"
+        },
+        "39": {
+            "type": "action",
+            "one": "49",
+            "content": "writeLine(\"\");"
+        },
+        "40": {
+            "type": "action",
+            "one": "71",
+            "content": "writeLine(\"ForLoop\");"
+        },
+        "49": {
+            "type": "branch",
+            "branchId": 8,
+            "one": "50",
+            "content": "ArrowLoop"
+        },
+        "50": {
+            "type": "action",
+            "one": "52",
+            "content": "writeLine(\"ArrowLoop\");"
+        },
+        "52": {
+            "type": "action",
+            "one": "53",
+            "content": "checkInt(10, selectArrow());"
+        },
+        "53": {
+            "type": "action",
+            "one": "78",
+            "content": "checkInt(-1, twoExits(array, 100));"
+        },
+        "55": {
+            "type": "action",
+            "one": "56",
+            "content": "checkInt(21, doWhile());"
+        },
+        "56": {
+            "type": "action",
+            "one": "57",
+            "content": "checkInt(21, whileDo());"
+        },
+        "57": {
+            "type": "action",
+            "one": "58",
+            "content": "checkInt(27, doWhileDo());"
+        },
+        "58": {
+            "type": "action",
+            "one": "65",
+            "content": "writeLine(\"\");"
+        },
+        "59": {
+            "type": "action",
+            "one": "18",
+            "content": "successCount = 0;\nerrorCount = 0;"
+        },
+        "62": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "63",
+            "content": "Own locals"
+        },
+        "63": {
+            "type": "action",
+            "one": "64",
+            "content": "intarray * array;"
+        },
+        "64": {
+            "type": "action",
+            "one": "79",
+            "content": "array = intarray_create(3);"
+        },
+        "65": {
+            "type": "branch",
+            "branchId": 9,
+            "one": "67",
+            "content": "Result"
+        },
+        "66": {
+            "type": "action",
+            "one": "70",
+            "content": "intarray_delete(array);"
+        },
+        "67": {
+            "type": "action",
+            "one": "68",
+            "two": "",
+            "content": "writeLine(\"Tests completed\");"
+        },
+        "68": {
+            "type": "action",
+            "one": "69",
+            "two": "",
+            "content": "printf(\"Successful: %d\\n\", successCount);"
+        },
+        "69": {
+            "type": "action",
+            "one": "8",
+            "two": "",
+            "content": "printf(\"Errors: %d\\n\", errorCount);"
+        },
+        "70": {
+            "type": "action",
+            "one": "1",
+            "content": "return 0;"
+        },
+        "71": {
+            "type": "action",
+            "one": "72",
+            "content": "intarray_set(array, 0, 10);"
+        },
+        "72": {
+            "type": "action",
+            "one": "73",
+            "content": "intarray_set(array, 1, 20);"
+        },
+        "73": {
+            "type": "action",
+            "one": "74",
+            "content": "intarray_set(array, 2, 30);"
+        },
+        "74": {
+            "type": "action",
+            "one": "77",
+            "content": "forArray(array);"
+        },
+        "75": {
+            "type": "action",
+            "one": "76",
+            "content": "earlyExit(array, 20);"
+        },
+        "76": {
+            "type": "action",
+            "one": "39",
+            "content": "checkInt(0, intarray_get(array, 1));"
+        },
+        "77": {
+            "type": "action",
+            "one": "75",
+            "content": "checkInt(20, intarray_get(array, 1));"
+        },
+        "78": {
+            "type": "action",
+            "one": "55",
+            "content": "checkInt(2, twoExits(array, 30));"
+        },
+        "79": {
+            "type": "action",
+            "one": "2",
+            "content": "hello();"
+        },
+        "80": {
+            "type": "action",
+            "one": "33",
+            "content": "checkInt(2, resourcesExample(100));"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "return int"
+}

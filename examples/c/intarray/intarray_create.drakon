@@ -1,0 +1,105 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "6",
+            "content": "intarray * obj;\nsize_t dataSize;"
+        },
+        "4": {
+            "type": "action",
+            "one": "15",
+            "content": "obj = malloc(sizeof(intarray));"
+        },
+        "6": {
+            "type": "question",
+            "one": "4",
+            "two": "7",
+            "flag1": 0,
+            "content": "size < 0"
+        },
+        "7": {
+            "type": "action",
+            "one": "4",
+            "content": "abort();"
+        },
+        "8": {
+            "type": "question",
+            "one": "12",
+            "two": "13",
+            "flag1": 0,
+            "content": "size == 0"
+        },
+        "9": {
+            "type": "action",
+            "one": "17",
+            "content": "obj->elements = malloc(dataSize);"
+        },
+        "10": {
+            "type": "action",
+            "one": "14",
+            "content": "memset(obj->elements, 0, dataSize);"
+        },
+        "11": {
+            "type": "action",
+            "one": "8",
+            "content": "obj->size = size;"
+        },
+        "12": {
+            "type": "action",
+            "one": "9",
+            "content": "dataSize = sizeof(int) * size;"
+        },
+        "13": {
+            "type": "action",
+            "one": "14",
+            "content": "obj->elements = 0;"
+        },
+        "14": {
+            "type": "action",
+            "one": "1",
+            "content": "return obj;"
+        },
+        "15": {
+            "type": "question",
+            "one": "11",
+            "two": "16",
+            "flag1": 1,
+            "content": "obj"
+        },
+        "16": {
+            "type": "action",
+            "one": "11",
+            "content": "abort();"
+        },
+        "17": {
+            "type": "question",
+            "one": "10",
+            "two": "18",
+            "flag1": 1,
+            "content": "obj->elements"
+        },
+        "18": {
+            "type": "action",
+            "one": "10",
+            "content": "abort();"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": true,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "int size\n\nreturn intarray *"
+}
