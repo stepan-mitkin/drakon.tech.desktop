@@ -415,6 +415,7 @@
         add(formatDiv, formatCombo);
         
         addComboboxOption(formatCombo, "CommonJS", "CommonJS — Node JS");
+        addComboboxOption(formatCombo, "modules", "JavaScript modules");
         addComboboxOption(formatCombo, "IIFE", "IIFE — Browser");
         addComboboxOption(formatCombo, "unit", "unit — Browser");
         setValue(formatCombo, globalOptions.format || "CommonJS");

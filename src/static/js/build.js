@@ -148,6 +148,7 @@
       var settings = {
         iife: folder.format === "IIFE",
         unit: folder.format === "unit",
+        modules: folder.format === "modules",
         dependencies: solution.dependencies,
         outputFile: solution.outputFile,
       };
