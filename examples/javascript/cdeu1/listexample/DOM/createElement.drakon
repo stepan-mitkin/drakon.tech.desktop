@@ -1,0 +1,120 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "4",
+            "content": "tag = args [0]"
+        },
+        "4": {
+            "type": "action",
+            "one": "6",
+            "content": "element = document.createElement(tag)"
+        },
+        "6": {
+            "type": "action",
+            "one": "11",
+            "content": "className = args [1]\nstyle = args [2]"
+        },
+        "8": {
+            "type": "loopend",
+            "one": "22",
+            "content": ""
+        },
+        "9": {
+            "type": "loopbegin",
+            "one": "10",
+            "content": "i = 3; i < args .length; i++"
+        },
+        "10": {
+            "type": "action",
+            "one": "8",
+            "content": "add(element, args [i])"
+        },
+        "11": {
+            "type": "question",
+            "one": "12",
+            "two": "13",
+            "flag1": 1,
+            "content": "className"
+        },
+        "12": {
+            "type": "action",
+            "one": "13",
+            "content": "element.className = className"
+        },
+        "13": {
+            "type": "question",
+            "one": "17",
+            "two": "9",
+            "flag1": 1,
+            "content": "style"
+        },
+        "14": {
+            "type": "loopend",
+            "one": "20",
+            "content": ""
+        },
+        "15": {
+            "type": "loopbegin",
+            "one": "18",
+            "content": "key, value; style"
+        },
+        "16": {
+            "type": "action",
+            "one": "14",
+            "content": "element.style[key] = value"
+        },
+        "17": {
+            "type": "action",
+            "one": "15",
+            "content": "text = undefined"
+        },
+        "18": {
+            "type": "question",
+            "one": "16",
+            "two": "19",
+            "flag1": 0,
+            "content": "key === \"text\""
+        },
+        "19": {
+            "type": "action",
+            "one": "14",
+            "content": "text = value"
+        },
+        "20": {
+            "type": "question",
+            "one": "21",
+            "two": "9",
+            "flag1": 1,
+            "content": "text"
+        },
+        "21": {
+            "type": "action",
+            "one": "9",
+            "content": "element.innerText = text"
+        },
+        "22": {
+            "type": "action",
+            "one": "1",
+            "content": "return element"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "args"
+}

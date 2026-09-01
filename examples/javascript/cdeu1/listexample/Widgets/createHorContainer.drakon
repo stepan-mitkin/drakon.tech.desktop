@@ -1,0 +1,38 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "3"
+        },
+        "3": {
+            "type": "action",
+            "one": "6",
+            "content": "args = [\"div\", undefined, undefined]"
+        },
+        "4": {
+            "type": "action",
+            "one": "1",
+            "content": "return createElement(args)"
+        },
+        "5": {
+            "type": "loopend",
+            "one": "4",
+            "content": ""
+        },
+        "6": {
+            "type": "loopbegin",
+            "one": "7",
+            "content": "i = 0; i < arguments .length; i++"
+        },
+        "7": {
+            "type": "action",
+            "one": "5",
+            "content": "args.push(arguments [i])"
+        }
+    }
+}
