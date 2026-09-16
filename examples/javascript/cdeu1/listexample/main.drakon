@@ -1,0 +1,52 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "4"
+        },
+        "4": {
+            "type": "action",
+            "one": "5",
+            "content": "app = App(\"main\")"
+        },
+        "5": {
+            "type": "action",
+            "one": "6",
+            "content": "app.init()"
+        },
+        "6": {
+            "type": "action",
+            "one": "8",
+            "content": "await pause(500)"
+        },
+        "7": {
+            "type": "action",
+            "one": "1",
+            "content": "console.log(\"main completed\")"
+        },
+        "8": {
+            "type": "action",
+            "one": "9",
+            "content": "items = [\n    {id: \"1\", text: \"Én\"},\n    {id: \"2\", text: \"To\"},\n    {id: \"3\", text: \"Tre\"},\n    {id: \"4\", text: \"Fire\"},\n    {id: \"5\", text: \"Fem\"}\n]"
+        },
+        "9": {
+            "type": "action",
+            "one": "7",
+            "content": "app.setList(items)"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": true,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": ""
+}

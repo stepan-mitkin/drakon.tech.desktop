@@ -1,0 +1,32 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 0,
+            "one": "8"
+        },
+        "7": {
+            "type": "action",
+            "one": "1",
+            "content": "render()"
+        },
+        "8": {
+            "type": "action",
+            "one": "7",
+            "content": "self.currentId = id"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": "id"
+}

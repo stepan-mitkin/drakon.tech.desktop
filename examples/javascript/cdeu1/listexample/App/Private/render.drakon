@@ -1,0 +1,109 @@
+{
+    "type": "drakon",
+    "items": {
+        "1": {
+            "type": "end"
+        },
+        "2": {
+            "type": "branch",
+            "branchId": 1,
+            "one": "4",
+            "content": "Clear container"
+        },
+        "4": {
+            "type": "action",
+            "one": "5",
+            "two": "",
+            "content": "container = get(containerId)"
+        },
+        "5": {
+            "type": "action",
+            "one": "16",
+            "two": "",
+            "content": "container.innerHTML = \"\""
+        },
+        "10": {
+            "type": "branch",
+            "one": "1",
+            "branchId": 4,
+            "content": "Exit"
+        },
+        "11": {
+            "type": "branch",
+            "one": "13",
+            "branchId": 3,
+            "content": "Add items"
+        },
+        "12": {
+            "type": "loopend",
+            "one": "10",
+            "two": "",
+            "content": ""
+        },
+        "13": {
+            "type": "loopbegin",
+            "one": "14",
+            "two": "",
+            "content": "item; self.items"
+        },
+        "14": {
+            "type": "action",
+            "one": "25",
+            "two": "",
+            "content": "itemDiv = add(\n    container,\n    createListItem(item.text)\n)"
+        },
+        "15": {
+            "type": "action",
+            "one": "12",
+            "two": "",
+            "content": "addDomEvent(\n    itemDiv,\n    \"click\",\n    item.id,\n    clickItem\n)"
+        },
+        "16": {
+            "type": "branch",
+            "branchId": 2,
+            "one": "19",
+            "content": "Create name input"
+        },
+        "19": {
+            "type": "action",
+            "one": "21",
+            "content": "self.nameInput = createTextInput()"
+        },
+        "21": {
+            "type": "action",
+            "one": "22",
+            "content": "renameDiv = createHorContainer(\n    self.nameInput,\n    createButton(\"Rename\", renameCurrent)\n)"
+        },
+        "22": {
+            "type": "action",
+            "one": "11",
+            "content": "add(container, renameDiv)"
+        },
+        "25": {
+            "type": "question",
+            "one": "15",
+            "two": "26",
+            "flag1": 0,
+            "content": "item.id === self.currentId"
+        },
+        "26": {
+            "type": "action",
+            "one": "27",
+            "content": "markAsSelected(itemDiv)"
+        },
+        "27": {
+            "type": "action",
+            "one": "15",
+            "content": "self.nameInput.value = item.text"
+        }
+    },
+    "keywords": {
+        "function": false,
+        "machine": false,
+        "async": false,
+        "export": false,
+        "algoprop": false,
+        "lazy": false
+    },
+    "params": ""
+}
