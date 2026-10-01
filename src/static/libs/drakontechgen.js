@@ -5218,14 +5218,6 @@ function Js2604Generator(options) {
         if (expr1.type === 'ExpressionStatement' && expr2.type === 'ExpressionStatement') {
             first = expr1.expression;
             second = expr2.expression;
-            if (!(second.type === 'Identifier')) {
-                varName = generateId('_collection');
-                addLocal(folder.scope, varName);
-                oldContent = second;
-                second = createIdentifier(varName);
-                newContent = createAssignment(createIdentifier(varName), oldContent);
-                insertActionBefore(folder, id, newContent);
-            }
             if (first.type === 'Identifier') {
                 item.subtype = 'array';
                 item.variable = first.name;
@@ -5233,6 +5225,14 @@ function Js2604Generator(options) {
                 item.content.itemId = id;
                 addLoopVar(folder.scope, item.variable);
             } else {
+                if (!(second.type === 'Identifier')) {
+                    varName = generateId('_collection');
+                    addLocal(folder.scope, varName);
+                    oldContent = second;
+                    second = createIdentifier(varName);
+                    newContent = createAssignment(createIdentifier(varName), oldContent);
+                    insertActionBefore(folder, id, newContent);
+                }
                 if (first.type === 'SequenceExpression' && first.expressions.length === 2) {
                     var1 = first.expressions[0];
                     var2 = first.expressions[1];
