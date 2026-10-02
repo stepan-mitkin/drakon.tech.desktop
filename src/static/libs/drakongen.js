@@ -148,7 +148,7 @@ function sortMindChildren(nodes) {
     for (var id in nodes) {
         var node = nodes[id]
         if (node.children) {
-            sortByProperty(node.children, "ordinal")
+            node.children = sortByProperty(node.children, "ordinal")
         }
     }
 }
@@ -179,7 +179,7 @@ function createMindNode(name) {
 }
 
 module.exports = { drakonToPseudocode, mindToTree };
-},{"./drakonToStruct":3,"./printPseudo":7,"./tools":10}],3:[function(require,module,exports){
+},{"./drakonToStruct":3,"./printPseudo":7,"./tools":11}],3:[function(require,module,exports){
 const { structFlow, redirectNode } = require("./structFlow");
 const { createError, remove } = require("./tools");
 
@@ -193,6 +193,31 @@ function drakonToStruct(
   htmlToString,
   options,
 ) {
+  options = options || {};
+  var dinfo = prepareDrakonDiagram(
+    drakonJson,
+    name,
+    filename,
+    translateFunction,
+    htmlToString,
+    options
+  )    
+
+  var diagram = dinfo.diagram;
+
+  if (dinfo.firstNodeId) {
+    var branches = dinfo.branches;
+
+    branches.forEach((branch) => cutOffBranch(dinfo.nodes, branch));
+    var branchTrees = structFlow(dinfo.nodes, branches, filename, translate, options);
+
+    diagram.branches = branchTrees
+    diagram.secondary = findSecondary(branchTrees, options)
+  }
+  return diagram
+}
+
+function prepareDrakonDiagram(drakonJson, name, filename, translateFunction, htmlToString, options) {
   options = options || {};
   translate = translateFunction;
   let drakonGraph;
@@ -213,13 +238,20 @@ function drakonToStruct(
   var params = decodeContent(drakonGraph.params, htmlToString);
   var description = decodeContent(drakonGraph.description, htmlToString);
 
-  var result = {
+  var diagram = {
     name: name,
     type: "drakon",
     params:  params,
     description: description,
     branches: []
   };
+
+  var result = {
+    diagram: diagram,
+    nodes: nodes,
+    branches: branches,
+    firstNodeId: firstNodeId
+  }
 
   if (!firstNodeId) {
     return result
@@ -237,12 +269,10 @@ function drakonToStruct(
       options
     ),
   );
-  rewireShortcircuit(nodes, filename);
-  branches.forEach((branch) => cutOffBranch(nodes, branch));
-  var branchTrees = structFlow(nodes, branches, filename, translate, options);
+  if (!options.skipShortcuts) {
+    rewireShortcircuit(nodes, filename);
+  }
 
-  result.branches = branchTrees
-  result.secondary = findSecondary(branchTrees, options)
   return result
 }
 
@@ -837,12 +867,13 @@ function markLoopBody(nodes, start, filename) {
   throw createError(translate("Loop end expected here"), filename, start.one);
 }
 
-module.exports = { drakonToStruct, drakonToGraph };
+module.exports = { drakonToStruct, drakonToGraph, prepareDrakonDiagram };
 
-},{"./structFlow":8,"./tools":10}],4:[function(require,module,exports){
+},{"./structFlow":9,"./tools":11}],4:[function(require,module,exports){
 const { drakonToPseudocode, mindToTree } = require("./drakonToPromptStruct");
 const { htmlToString } = require("./browserTools");
 const { setUpLanguage, translate } = require("./translate");
+const { treeToScenarios, printScenarios } = require("./scenarios");
 const { drakonToStruct } = require("./drakonToStruct");
 const { freeDiagramToText } = require("./free");
 
@@ -894,9 +925,36 @@ window.drakongen = {
     );
     return JSON.stringify(result, null, 4);
   },
+
+  makeScenarios: function (drakonJson, name, filename, language) {
+    setUpLanguage(language);
+    var scenarios = treeToScenarios(
+      drakonJson,
+      name,
+      filename,
+      translate,
+      htmlToString
+    );
+    return printScenarios(
+      scenarios,
+      name,
+      translate
+    );
+  },
+  makeScenariosJson: function (drakonJson, name, filename, language) {
+    setUpLanguage(language);
+    var result = treeToScenarios(
+      drakonJson,
+      name,
+      filename,
+      translate,
+      htmlToString
+    );
+    return JSON.stringify(result, null, 4);
+  },   
 };
 
-},{"./browserTools":1,"./drakonToPromptStruct":2,"./drakonToStruct":3,"./free":5,"./translate":11}],5:[function(require,module,exports){
+},{"./browserTools":1,"./drakonToPromptStruct":2,"./drakonToStruct":3,"./free":5,"./scenarios":8,"./translate":12}],5:[function(require,module,exports){
 var {addRange} = require("./tools")
 const { createError } = require("./tools");
 
@@ -966,16 +1024,15 @@ function freeDiagramToText(freeJson, name, filename, translateFunction, htmlToSt
 }
 
 module.exports = {freeDiagramToText}
-},{"./tools":10}],6:[function(require,module,exports){
+},{"./tools":11}],6:[function(require,module,exports){
 function decrement_arrow_count(context, node) {
     var algonode;
     algonode = context.nodes[node.arrow];
     algonode.branching--;
 }
 function decrement_if_count(context, node) {
-    var _collection_12, if_id, if_node;
-    _collection_12 = node.stack;
-    for (if_id of _collection_12) {
+    var if_id, if_node;
+    for (if_id of node.stack) {
         if_node = context.nodes[if_id];
         if_node.branching--;
     }
@@ -999,9 +1056,8 @@ function group_stack_by_id(stack) {
     return counts_by_id;
 }
 function increment_if_count(context, node) {
-    var _collection_14, if_id, if_node;
-    _collection_14 = node.stack;
-    for (if_id of _collection_14) {
+    var if_id, if_node;
+    for (if_id of node.stack) {
         if_node = context.nodes[if_id];
         if_node.branching++;
     }
@@ -1050,9 +1106,9 @@ function merge_converging_branches(context, node_id, node, stack) {
     node.stack = processed_stack;
 }
 function recurse_traversal(context, node_id, node) {
-    var _collection_20, _selectValue_18, proc, stack1, stack2;
-    _selectValue_18 = node.type;
-    if (_selectValue_18 === 'question') {
+    var _selectValue_2, proc, stack1, stack2;
+    _selectValue_2 = node.type;
+    if (_selectValue_2 === 'question') {
         increment_if_count(context, node);
         stack1 = node.stack.slice();
         stack1.push(node_id);
@@ -1061,17 +1117,16 @@ function recurse_traversal(context, node_id, node) {
         traverse_node(context, node.two, stack2);
         traverse_node(context, node.one, stack1);
     } else {
-        if (_selectValue_18 === 'arrow-loop') {
+        if (_selectValue_2 === 'arrow-loop') {
             stack1 = node.stack.slice();
             stack1.push(node_id);
             traverse_node(context, node.one, stack1);
         } else {
-            if (_selectValue_18 === 'arrow-stub') {
+            if (_selectValue_2 === 'arrow-stub') {
                 decrement_arrow_count(context, node);
             } else {
-                if (_selectValue_18 === 'parbegin') {
-                    _collection_20 = node.procs;
-                    for (proc of _collection_20) {
+                if (_selectValue_2 === 'parbegin') {
+                    for (proc of node.procs) {
                         flow_no_loop(context.nodes, proc.start);
                     }
                 } else {
@@ -1287,7 +1342,331 @@ function printPseudo(algorithm, translate, output, htmlToString) {
 }
 
 module.exports = {printPseudo, printWithIndent, makeIndent}
-},{"./tools":10}],8:[function(require,module,exports){
+},{"./tools":11}],8:[function(require,module,exports){
+const {prepareDrakonDiagram} = require('./drakonToStruct');
+var tr;
+function addContent(step, depth, lines) {
+    var _selectValue_2, content;
+    if (step.secondary) {
+        addLine(step.secondary, depth, lines);
+    }
+    _selectValue_2 = step.type;
+    if (_selectValue_2 === 'question') {
+        content = normalizeContent(step);
+        if (step.answer === 'yes') {
+            content = yesPath(content);
+        } else {
+            content = noPath(content);
+        }
+    } else {
+        if (_selectValue_2 === 'loopbegin') {
+            if (step.loop === 'iteration') {
+                content = iteration(step.content);
+            } else {
+                content = skipLoop(step.content);
+            }
+        } else {
+            content = step.content;
+        }
+    }
+    addLine(content, depth, lines);
+}
+function addLine(text, depth, lines) {
+    var indent, part, parts;
+    indent = ' '.repeat(4 * depth);
+    parts = text.split('\n');
+    for (part of parts) {
+        lines.push(indent + part);
+    }
+}
+function branchContext(ctx) {
+    return {
+        nodes: ctx.nodes,
+        firstNodeId: ctx.firstNodeId,
+        scenarios: ctx.scenarios,
+        decisions: ctx.decisions,
+        branchCount: clone(ctx.branchCount)
+    };
+}
+function buildContent(step) {
+    var _selectValue_2, content;
+    _selectValue_2 = step.type;
+    if (_selectValue_2 === 'question') {
+        content = normalizeContent(step);
+        if (step.answer === 'yes') {
+            return yesPath(content);
+        } else {
+            return noPath(content);
+        }
+    } else {
+        if (_selectValue_2 === 'loopbegin') {
+            if (step.loop === 'iteration') {
+                return iteration(step.content);
+            } else {
+                return skipLoop(step.content);
+            }
+        } else {
+            return step.content;
+        }
+    }
+}
+function clone(obj) {
+    var copy;
+    copy = {};
+    Object.assign(copy, obj);
+    return copy;
+}
+function cloneContext(ctx, firstNodeId, scenarios) {
+    return {
+        nodes: ctx.nodes,
+        firstNodeId: firstNodeId,
+        scenarios: scenarios,
+        decisions: {},
+        branchCount: {}
+    };
+}
+function cloneScenario(ctx, scenario) {
+    var clone;
+    clone = scenario.slice();
+    ctx.scenarios.push(clone);
+    return clone;
+}
+function cloneStep(step, scenario) {
+    var clone;
+    clone = {
+        id: step.id,
+        type: step.type,
+        content: step.content
+    };
+    if (!(step.secondary === undefined)) {
+        clone.secondary = step.secondary;
+    }
+    if (!(step.message === undefined)) {
+        clone.message = step.message;
+    }
+    scenario.push(clone);
+    return clone;
+}
+function createContext(dinfo) {
+    return {
+        nodes: dinfo.nodes,
+        firstNodeId: dinfo.firstNodeId,
+        scenarios: [],
+        decisions: {},
+        branchCount: {}
+    };
+}
+function createScenario(ctx) {
+    var scenario;
+    scenario = [];
+    ctx.scenarios.push(scenario);
+    return scenario;
+}
+function getQuestionExits(step) {
+    if (step.flag1 == 1) {
+        return {
+            down: 'yes',
+            right: 'no'
+        };
+    } else {
+        return {
+            down: 'no',
+            right: 'yes'
+        };
+    }
+}
+function handleParallel(ctx, step, scenario) {
+    var clone, ctxClone, next, proc, proc2;
+    next = step.procs[0].next;
+    clone = {
+        id: step.id,
+        procs: [],
+        type: 'parallel'
+    };
+    scenario.push(clone);
+    for (proc of step.procs) {
+        proc2 = { scenarios: [] };
+        clone.procs.push(proc2);
+        ctxClone = cloneContext(ctx, proc.start, proc2.scenarios);
+        scanAlgorithm(ctxClone);
+    }
+    traverseNode(ctx, next, scenario);
+}
+function iteration(content) {
+    return tr('Iteration') + ': ' + content;
+}
+function noPath(content) {
+    return content + ' - ' + tr('No');
+}
+function normalizeContent(step) {
+    var content;
+    content = step.content;
+    if (content.operator === 'equal') {
+        return content.left + ' == ' + content.right;
+    } else {
+        return content;
+    }
+}
+function printParallel(step, baseIndex, depth, lines) {
+    var branch, i;
+    i = 1;
+    for (branch of step.procs) {
+        addLine(tr('Parallel process') + ' ' + i, depth, lines);
+        printScenariosCore(branch.scenarios, baseIndex + '.' + i, depth + 1, lines);
+        i++;
+    }
+}
+function printScenario(scenario, baseIndex, depth, lines) {
+    var step;
+    for (step of scenario) {
+        if (step.type === 'parallel') {
+            printParallel(step, baseIndex, depth, lines);
+        } else {
+            if (step.type === 'error') {
+                addLine(step.message + ': ' + step.content, depth, lines);
+            } else {
+                addContent(step, depth, lines);
+            }
+        }
+    }
+}
+function printScenarios(scenarios, name, translateFunction) {
+    var baseIndex, depth, lines;
+    tr = translateFunction;
+    lines = [];
+    lines.push('# ' + name + ': ' + tr('scenarios'));
+    baseIndex = '';
+    depth = 0;
+    printScenariosCore(scenarios, baseIndex, depth, lines);
+    return lines.join('\n');
+}
+function printScenariosCore(scenarios, baseIndex, depth, lines) {
+    var i, scenario, subheader;
+    if (baseIndex) {
+        baseIndex = baseIndex + '.';
+    }
+    i = 1;
+    for (scenario of scenarios) {
+        subheader = tr('Scenario') + ' ' + baseIndex + i;
+        addLine(subheader, depth, lines);
+        printScenario(scenario, baseIndex + i, depth + 1, lines);
+        i++;
+    }
+}
+function scanAlgorithm(ctx) {
+    var scenario;
+    scenario = createScenario(ctx);
+    traverseNode(ctx, ctx.firstNodeId, scenario);
+}
+function skipLoop(content) {
+    return tr('Skip loop') + ': ' + content;
+}
+function tooManyLoops(ctx, nodeId) {
+    var maxBranch;
+    maxBranch = 2;
+    if (!(nodeId in ctx.branchCount)) {
+        ctx.branchCount[nodeId] = 0;
+    }
+    ctx.branchCount[nodeId]++;
+    if (ctx.branchCount[nodeId] > maxBranch) {
+        return true;
+    } else {
+        return false;
+    }
+}
+function traverseNode(ctx, nodeId, scenario) {
+    var _selectValue_2, ctx2, down, exits, iteration, right, scenarioRight, skip, step, visited;
+    if (nodeId) {
+        step = ctx.nodes[nodeId];
+        visited = visit(ctx, step);
+        _selectValue_2 = step.type;
+        if (_selectValue_2 === 'question') {
+            exits = getQuestionExits(step);
+            if (visited) {
+                down = cloneStep(step, scenario);
+                down.answer = exits.down;
+                traverseNode(ctx, step.one, scenario);
+            } else {
+                ctx2 = branchContext(ctx);
+                scenarioRight = cloneScenario(ctx2, scenario);
+                down = cloneStep(step, scenario);
+                down.answer = exits.down;
+                traverseNode(ctx, step.one, scenario);
+                right = cloneStep(step, scenarioRight);
+                right.answer = exits.right;
+                traverseNode(ctx2, step.two, scenarioRight);
+            }
+        } else {
+            if (_selectValue_2 === 'loopbegin') {
+                if (visited) {
+                    iteration = cloneStep(step, scenario);
+                    iteration.loop = 'iteration';
+                    traverseNode(ctx, step.one, scenario);
+                } else {
+                    ctx2 = branchContext(ctx);
+                    scenarioRight = cloneScenario(ctx2, scenario);
+                    iteration = cloneStep(step, scenario);
+                    iteration.loop = 'iteration';
+                    traverseNode(ctx, step.one, scenario);
+                    skip = cloneStep(step, scenarioRight);
+                    skip.loop = 'skip';
+                    traverseNode(ctx2, step.next, scenarioRight);
+                }
+            } else {
+                if (_selectValue_2 === 'branch') {
+                    if (step.content) {
+                        cloneStep(step, scenario);
+                    }
+                    if (!tooManyLoops(ctx, nodeId)) {
+                        traverseNode(ctx, step.one, scenario);
+                    }
+                } else {
+                    if (_selectValue_2 === 'parbegin') {
+                        handleParallel(ctx, step, scenario);
+                    } else {
+                        if (!(_selectValue_2 === 'parend')) {
+                            if (step.content) {
+                                cloneStep(step, scenario);
+                            }
+                            if (!(step.type === 'error')) {
+                                traverseNode(ctx, step.one, scenario);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+function treeToScenarios(drakonJson, name, filename, translateFunction, htmlToString) {
+    var ctx, dinfo, options;
+    tr = translateFunction;
+    options = { skipShortcuts: true };
+    dinfo = prepareDrakonDiagram(drakonJson, name, filename, translateFunction, htmlToString, options);
+    if (dinfo.firstNodeId) {
+        ctx = createContext(dinfo);
+        scanAlgorithm(ctx, dinfo);
+        return ctx.scenarios;
+    } else {
+        return [];
+    }
+}
+function visit(ctx, step) {
+    if (step.id in ctx.decisions) {
+        return true;
+    } else {
+        ctx.decisions[step.id] = true;
+        return false;
+    }
+}
+function yesPath(content) {
+    return content + ' - ' + tr('Yes');
+}
+module.exports = {
+    printScenarios,
+    treeToScenarios
+};
+},{"./drakonToStruct":3}],9:[function(require,module,exports){
 var { buildTree } = require("./technicalTree");
 const { createError, sortByProperty } = require("./tools");
 const { optimizeTree } = require("./treeTools");
@@ -1432,7 +1811,7 @@ function structFlow(nodes, branches, filename, translate, options) {
 
     for (var branch of branches) {
       var body = [];
-      buildTree(nodes, branch.next, body, "<dummy id>", undefined, onError);
+      buildTree(nodes, branch.next, body, "<dummy id>", undefined, onError, []);
 
       result.push({
         name: branch.content,
@@ -1450,8 +1829,14 @@ function structFlow(nodes, branches, filename, translate, options) {
 }
 module.exports = { structFlow, redirectNode };
 
-},{"./noloop":6,"./technicalTree":9,"./tools":10,"./treeTools":12}],9:[function(require,module,exports){
-function buildTree(nodes, nodeId, body, stopId, afterLoop, onError) {
+},{"./noloop":6,"./technicalTree":10,"./tools":11,"./treeTools":13}],10:[function(require,module,exports){
+function append(array, item) {
+    var copy = array.slice();
+    copy.push(item);
+    return copy;
+}
+
+function buildTree(nodes, nodeId, body, stopId, afterLoop, onError, qstack) {
     while (nodeId) {
         if (nodeId === afterLoop) {
             body.push({type: "break"}) 
@@ -1465,7 +1850,8 @@ function buildTree(nodes, nodeId, body, stopId, afterLoop, onError) {
         let next;
 
         if (node.type === "question") {
-            next = reserveNext(nodes, node)
+            var myStack = append(qstack, nodeId);
+            next = reserveNext(nodes, node, myStack);
             
             transformed = {
                 id: node.id,
@@ -1478,8 +1864,8 @@ function buildTree(nodes, nodeId, body, stopId, afterLoop, onError) {
             const yesNodeId = node.flag1 === 1 ? node.one : node.two;
             const noNodeId = node.flag1 === 1 ? node.two : node.one;
 
-            buildTree(nodes, yesNodeId, transformed.yes, node.next, afterLoop, onError);
-            buildTree(nodes, noNodeId, transformed.no, node.next, afterLoop, onError);
+            buildTree(nodes, yesNodeId, transformed.yes, node.next, afterLoop, onError, myStack);
+            buildTree(nodes, noNodeId, transformed.no, node.next, afterLoop, onError, myStack);
             if (next === afterLoop) {
                 next = undefined
             }
@@ -1492,7 +1878,7 @@ function buildTree(nodes, nodeId, body, stopId, afterLoop, onError) {
                 body: []
             };
             var end = nodes[node.end]
-            buildTree(nodes, node.one, transformed.body, node.end, end.one, onError)
+            buildTree(nodes, node.one, transformed.body, node.end, end.one, onError, qstack)
             next = node.next;   
         } else if (node.type == "loopend") {
             if (stopId !== afterLoop) {
@@ -1511,7 +1897,7 @@ function buildTree(nodes, nodeId, body, stopId, afterLoop, onError) {
                 body: []
             };
             var end = nodes[node.stub]
-            buildTree(nodes, node.one, transformed.body, node.stub, end.one, onError)
+            buildTree(nodes, node.one, transformed.body, node.stub, end.one, onError, qstack)
             next = node.next;  
         } else if (node.type === "arrow-stub") {
             return
@@ -1527,7 +1913,7 @@ function buildTree(nodes, nodeId, body, stopId, afterLoop, onError) {
                     body: []
                 }
                 transformed.procs.push(childProc)
-                buildTree(nodes, proc.start, childProc.body, undefined, undefined, buildTree)
+                buildTree(nodes, proc.start, childProc.body, undefined, undefined, onError, [])
             }
             next = node.one;
         } else {
@@ -1568,22 +1954,26 @@ function copyFields(dst, src, fields) {
     }
 }
 
-function reserveNext(nodes, node) {
+function reserveNext(nodes, node, qstack) {
     if (!node.next) {
         return undefined
     }
     const target = nodes[node.next];
-    if (target.targetTaken) {
-        return undefined;
-    } else {
-        target.targetTaken = true;
-        return node.next;
-    }    
+    if (!target.ifs) {
+        target.ifs = {}
+    }
+    for (var qid of qstack) {
+        if (target.ifs[qid]) {
+            return undefined;
+        }
+    }
+    target.ifs[node.id] = true;
+    return node.next   
 }
 
 module.exports = {buildTree}
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 function createError(message, filename, nodeId) {
     var error = new Error(message)
@@ -1624,8 +2014,15 @@ function addRange(to, from) {
     }
 }
 module.exports = { createError, sortByProperty, addRange, remove }
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var translationsRu = {
+    "Parallel process": "Параллельный процесс",
+    "Scenario": "Сценарий",
+    "scenarios": "сценарии",
+    "Iteration": "Итерация",
+    "No": "Нет",
+    "Yes": "Да",
+    "Skip loop": "Пропустить цикл",    
     "error": "ОШИБКА",
     "not": "не",
     break: 'выход из цикла',
@@ -1663,6 +2060,13 @@ var translationsRu = {
 }
 
 var translationsEn = {
+    "Parallel process":"Parallel process",
+    "Scenario":"Scenario",
+    "scenarios":"scenarios",
+    "Iteration":"Iteration",
+    "No":"No",
+    "Yes":"Yes",
+    "Skip loop":"Skip loop",    
     error: 'Error',
     not: 'not',
     break: 'break',
@@ -1700,6 +2104,13 @@ var translationsEn = {
 }
 
 var translationsNo = {
+    "Parallel process": "Parallell prosess",
+    "Scenario": "Scenario",
+    "scenarios": "scenarioer",
+    "Iteration": "Iterasjon",
+    "No": "Nei",
+    "Yes": "Ja",
+    "Skip loop": "Hopp over løkke",    
     error: 'Feil',
     not: 'ikke',
     break: 'avslutt løkken',
@@ -1737,6 +2148,13 @@ var translationsNo = {
 };
 
 var translationsFr = {
+    "Parallel process": "Processus parallèle",
+    "Scenario": "Scénario",
+    "scenarios": "scénarios",
+    "Iteration": "Itération",
+    "No": "Non",
+    "Yes": "Oui",
+    "Skip loop": "Ignorer la boucle",    
     error: 'Erreur',
     not: 'non',
     break: 'quitter la boucle',
@@ -1774,6 +2192,13 @@ var translationsFr = {
 };
 
 var translationsDe = {
+    "Parallel process": "Paralleler Prozess",
+    "Scenario": "Szenario",
+    "scenarios": "Szenarien",
+    "Iteration": "Iteration",
+    "No": "Nein",
+    "Yes": "Ja",
+    "Skip loop": "Schleife überspringen",    
     error: 'Fehler',
     not: 'nicht',
     break: 'Schleife beenden',
@@ -1811,6 +2236,13 @@ var translationsDe = {
 };
 
 var translationsEs = {
+    "Parallel process": "Proceso paralelo",
+    "Scenario": "Escenario",
+    "scenarios": "escenarios",
+    "Iteration": "Iteración",
+    "No": "No",
+    "Yes": "Sí",
+    "Skip loop": "Omitir bucle",    
     error: 'Error',
     not: 'no',
     break: 'salir del bucle',
@@ -1848,6 +2280,13 @@ var translationsEs = {
 };
 
 var translationsLt = {
+    "Parallel process": "Lygiagretus procesas",
+    "Scenario": "Scenarijus",
+    "scenarios": "scenarijai",
+    "Iteration": "Iteracija",
+    "No": "Ne",
+    "Yes": "Taip",
+    "Skip loop": "Praleisti ciklą",    
     error: 'Klaida',
     not: 'ne',
     break: 'nutraukti ciklą',
@@ -1911,7 +2350,7 @@ function setUpLanguage(language) {
 }
 
 module.exports = { setUpLanguage, translate };
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 function optimizeTree(steps) {
     var result = []
